@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../typescript-config/react-library.json",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "@repo/frontend-base/constants": ["frontend-base/src/constants/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "../frontend-base/src/**/*"],
+  "exclude": ["node_modules", ".react-email"]
+}

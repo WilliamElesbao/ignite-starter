@@ -1,0 +1,14 @@
+{
+  "name": "@repo/backend-base",
+  "scripts": {
+    "test:watch": "bun test --watch"
+  },
+  "dependencies": {
+    "@repo/database": "workspace:*",
+    "elysia": "latest"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "bun-types": "latest"
+  }
+}
