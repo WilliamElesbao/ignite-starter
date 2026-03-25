@@ -6,6 +6,9 @@ import type {
   GetUserByIdData,
   GetUserByIdErrors,
   GetUserByIdResponses,
+  PostEmailSendData,
+  PostEmailSendErrors,
+  PostEmailSendResponses,
 } from "./types.gen";
 
 export type Options<
@@ -33,3 +36,12 @@ export const getUserById = <ThrowOnError extends boolean = false>(
     GetUserByIdErrors,
     ThrowOnError
   >({ url: "/user/{id}", ...options });
+
+export const postEmailSend = <ThrowOnError extends boolean = false>(
+  options?: Options<PostEmailSendData, ThrowOnError>,
+) =>
+  (options?.client ?? client).post<
+    PostEmailSendResponses,
+    PostEmailSendErrors,
+    ThrowOnError
+  >({ url: "/email/send", ...options });

@@ -59,3 +59,35 @@ export type GetUserByIdResponses = {
 
 export type GetUserByIdResponse =
   GetUserByIdResponses[keyof GetUserByIdResponses];
+
+export type PostEmailSendData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/email/send";
+};
+
+export type PostEmailSendErrors = {
+  /**
+   * Response for status 500
+   */
+  500: {
+    message: string;
+    success: boolean;
+  };
+};
+
+export type PostEmailSendError = PostEmailSendErrors[keyof PostEmailSendErrors];
+
+export type PostEmailSendResponses = {
+  /**
+   * Response for status 200
+   */
+  200: {
+    message: string;
+    success: boolean;
+  };
+};
+
+export type PostEmailSendResponse =
+  PostEmailSendResponses[keyof PostEmailSendResponses];
