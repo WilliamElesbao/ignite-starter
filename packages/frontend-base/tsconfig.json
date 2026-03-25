@@ -8,7 +8,10 @@
     "baseUrl": "..",
     "paths": {
       "@repo/api": ["api/*"],
-      "@repo/emails/*": ["emails/src/*"]
+      "@repo/emails/*": ["emails/src/*"],
+      "@repo/frontend-base/constants": ["frontend-base/src/constants/index.ts"],
+      "@/api/*": ["api/*"],
+      "@/lib/*": ["api/src/lib/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "../emails/**/*", "../api/**/*"]

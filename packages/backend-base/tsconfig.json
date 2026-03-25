@@ -11,7 +11,8 @@
     "skipLibCheck": true,
     "baseUrl": "..",
     "paths": {
-      "@repo/database": ["database/*"]
+      "@repo/database": ["database/*"],
+      "@/prisma/*": ["database/prisma/*"]
     }
   },
   "include": ["index.ts", "src/**/*", "../database"]
