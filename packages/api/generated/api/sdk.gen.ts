@@ -2,7 +2,11 @@
 
 import type { Client, Options as Options2, TDataShape } from "./client";
 import { client } from "./client.gen";
-import type { GetUserByIdData } from "./types.gen";
+import type {
+  GetUserByIdData,
+  GetUserByIdErrors,
+  GetUserByIdResponses,
+} from "./types.gen";
 
 export type Options<
   TData extends TDataShape = TDataShape,
@@ -24,7 +28,8 @@ export type Options<
 export const getUserById = <ThrowOnError extends boolean = false>(
   options: Options<GetUserByIdData, ThrowOnError>,
 ) =>
-  (options.client ?? client).get<null, null, ThrowOnError>({
-    url: "/user/{id}",
-    ...options,
-  });
+  (options.client ?? client).get<
+    GetUserByIdResponses,
+    GetUserByIdErrors,
+    ThrowOnError
+  >({ url: "/user/{id}", ...options });

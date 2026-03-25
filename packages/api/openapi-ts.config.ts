@@ -33,7 +33,7 @@ export default defineConfig({
     {
       exportFromIndex: false,
       name: "@hey-api/client-fetch",
-      runtimeConfigPath: "@/lib/client/heyapi",
+      runtimeConfigPath: "../../src/lib/client/heyapi",
     },
     {
       exportFromIndex: false,

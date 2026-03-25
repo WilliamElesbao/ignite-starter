@@ -191,7 +191,7 @@ export const mergeConfigs = (a: Config, b: Config): Config => {
 
 const headersEntries = (headers: Headers): Array<[string, string]> => {
   const entries: Array<[string, string]> = [];
-  headers.forEach((value: string, key: string) => {
+  headers.forEach((value, key) => {
     entries.push([key, value]);
   });
   return entries;

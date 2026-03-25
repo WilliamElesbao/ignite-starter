@@ -4,6 +4,17 @@ export type ClientOptions = {
   baseUrl: "http://localhost:4000" | (string & {});
 };
 
+export const RoleEnum = { ADMIN: "ADMIN", DEFAULT: "DEFAULT" } as const;
+
+export type RoleEnum = (typeof RoleEnum)[keyof typeof RoleEnum];
+
+export const StatusEnum = {
+  AUTHORIZED: "AUTHORIZED",
+  UNAUTHORIZED: "UNAUTHORIZED",
+} as const;
+
+export type StatusEnum = (typeof StatusEnum)[keyof typeof StatusEnum];
+
 export type GetUserByIdData = {
   body?: never;
   path: {
@@ -12,3 +23,39 @@ export type GetUserByIdData = {
   query?: never;
   url: "/user/{id}";
 };
+
+export type GetUserByIdErrors = {
+  /**
+   * Response for status 404
+   */
+  404: {
+    message: string;
+  };
+};
+
+export type GetUserByIdError = GetUserByIdErrors[keyof GetUserByIdErrors];
+
+export type GetUserByIdResponses = {
+  /**
+   * Response for status 200
+   */
+  200: {
+    id: string;
+    image: string | null | null;
+    name: string;
+    surname: string;
+    email: string;
+    emailVerified: boolean;
+    otpCode: string | null | null;
+    otpExpiresAt: string | null | null;
+    createdAt: string;
+    updatedAt: string;
+    role: RoleEnum;
+    status: StatusEnum;
+    lastLogin: string | null | null;
+    stripeSubscriptionId: string | null | null;
+  };
+};
+
+export type GetUserByIdResponse =
+  GetUserByIdResponses[keyof GetUserByIdResponses];
