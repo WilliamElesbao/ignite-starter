@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useEmail } from "../email/hooks/useSendEmail";
+import { useEmail } from "@/feature/emails/hooks/useSendWelcomeEmail";
 
 export function NavMain({
   items,
@@ -21,7 +21,7 @@ export function NavMain({
     icon?: Icon;
   }[];
 }) {
-  const { sendEmail } = useEmail();
+  const { sendWelcomeEmail } = useEmail();
 
   return (
     <SidebarGroup>
@@ -39,7 +39,7 @@ export function NavMain({
               size="icon"
               className="size-8 group-data-[collapsible=icon]:opacity-0"
               variant="outline"
-              onClick={sendEmail}
+              onClick={sendWelcomeEmail}
             >
               <IconMail />
               <span className="sr-only">Inbox</span>
