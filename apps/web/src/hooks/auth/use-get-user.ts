@@ -1,8 +1,8 @@
+import type { User } from "@repo/database/prisma/generated/prisma/client";
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { getUserByIdAction } from "@/actions";
 import { REACT_QUERY_KEYS } from "@/constants/queries-keys";
-import type { User } from "@/prisma/generated/prisma/client";
 
 /**
  * Hook to fetch user data from server action and show welcome toast.

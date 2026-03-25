@@ -1,4 +1,4 @@
-import type { User } from "@/prisma/generated/prisma/client";
+import type { User } from "../../prisma/generated/prisma/client";
 import { db } from "../connection";
 import type { UserDto } from "./dtos/user.dto";
 

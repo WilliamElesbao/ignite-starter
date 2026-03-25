@@ -1,6 +1,5 @@
-import type { UserRepository } from "@/database/repositories";
-import type { UserDto } from "@/database/repositories/dtos";
-import type { User } from "@/prisma/generated/prisma/client";
+import type { UserDto, UserRepository } from "@repo/database/index";
+import type { User } from "@repo/database/prisma/generated/prisma/client";
 
 /**
  * Service responsible for user-related business logic.

@@ -1,6 +1,6 @@
+import { db } from "@repo/database/index";
 import { type NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { db } from "@/database/connection";
 import { stripe } from "@/lib/stripe";
 
 export async function POST(request: NextRequest) {

@@ -1,5 +1,5 @@
+import { db } from "@repo/database/index";
 import { headers } from "next/headers";
-import { db } from "@/database/connection";
 import { auth } from "@/lib/better-auth";
 import dayjs from "@/lib/dayjs";
 import { stripe } from "@/lib/stripe";

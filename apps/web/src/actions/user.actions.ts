@@ -1,7 +1,7 @@
 "use server";
 
-import { UserRepository } from "@/database/repositories";
-import type { User } from "@/prisma/generated/prisma/client";
+import { UserRepository } from "@repo/database/index";
+import type { User } from "@repo/database/prisma/generated/prisma/client";
 import { UserService } from "@/services";
 
 /**
