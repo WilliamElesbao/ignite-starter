@@ -1,8 +1,8 @@
 import openapi from "@elysiajs/openapi";
-import { userPlugin } from "@repo/backend-base";
+import { emailPlugin, userPlugin } from "@repo/backend-base";
 import { Elysia } from "elysia";
 
-const app = new Elysia().use(userPlugin).use(openapi());
+const app = new Elysia().use(userPlugin).use(emailPlugin).use(openapi());
 
 app.listen(process.env.PORT ?? 4000);
 

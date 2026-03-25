@@ -12,8 +12,9 @@
     "baseUrl": "..",
     "paths": {
       "@repo/database": ["database/*"],
-      "@/prisma/*": ["database/prisma/*"]
+      "@/prisma/*": ["database/prisma/*"],
+      "@repo/emails": ["emails/*"],
     }
   },
-  "include": ["index.ts", "src/**/*", "../database"]
+  "include": ["index.ts", "src/**/*", "../database", "../emails"]
 }

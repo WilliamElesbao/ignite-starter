@@ -111,7 +111,10 @@
       "name": "@repo/backend-base",
       "dependencies": {
         "@repo/database": "workspace:*",
+        "@repo/emails": "workspace:*",
+        "axios": "^1.13.6",
         "elysia": "latest",
+        "resend": "^6.9.4",
       },
       "devDependencies": {
         "@repo/typescript-config": "*",
