@@ -1,5 +1,4 @@
-import { db } from "@repo/database/index";
-import { Role, Status } from "@repo/database/prisma/generated/prisma/enums";
+import { db, Role, Status } from "@repo/db";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";

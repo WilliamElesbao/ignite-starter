@@ -19,7 +19,6 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
-import { baseUrl } from "@repo/frontend-base/constants";
 
 /**
  * Props for the Welcome Email
@@ -40,10 +39,7 @@ interface WelcomeEmailProps {
  * - Preview text for inbox snippets
  * - Clear call-to-action button
  */
-export function WelcomeEmail({
-  name,
-  actionUrl = baseUrl,
-}: Readonly<WelcomeEmailProps>) {
+export function WelcomeEmail({ name, actionUrl }: Readonly<WelcomeEmailProps>) {
   return (
     <Html lang="en">
       <Head />
@@ -100,7 +96,7 @@ export function WelcomeEmail({
  */
 WelcomeEmail.PreviewProps = {
   name: "John Doe",
-  actionUrl: baseUrl,
+  actionUrl: "https://example.com",
 } satisfies WelcomeEmailProps;
 
 export default WelcomeEmail;

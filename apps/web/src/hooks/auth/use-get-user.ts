@@ -1,4 +1,4 @@
-import type { User } from "@repo/database/prisma/generated/prisma/client";
+import type { User } from "@repo/db";
 import { toast } from "sonner";
 import { useGetUserById } from "../user/user.queries";
 

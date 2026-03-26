@@ -1,6 +1,5 @@
 import type { User } from "../../prisma/generated/prisma/client";
 import { db } from "../connection";
-import type { UserDto } from "./dtos/user.dto";
 
 export class UserRepository {
   constructor(private readonly model = db.user) {}
@@ -10,7 +9,7 @@ export class UserRepository {
    * @param idDto - DTO containing the user ID.
    * @returns The user object if found, or `null` if not found.
    */
-  async findUserById({ id }: UserDto): Promise<User | null> {
+  async findUserById({ id }: Pick<User, "id">): Promise<User | null> {
     try {
       return await this.model.findUnique({ where: { id } });
     } catch (error) {

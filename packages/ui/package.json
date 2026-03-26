@@ -1,25 +1,21 @@
 {
-  "name": "@repo/frontend-base",
+  "name": "@repo/ui",
   "version": "0.0.0",
   "private": true,
   "exports": {
     "./*": "./src/*"
   },
   "scripts": {
-    "lint": "biome lint .",
     "generate:component": "turbo gen react-component",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@repo/api": "workspace:*",
-    "@repo/emails": "workspace:*",
-    "@tanstack/react-query": "^5.95.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@repo/typescript-config": "*",
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.15.3",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",

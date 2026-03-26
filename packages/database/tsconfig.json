@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "../typescript-config/base.json",
-  "include": ["index.ts", "src/**/*.ts", "prisma/**/*.ts"]
+  "extends": "@repo/typescript-config/base.json",
+  "include": ["src"]
 }

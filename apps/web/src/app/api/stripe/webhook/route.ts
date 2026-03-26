@@ -1,4 +1,4 @@
-import { db } from "@repo/database/index";
+import { db } from "@repo/db";
 import { type NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";

@@ -1,17 +1,21 @@
 {
-  "name": "@repo/database",
+  "name": "@repo/db",
+  "private": true,
+  "exports": {
+    ".": "./index.ts"
+  },
   "scripts": {
     "build": "",
-    "migrate:dev": "bunx --bun prisma migrate dev",
-    "model:generate": "bunx --bun prisma generate",
-    "prisma:studio": "bunx --bun prisma studio",
+    "db:generate": "bunx --bun prisma generate",
+    "db:migrate": "bunx --bun prisma migrate dev",
+    "db:studio": "bunx --bun prisma studio",
     "db:seed": ""
   },
   "dependencies": {
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@repo/typescript-config": "*",
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "^20",
     "typescript": "^5"
   }

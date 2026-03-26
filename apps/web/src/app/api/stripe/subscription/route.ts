@@ -1,4 +1,4 @@
-import { db } from "@repo/database/index";
+import { db } from "@repo/db";
 import { headers } from "next/headers";
 import { auth } from "@/lib/better-auth";
 import dayjs from "@/lib/dayjs";

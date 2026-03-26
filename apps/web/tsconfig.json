@@ -19,9 +19,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@repo/api": ["../../packages/api/*"],
-      "@repo/database/*": ["../../packages/database/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [
@@ -30,9 +28,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts",
-    "../../packages/api/**/*"
-    // "../../packages/database/**/*.ts"
+    "**/*.mts"
   ],
   "exclude": ["node_modules"]
 }

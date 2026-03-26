@@ -1,7 +1,10 @@
 {
   "name": "@repo/emails",
-  "version": "1.1.0",
+  "version": "0.0.0",
   "private": true,
+  "exports": {
+    "./templates": "./src/index.ts"
+  },
   "scripts": {
     "dev": "email dev --dir ./src/templates --port 3001"
   },
@@ -11,7 +14,7 @@
     "react": "^19.0.0"
   },
   "devDependencies": {
-    "@repo/typescript-config": "*",
+    "@repo/typescript-config": "workspace:*",
     "@react-email/preview-server": "5.2.10",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",
