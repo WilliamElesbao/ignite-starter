@@ -3,7 +3,7 @@ import shared from "../shared/shared.plugin";
 import { EmailResponseDto } from "./dtos/email-response.dto";
 import { EmailService } from "./email.service";
 
-const plugin = new Elysia()
+const plugin = new Elysia({ tags: ["email"] })
   .use(shared)
   .state((state) => ({
     ...state,
@@ -23,6 +23,7 @@ const plugin = new Elysia()
         return { message: "Email sent successfully", success: true };
       },
       {
+        detail: { description: "Send a welcome email" },
         response: {
           200: EmailResponseDto,
           500: EmailResponseDto,

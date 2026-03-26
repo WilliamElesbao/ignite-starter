@@ -4,24 +4,12 @@ import shared from "../shared/shared.plugin";
 import { UserResponseDto } from "./dtos/user-response.dto";
 import { UserService } from "./user.service";
 
-/* -------------------------------------------------
-   1️⃣ Build the base app
-   ------------------------------------------------- */
-const plugin = new Elysia()
-  // bring in shared utilities (db, logger, …)
+const plugin = new Elysia({ tags: ["user"] })
   .use(shared)
-
-  // put the service in the app state – it will be available as
-  // `store.userService` inside every handler
   .state((state) => ({
     ...state,
     userService: new UserService(state.db),
   }))
-
-  /* -------------------------------------------------
-     2️⃣ Group all user‑related routes under /user
-        (no guard here)
-     ------------------------------------------------- */
   .group("/user", (app) =>
     app.get(
       "/:id",
@@ -36,6 +24,7 @@ const plugin = new Elysia()
         return user;
       },
       {
+        detail: { description: "Get user by ID" },
         response: {
           200: UserResponseDto,
           404: ErrorDto,
