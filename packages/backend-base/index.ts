@@ -1,6 +1,13 @@
-import type { EmailPlugin } from "./src/email/email.plugin";
-import emailPlugin from "./src/email/email.plugin";
-import type { UserPlugin } from "./src/user/user.plugin";
-import userPlugin from "./src/user/user.plugin";
+import authPLugin, { type AuthPlugin, OpenAPI } from "./src/auth/auth.plugin";
+import emailPlugin, { type EmailPlugin } from "./src/email/email.plugin";
+import userPlugin, { type UserPlugin } from "./src/user/user.plugin";
 
-export { userPlugin, type UserPlugin, emailPlugin, type EmailPlugin };
+export {
+  OpenAPI,
+  authPLugin,
+  type AuthPlugin,
+  emailPlugin,
+  type EmailPlugin,
+  userPlugin,
+  type UserPlugin,
+};

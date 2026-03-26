@@ -1,7 +1,7 @@
 import { defineConfig } from "@hey-api/openapi-ts";
 
 export default defineConfig({
-  input: `${process.env.API_URL ?? "http://localhost:4000"}/openapi/json`,
+  input: `${process.env.API_URL ?? "http://localhost:3333"}/openapi/json`,
   output: {
     path: "./generated/api",
     postProcess: [
