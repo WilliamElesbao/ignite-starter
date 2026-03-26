@@ -1,20 +1,14 @@
 {
-  "extends": "../typescript-config/base.json",
   "compilerOptions": {
     "target": "ES2021",
     "module": "ES2022",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
     "types": ["bun-types"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true,
-    "baseUrl": "..",
-    "paths": {
-      "@repo/database": ["database/*"],
-      "@/prisma/*": ["database/prisma/*"],
-      "@repo/emails": ["emails/*"],
-    }
+    "skipLibCheck": true
   },
-  "include": ["index.ts", "src/**/*", "../database", "../emails"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }

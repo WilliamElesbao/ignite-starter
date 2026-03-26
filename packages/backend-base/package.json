@@ -1,17 +1,20 @@
 {
   "name": "@repo/backend-base",
+  "type": "module",
+  "private": true,
   "scripts": {
     "test:watch": "bun test --watch"
   },
   "dependencies": {
-    "@repo/database": "workspace:*",
+    "@repo/db": "workspace:*",
     "@repo/emails": "workspace:*",
+    "@elysiajs/cors": "^1.4.1",
     "axios": "^1.13.6",
     "elysia": "latest",
     "resend": "^6.9.4"
   },
   "devDependencies": {
-    "@repo/typescript-config": "*",
+    "@repo/typescript-config": "workspace:*",
     "bun-types": "latest"
   }
 }

@@ -9,7 +9,7 @@
     "format": "turbo run format",
     "check-types": "turbo run check-types",
     "tsc": "turbo run check-types",
-    "check:all": "for d in web backend; do (cd apps/$d && bun biome format . --write && bun biome lint . && bun tsc --noEmit); done && for d in database backend-base api frontend-base emails; do (cd packages/$d && bun biome format . --write && bun biome lint . && bun tsc --noEmit); done"
+    "check:all": "for d in web backend; do (cd apps/$d && bun biome format . --write && bun biome lint . && bun tsc --noEmit); done && for d in database backend-base api ui emails; do (cd packages/$d && bun biome format . --write && bun biome lint . && bun tsc --noEmit); done"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",

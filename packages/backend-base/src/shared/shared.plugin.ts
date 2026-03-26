@@ -1,5 +1,5 @@
 import { cors } from "@elysiajs/cors";
-import { db as Database } from "@repo/database";
+import { db as Database } from "@repo/db";
 import { Elysia } from "elysia";
 
 export type db = typeof Database;
