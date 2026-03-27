@@ -11,7 +11,7 @@
     "elysia": "latest"
   },
   "devDependencies": {
-    "@repo/typescript-config": "*",
+    "@repo/typescript-config": "workspace:*",
     "bun-types": "latest"
   },
   "module": "src/index.js"
