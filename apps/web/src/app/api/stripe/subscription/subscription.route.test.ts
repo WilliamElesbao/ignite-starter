@@ -38,7 +38,7 @@ vi.mock("@/lib/dayjs", () => ({
   }),
 }));
 
-import { auth } from "@/lib/better-auth";
+import { authClient } from "@/lib/better-auth/auth-client";
 import { stripe } from "@/lib/stripe";
 import { POST } from "./route";
 
@@ -49,7 +49,7 @@ describe("/api/stripe/subscription POST (e2e-style)", () => {
 
   it("returns a checkout url when user is authenticated", async () => {
     (
-      auth.api.getSession as unknown as ReturnType<typeof vi.fn>
+      authClient.getSession as unknown as ReturnType<typeof vi.fn>
     ).mockResolvedValueOnce({
       user: { id: "user_1", email: "user@example.com" },
     });
@@ -94,7 +94,7 @@ describe("/api/stripe/subscription POST (e2e-style)", () => {
 
   it("returns 401 when there is no authenticated user", async () => {
     (
-      auth.api.getSession as unknown as ReturnType<typeof vi.fn>
+      authClient.getSession as unknown as ReturnType<typeof vi.fn>
     ).mockResolvedValueOnce(null);
 
     const request = new Request(

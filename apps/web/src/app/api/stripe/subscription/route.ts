@@ -1,13 +1,10 @@
 import { db } from "@repo/db";
-import { headers } from "next/headers";
-import { auth } from "@/lib/better-auth";
+import { authClient } from "@/lib/better-auth/auth-client";
 import dayjs from "@/lib/dayjs";
 import { stripe } from "@/lib/stripe";
 
 export async function POST(request: Request) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const { data: session } = await authClient.getSession({});
 
   if (!session?.user)
     return Response.json({ error: "Unauthorized" }, { status: 401 });
@@ -45,9 +42,7 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const { data: session } = await authClient.getSession({});
 
   if (!session?.user) {
     return new Response("Unauthorized", { status: 401 });
@@ -116,9 +111,7 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const { data: session } = await authClient.getSession({});
 
   if (!session?.user) {
     return new Response("Unauthorized", { status: 401 });

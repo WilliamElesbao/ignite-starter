@@ -1,9 +1,9 @@
-import type { User } from "better-auth";
 import Link from "next/link";
 import * as IconsSi from "rocketicons/si";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import type { SessionResponse } from "@/lib/better-auth/auth-server";
 import type { SubscriptionDetailsResponseDto } from "@/services/stripe/dtos";
 import CancelSubscriptionDialog from "./origin-ui/cancel-plan-dialog";
 import { ThemeToggle } from "./theme-toggle";
@@ -12,7 +12,7 @@ export function SiteHeader({
   user,
   subscription,
 }: Readonly<{
-  user?: User;
+  user?: SessionResponse["user"];
   subscription?: SubscriptionDetailsResponseDto | null;
 }>) {
   const hasSubscription =

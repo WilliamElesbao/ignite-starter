@@ -1,6 +1,5 @@
 "use client";
 
-import type { User } from "better-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -11,12 +10,13 @@ import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { DialogProvider } from "@/context/dialog.context";
-import { useGetUser } from "@/hooks/auth";
+import { useWelcomeToast } from "@/hooks/auth";
 import { useProducts, useSubscriptionDetails } from "@/hooks/stripe";
+import type { SessionResponse } from "@/lib/better-auth/auth-server";
 import data from "./data.json";
 
 interface DashboardWrapperProps {
-  user?: User;
+  user?: SessionResponse["user"];
 }
 
 export function DashboardWrapper({ user }: DashboardWrapperProps) {
@@ -29,8 +29,7 @@ export function DashboardWrapper({ user }: DashboardWrapperProps) {
     stripeSubscriptionId: user?.stripeSubscriptionId ?? "",
   });
 
-  useGetUser({
-    id: user?.id || "",
+  useWelcomeToast({
     showWelcomeToast: !!user?.id && isWelcome,
   });
 

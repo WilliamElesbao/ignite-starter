@@ -26,7 +26,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useDialog } from "@/context";
-import { signOut } from "@/hooks/auth";
+import { authClient } from "@/lib/better-auth/auth-client";
 
 export function NavUser({ user }: Readonly<{ user?: User | null }>) {
   const { isMobile } = useSidebar();
@@ -35,7 +35,7 @@ export function NavUser({ user }: Readonly<{ user?: User | null }>) {
 
   const handleSignOut = async () => {
     try {
-      await signOut();
+      await authClient.signOut();
       router.replace("/login");
     } catch (error) {
       console.error("[NavUser] signOut error:", error);

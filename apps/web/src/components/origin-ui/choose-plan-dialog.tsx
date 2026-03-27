@@ -1,6 +1,5 @@
 "use client";
 
-import type { User } from "better-auth";
 import { CheckIcon, RefreshCcwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useDialog } from "@/context";
 import { useSubscription, useUpdateSubscription } from "@/hooks/stripe";
+import type { SessionResponse } from "@/lib/better-auth/auth-server";
 import type {
   ProductListDto,
   SubscriptionDetailsResponseDto,
@@ -28,7 +28,7 @@ export const ChoosePlanDialog = ({
   products,
   subscription,
 }: {
-  user?: User;
+  user?: SessionResponse["user"];
   products?: ProductListDto;
   subscription?: SubscriptionDetailsResponseDto | null;
 }) => {
