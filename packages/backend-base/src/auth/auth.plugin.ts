@@ -1,5 +1,5 @@
 import Elysia from "elysia";
-import { auth } from "@/lib/better-auth/auth";
+import { auth } from "../lib/better-auth/auth";
 
 const plugin = new Elysia({ name: "better-auth", tags: ["auth"] })
   .mount(auth.handler)
