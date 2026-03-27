@@ -1,5 +1,3 @@
-export * from "./prisma/generated/prisma/client";
-export * from "./prisma/generated/prisma/enums";
-
-export { db } from "./src/connection";
+export { db } from "./src/client";
 export { UserRepository } from "./src/repositories/user.repository";
+export * from "./src/schema";

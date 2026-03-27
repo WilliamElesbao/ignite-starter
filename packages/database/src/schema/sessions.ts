@@ -1,5 +1,5 @@
 import { randomUUIDv7 } from "bun";
-import { relations } from "drizzle-orm";
+import { type InferSelectModel, relations } from "drizzle-orm";
 import { index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { users } from "./users";
 
@@ -30,3 +30,5 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export type Sessions = InferSelectModel<typeof sessions>;

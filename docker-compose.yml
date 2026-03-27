@@ -1,32 +1,18 @@
 services:
-  postgres:
+  database:
     image: postgres:latest
-    container_name: starter-postgres
+    container_name: origin-starter-database
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: starter
+      POSTGRES_DB: origin-starter
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
     ports:
       - "5432:5432"
-    volumes:
-      - ./.docker/postgres_data:/var/lib/postgresql
-
-  starter-studio:
-    image: timothyjmiller/prisma-studio
-    container_name: starter-studio
-    depends_on:
-      - postgres
-    restart: always
-    ports:
-      - 5555:5555
-    environment:
-      POSTGRES_URL: postgresql://postgres:password@postgres:5432/starter
-
   stripe:
     image: stripe/stripe-cli:latest
-    container_name: stripe-cli
+    container_name: stripe
     command: listen --forward-to http://host.docker.internal:3000/api/stripe/webhook
     environment:
       STRIPE_WEBHOOK_SECRET: whsec_4be7d23c91c2b79093393067292d3a278356eab836d6da476c399d909139b4dc
     depends_on:
-      - postgres
+      - database

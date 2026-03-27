@@ -1,4 +1,5 @@
-import { db } from "@repo/db";
+import { db, schema } from "@repo/db";
+import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
@@ -28,16 +29,18 @@ export async function POST(request: NextRequest) {
       console.log("[/api/stripe/webhook] Session:", session);
 
       try {
-        const setSubscription = await db.user.update({
-          where: { id: userId },
-          data: {
-            stripeSubscriptionId,
-          },
-        });
-        console.log(
-          "[/api/stripe/webhook] Subscription updated:",
-          setSubscription,
-        );
+        // const setSubscription = await db.user.update({
+        //   where: { id: userId },
+        //   data: {
+        //     stripeSubscriptionId,
+        //   },
+        // });
+        const [updatedUser] = await db
+          .update(schema.users)
+          .set({ stripeSubscriptionId })
+          .where(eq(schema.users.id, userId))
+          .returning();
+        console.log("[/api/stripe/webhook] Subscription updated:", updatedUser);
       } catch (error) {
         console.error("[/api/stripe/webhook] Error:", error);
       }

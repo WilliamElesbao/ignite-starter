@@ -1,4 +1,5 @@
 import { randomUUIDv7 } from "bun";
+import type { InferSelectModel } from "drizzle-orm";
 import { index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const verifications = pgTable(
@@ -17,3 +18,5 @@ export const verifications = pgTable(
   },
   (table) => [index("verifications_identifier_idx").on(table.identifier)],
 );
+
+export type Verifications = InferSelectModel<typeof verifications>;

@@ -1,10 +1,11 @@
-import { db } from "@repo/db";
-import { authClient } from "@/lib/better-auth/auth-client";
+import { db, schema } from "@repo/db";
+import { eq } from "drizzle-orm";
+import { getSession } from "@/lib/better-auth/auth-server";
 import dayjs from "@/lib/dayjs";
 import { stripe } from "@/lib/stripe";
 
 export async function POST(request: Request) {
-  const { data: session } = await authClient.getSession({});
+  const session = await getSession();
 
   if (!session?.user)
     return Response.json({ error: "Unauthorized" }, { status: 401 });
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const { data: session } = await authClient.getSession({});
+  const session = await getSession();
 
   if (!session?.user) {
     return new Response("Unauthorized", { status: 401 });
@@ -53,9 +54,14 @@ export async function PATCH(request: Request) {
   const priceId = data.priceId;
   const planName = data.planName;
 
-  const subscription = await db.user.findUnique({
-    where: { id: session.user.id },
-  });
+  // const subscription = await db.user.findUnique({
+  //   where: { id: session.user.id },
+  // });
+
+  const [subscription] = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.id, session.user.id));
 
   if (!subscription?.stripeSubscriptionId) {
     return new Response("Subscription not found", { status: 404 });
@@ -89,13 +95,22 @@ export async function PATCH(request: Request) {
     );
     console.log("[/api/subscription/update] Updated Subscription:", updated);
 
-    await db.user.update({
-      where: { id: session.user.id },
-      data: {
+    // await db.user.update({
+    //   where: { id: session.user.id },
+    //   data: {
+    //     stripeSubscriptionId: updated.id,
+    //     updatedAt: dayjs().toDate(),
+    //   },
+    // });
+    const [updatedUser] = await db
+      .update(schema.users)
+      .set({
         stripeSubscriptionId: updated.id,
         updatedAt: dayjs().toDate(),
-      },
-    });
+      })
+      .where(eq(schema.users.id, session.user.id))
+      .returning();
+    console.log("[/api/subscription/update] Updated User:", updatedUser);
 
     return Response.json({ updated });
   } catch (error) {
@@ -111,15 +126,19 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE() {
-  const { data: session } = await authClient.getSession({});
+  const session = await getSession();
 
   if (!session?.user) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const subscription = await db.user.findUnique({
-    where: { id: session.user.id },
-  });
+  // const subscription = await db.user.findUnique({
+  //   where: { id: session.user.id },
+  // });
+  const [subscription] = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.id, session.user.id));
 
   if (!subscription?.stripeSubscriptionId) {
     return new Response("Subscription not found", { status: 404 });
@@ -130,12 +149,18 @@ export async function DELETE() {
       cancel_at_period_end: true,
     });
 
-    await db.user.update({
-      where: { id: session.user.id },
-      data: {
-        updatedAt: dayjs().toDate(),
-      },
-    });
+    // await db.user.update({
+    //   where: { id: session.user.id },
+    //   data: {
+    //     updatedAt: dayjs().toDate(),
+    //   },
+    // });
+    const [updatedUser] = await db
+      .update(schema.users)
+      .set({ updatedAt: dayjs().toDate() })
+      .where(eq(schema.users.id, session.user.id))
+      .returning();
+    console.log("[/api/subscription/update] Updated User:", updatedUser);
 
     return new Response("Subscription canceled successfully", { status: 200 });
   } catch (error) {

@@ -11,13 +11,6 @@
     "tsc": "turbo run check-types",
     "check:all": "for d in web backend; do (cd apps/$d && bun biome format . --write && bun biome lint . && bun tsc --noEmit); done && for d in database backend-base api ui emails; do (cd packages/$d && bun biome format . --write && bun biome lint . && bun tsc --noEmit); done"
   },
-  "devDependencies": {
-    "@biomejs/biome": "2.2.0",
-    "@types/pg": "^8.20.0",
-    "prisma": "^7.5.0",
-    "turbo": "^2.8.20",
-    "typescript": "5.9.2"
-  },
   "engines": {
     "node": ">=18"
   },
@@ -27,8 +20,12 @@
     "packages/*"
   ],
   "dependencies": {
-    "@prisma/adapter-pg": "^7.5.0",
-    "@prisma/client": "^7.5.0",
     "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.0",
+    "@types/pg": "^8.20.0",
+    "turbo": "^2.8.20",
+    "typescript": "5.9.2"
   }
 }

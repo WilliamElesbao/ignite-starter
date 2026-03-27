@@ -17,7 +17,7 @@ const setup = new Elysia({ name: "shared" })
 
 setup.onStop(() => {
   console.log("onStop on shared plugin");
-  Database.$disconnect();
+  Database.$client.end();
 });
 
 export default setup;
