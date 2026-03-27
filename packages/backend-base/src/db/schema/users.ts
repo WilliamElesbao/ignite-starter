@@ -16,6 +16,7 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at")
     .$onUpdate(() => new Date())
     .notNull(),
+  stripeSubscriptionId: text("stripe_subscription_id"),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({

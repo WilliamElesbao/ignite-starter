@@ -4,7 +4,16 @@ import { Elysia } from "elysia";
 
 export type db = typeof Database;
 
-const setup = new Elysia({ name: "shared" }).use(cors()).state("db", Database);
+const setup = new Elysia({ name: "shared" })
+  .use(
+    cors({
+      origin: [Bun.env.WEB_URL ?? "http://localhost:3000"],
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      credentials: true,
+      allowedHeaders: ["Content-Type", "Authorization"],
+    }),
+  )
+  .state("db", Database);
 
 setup.onStop(() => {
   console.log("onStop on shared plugin");

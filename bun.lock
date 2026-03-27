@@ -21,6 +21,7 @@
       "name": "@apps/backend",
       "version": "1.0.50",
       "dependencies": {
+        "@elysiajs/cors": "^1.4.1",
         "@elysiajs/openapi": "^1.4.14",
         "@repo/backend-base": "workspace:*",
         "elysia": "latest",
