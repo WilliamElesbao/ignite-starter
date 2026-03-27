@@ -7,7 +7,6 @@
   },
   "dependencies": {
     "@repo/backend-base": "workspace:*",
-    "@elysiajs/cors": "^1.4.1",
     "@elysiajs/openapi": "^1.4.14",
     "elysia": "latest"
   },
