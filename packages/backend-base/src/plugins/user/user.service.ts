@@ -6,9 +6,6 @@ export class UserService {
   constructor(private readonly db: db) {}
 
   async getUserById({ id }: Pick<Users, "id">) {
-    // pg + prisma
-    // const user = await this.db.user.findUnique({ where: { id } });
-    // pg + drizzle
     const [user] = await this.db
       .select()
       .from(schema.users)
