@@ -1,5 +1,5 @@
 import { WelcomeEmail } from "@repo/emails/templates";
-import { resend } from "../lib/resend";
+import { resend } from "../../lib/resend";
 
 const emailFrom = process.env.EMAIL_FROM ?? "";
 const emailTo = process.env.EMAIL_TO ?? "";

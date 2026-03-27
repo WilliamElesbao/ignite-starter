@@ -1,7 +1,6 @@
-import type { Users } from "@repo/db";
+import { schema, type Users } from "@repo/db";
 import { eq } from "drizzle-orm";
-import { schema } from "../../../database/src/schema";
-import type { db } from "../shared/shared.plugin";
+import type { db } from "../../shared/shared.plugin";
 
 export class UserService {
   constructor(private readonly db: db) {}

@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
-import authPLugin from "../auth/auth.plugin";
-import { ErrorDto } from "../shared/dtos/error.dto";
-import shared from "../shared/shared.plugin";
+import authPLugin from "../../auth/auth.plugin";
+import { ErrorDto } from "../../shared/dtos/error.dto";
+import shared from "../../shared/shared.plugin";
 import { UserResponseDto } from "./dtos/user-response.dto";
 import { UserService } from "./user.service";
 

@@ -1,5 +1,5 @@
 import Elysia from "elysia";
-import shared from "../shared/shared.plugin";
+import shared from "../../shared/shared.plugin";
 import { EmailResponseDto } from "./dtos/email-response.dto";
 import { EmailService } from "./email.service";
 
