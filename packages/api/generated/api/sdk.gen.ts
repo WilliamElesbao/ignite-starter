@@ -3,12 +3,106 @@
 import type { Client, Options as Options2, TDataShape } from "./client";
 import { client } from "./client.gen";
 import type {
+  ChangeEmailData,
+  ChangeEmailErrors,
+  ChangeEmailResponses,
+  ChangePasswordData,
+  ChangePasswordErrors,
+  ChangePasswordResponses,
+  DeleteUserData,
+  DeleteUserErrors,
+  DeleteUserResponses,
+  GetAuthAccountInfoData,
+  GetAuthAccountInfoErrors,
+  GetAuthAccountInfoResponses,
+  GetAuthCallbackByIdData,
+  GetAuthCallbackByIdErrors,
+  GetAuthDeleteUserCallbackData,
+  GetAuthDeleteUserCallbackErrors,
+  GetAuthDeleteUserCallbackResponses,
+  GetAuthErrorData,
+  GetAuthErrorErrors,
+  GetAuthErrorResponses,
+  GetAuthOkData,
+  GetAuthOkErrors,
+  GetAuthOkResponses,
+  GetAuthVerifyEmailData,
+  GetAuthVerifyEmailErrors,
+  GetAuthVerifyEmailResponses,
+  GetSession2Data,
+  GetSession2Errors,
+  GetSession2Responses,
+  GetSessionData,
+  GetSessionErrors,
+  GetSessionResponses,
   GetUserByIdData,
   GetUserByIdErrors,
   GetUserByIdResponses,
+  LinkSocialAccountData,
+  LinkSocialAccountErrors,
+  LinkSocialAccountResponses,
+  ListUserAccountsData,
+  ListUserAccountsErrors,
+  ListUserAccountsResponses,
+  ListUserSessionsData,
+  ListUserSessionsErrors,
+  ListUserSessionsResponses,
+  PostAuthCallbackByIdData,
+  PostAuthCallbackByIdErrors,
+  PostAuthGetAccessTokenData,
+  PostAuthGetAccessTokenErrors,
+  PostAuthGetAccessTokenResponses,
+  PostAuthRefreshTokenData,
+  PostAuthRefreshTokenErrors,
+  PostAuthRefreshTokenResponses,
+  PostAuthRevokeOtherSessionsData,
+  PostAuthRevokeOtherSessionsErrors,
+  PostAuthRevokeOtherSessionsResponses,
+  PostAuthRevokeSessionData,
+  PostAuthRevokeSessionErrors,
+  PostAuthRevokeSessionResponses,
+  PostAuthRevokeSessionsData,
+  PostAuthRevokeSessionsErrors,
+  PostAuthRevokeSessionsResponses,
+  PostAuthUnlinkAccountData,
+  PostAuthUnlinkAccountErrors,
+  PostAuthUnlinkAccountResponses,
   PostEmailSendData,
   PostEmailSendErrors,
   PostEmailSendResponses,
+  RequestPasswordResetData,
+  RequestPasswordResetErrors,
+  RequestPasswordResetResponses,
+  ResetPasswordCallbackData,
+  ResetPasswordCallbackErrors,
+  ResetPasswordCallbackResponses,
+  ResetPasswordData,
+  ResetPasswordErrors,
+  ResetPasswordResponses,
+  SendVerificationEmailData,
+  SendVerificationEmailErrors,
+  SendVerificationEmailResponses,
+  SignInEmailData,
+  SignInEmailErrors,
+  SignInEmailResponses,
+  SignOutData,
+  SignOutErrors,
+  SignOutResponses,
+  SignUpWithEmailAndPasswordData,
+  SignUpWithEmailAndPasswordErrors,
+  SignUpWithEmailAndPasswordResponses,
+  SocialSignInData,
+  SocialSignInErrors,
+  SocialSignInResponses,
+  UpdateSessionData,
+  UpdateSessionErrors,
+  UpdateSessionResponses,
+  UpdateUserData,
+  UpdateUserErrors,
+  UpdateUserResponses,
+  VerifyPasswordData,
+  VerifyPasswordErrors,
+  VerifyPasswordResponses,
 } from "./types.gen";
 
 export type Options<
@@ -28,6 +122,9 @@ export type Options<
   meta?: Record<string, null>;
 };
 
+/**
+ * Get user by ID
+ */
 export const getUserById = <ThrowOnError extends boolean = false>(
   options: Options<GetUserByIdData, ThrowOnError>,
 ) =>
@@ -37,6 +134,9 @@ export const getUserById = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({ url: "/user/{id}", ...options });
 
+/**
+ * Send a welcome email
+ */
 export const postEmailSend = <ThrowOnError extends boolean = false>(
   options?: Options<PostEmailSendData, ThrowOnError>,
 ) =>
@@ -45,3 +145,598 @@ export const postEmailSend = <ThrowOnError extends boolean = false>(
     PostEmailSendErrors,
     ThrowOnError
   >({ url: "/email/send", ...options });
+
+/**
+ * Sign in with a social provider
+ */
+export const socialSignIn = <ThrowOnError extends boolean = false>(
+  options: Options<SocialSignInData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    SocialSignInResponses,
+    SocialSignInErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/sign-in/social",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+export const getAuthCallbackById = <ThrowOnError extends boolean = false>(
+  options?: Options<GetAuthCallbackByIdData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    null,
+    GetAuthCallbackByIdErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/callback/{id}",
+    ...options,
+  });
+
+export const postAuthCallbackById = <ThrowOnError extends boolean = false>(
+  options?: Options<PostAuthCallbackByIdData, ThrowOnError>,
+) =>
+  (options?.client ?? client).post<
+    null,
+    PostAuthCallbackByIdErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/callback/{id}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+
+/**
+ * Get the current session
+ */
+export const getSession = <ThrowOnError extends boolean = false>(
+  options?: Options<GetSessionData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    GetSessionResponses,
+    GetSessionErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/get-session",
+    ...options,
+  });
+
+/**
+ * Get the current session
+ */
+export const getSession2 = <ThrowOnError extends boolean = false>(
+  options?: Options<GetSession2Data, ThrowOnError>,
+) =>
+  (options?.client ?? client).post<
+    GetSession2Responses,
+    GetSession2Errors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/get-session",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+
+/**
+ * Sign out the current user
+ */
+export const signOut = <ThrowOnError extends boolean = false>(
+  options?: Options<SignOutData, ThrowOnError>,
+) =>
+  (options?.client ?? client).post<
+    SignOutResponses,
+    SignOutErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/sign-out",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+
+/**
+ * Sign up a user using email and password
+ */
+export const signUpWithEmailAndPassword = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<SignUpWithEmailAndPasswordData, ThrowOnError>,
+) =>
+  (options?.client ?? client).post<
+    SignUpWithEmailAndPasswordResponses,
+    SignUpWithEmailAndPasswordErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/sign-up/email",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+
+/**
+ * Sign in with email and password
+ */
+export const signInEmail = <ThrowOnError extends boolean = false>(
+  options: Options<SignInEmailData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    SignInEmailResponses,
+    SignInEmailErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/sign-in/email",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Reset the password for a user
+ */
+export const resetPassword = <ThrowOnError extends boolean = false>(
+  options: Options<ResetPasswordData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    ResetPasswordResponses,
+    ResetPasswordErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/reset-password",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Verify the current user's password
+ */
+export const verifyPassword = <ThrowOnError extends boolean = false>(
+  options: Options<VerifyPasswordData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    VerifyPasswordResponses,
+    VerifyPasswordErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/verify-password",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Verify the email of the user
+ */
+export const getAuthVerifyEmail = <ThrowOnError extends boolean = false>(
+  options: Options<GetAuthVerifyEmailData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    GetAuthVerifyEmailResponses,
+    GetAuthVerifyEmailErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/verify-email",
+    ...options,
+  });
+
+/**
+ * Send a verification email to the user
+ */
+export const sendVerificationEmail = <ThrowOnError extends boolean = false>(
+  options?: Options<SendVerificationEmailData, ThrowOnError>,
+) =>
+  (options?.client ?? client).post<
+    SendVerificationEmailResponses,
+    SendVerificationEmailErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/send-verification-email",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+
+export const changeEmail = <ThrowOnError extends boolean = false>(
+  options: Options<ChangeEmailData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    ChangeEmailResponses,
+    ChangeEmailErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/change-email",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Change the password of the user
+ */
+export const changePassword = <ThrowOnError extends boolean = false>(
+  options: Options<ChangePasswordData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    ChangePasswordResponses,
+    ChangePasswordErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/change-password",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Update the current session
+ */
+export const updateSession = <ThrowOnError extends boolean = false>(
+  options?: Options<UpdateSessionData, ThrowOnError>,
+) =>
+  (options?.client ?? client).post<
+    UpdateSessionResponses,
+    UpdateSessionErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/update-session",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+
+/**
+ * Update the current user
+ */
+export const updateUser = <ThrowOnError extends boolean = false>(
+  options?: Options<UpdateUserData, ThrowOnError>,
+) =>
+  (options?.client ?? client).post<
+    UpdateUserResponses,
+    UpdateUserErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/update-user",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+
+/**
+ * Delete the user
+ */
+export const deleteUser = <ThrowOnError extends boolean = false>(
+  options?: Options<DeleteUserData, ThrowOnError>,
+) =>
+  (options?.client ?? client).post<
+    DeleteUserResponses,
+    DeleteUserErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/delete-user",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+
+/**
+ * Send a password reset email to the user
+ */
+export const requestPasswordReset = <ThrowOnError extends boolean = false>(
+  options: Options<RequestPasswordResetData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    RequestPasswordResetResponses,
+    RequestPasswordResetErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/request-password-reset",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Redirects the user to the callback URL with the token
+ */
+export const resetPasswordCallback = <ThrowOnError extends boolean = false>(
+  options: Options<ResetPasswordCallbackData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    ResetPasswordCallbackResponses,
+    ResetPasswordCallbackErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/reset-password/{token}",
+    ...options,
+  });
+
+/**
+ * List all active sessions for the user
+ */
+export const listUserSessions = <ThrowOnError extends boolean = false>(
+  options?: Options<ListUserSessionsData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    ListUserSessionsResponses,
+    ListUserSessionsErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/list-sessions",
+    ...options,
+  });
+
+/**
+ * Revoke a single session
+ */
+export const postAuthRevokeSession = <ThrowOnError extends boolean = false>(
+  options?: Options<PostAuthRevokeSessionData, ThrowOnError>,
+) =>
+  (options?.client ?? client).post<
+    PostAuthRevokeSessionResponses,
+    PostAuthRevokeSessionErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/revoke-session",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+
+/**
+ * Revoke all sessions for the user
+ */
+export const postAuthRevokeSessions = <ThrowOnError extends boolean = false>(
+  options?: Options<PostAuthRevokeSessionsData, ThrowOnError>,
+) =>
+  (options?.client ?? client).post<
+    PostAuthRevokeSessionsResponses,
+    PostAuthRevokeSessionsErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/revoke-sessions",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+
+/**
+ * Revoke all other sessions for the user except the current one
+ */
+export const postAuthRevokeOtherSessions = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<PostAuthRevokeOtherSessionsData, ThrowOnError>,
+) =>
+  (options?.client ?? client).post<
+    PostAuthRevokeOtherSessionsResponses,
+    PostAuthRevokeOtherSessionsErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/revoke-other-sessions",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+
+/**
+ * Link a social account to the user
+ */
+export const linkSocialAccount = <ThrowOnError extends boolean = false>(
+  options: Options<LinkSocialAccountData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    LinkSocialAccountResponses,
+    LinkSocialAccountErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/link-social",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * List all accounts linked to the user
+ */
+export const listUserAccounts = <ThrowOnError extends boolean = false>(
+  options?: Options<ListUserAccountsData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    ListUserAccountsResponses,
+    ListUserAccountsErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/list-accounts",
+    ...options,
+  });
+
+/**
+ * Callback to complete user deletion with verification token
+ */
+export const getAuthDeleteUserCallback = <ThrowOnError extends boolean = false>(
+  options?: Options<GetAuthDeleteUserCallbackData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    GetAuthDeleteUserCallbackResponses,
+    GetAuthDeleteUserCallbackErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/delete-user/callback",
+    ...options,
+  });
+
+/**
+ * Unlink an account
+ */
+export const postAuthUnlinkAccount = <ThrowOnError extends boolean = false>(
+  options: Options<PostAuthUnlinkAccountData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    PostAuthUnlinkAccountResponses,
+    PostAuthUnlinkAccountErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/unlink-account",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Refresh the access token using a refresh token
+ */
+export const postAuthRefreshToken = <ThrowOnError extends boolean = false>(
+  options: Options<PostAuthRefreshTokenData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    PostAuthRefreshTokenResponses,
+    PostAuthRefreshTokenErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/refresh-token",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get a valid access token, doing a refresh if needed
+ */
+export const postAuthGetAccessToken = <ThrowOnError extends boolean = false>(
+  options: Options<PostAuthGetAccessTokenData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    PostAuthGetAccessTokenResponses,
+    PostAuthGetAccessTokenErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/get-access-token",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get the account info provided by the provider
+ */
+export const getAuthAccountInfo = <ThrowOnError extends boolean = false>(
+  options?: Options<GetAuthAccountInfoData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    GetAuthAccountInfoResponses,
+    GetAuthAccountInfoErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/account-info",
+    ...options,
+  });
+
+/**
+ * Check if the API is working
+ */
+export const getAuthOk = <ThrowOnError extends boolean = false>(
+  options?: Options<GetAuthOkData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    GetAuthOkResponses,
+    GetAuthOkErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/ok",
+    ...options,
+  });
+
+/**
+ * Displays an error page
+ */
+export const getAuthError = <ThrowOnError extends boolean = false>(
+  options?: Options<GetAuthErrorData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    GetAuthErrorResponses,
+    GetAuthErrorErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/auth/error",
+    ...options,
+  });
