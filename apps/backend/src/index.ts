@@ -11,6 +11,18 @@ const app = new Elysia()
   .use(
     openapi({
       documentation: {
+        tags: [
+          { name: "Better Auth", description: "Authentication endpoints" },
+          { name: "User", description: "Endpoints related to user management" },
+          {
+            name: "Email",
+            description: "Endpoints related to email functionality",
+          },
+          {
+            name: "Stripe",
+            description: "Endpoints related to Stripe integration",
+          },
+        ],
         components: await OpenAPI.components,
         paths: await OpenAPI.getPaths(),
       },
