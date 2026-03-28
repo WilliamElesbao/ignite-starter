@@ -11,5 +11,5 @@ export const useGetStripeProducts = () =>
 
 export const useGetStripeSubscriptionDetails = () =>
   useQuery({
-    ...getStripeSubscriptionDetailsOptions({ credentials: "include" }),
+    ...getStripeSubscriptionDetailsOptions(),
   });

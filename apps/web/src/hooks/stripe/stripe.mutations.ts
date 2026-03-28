@@ -7,15 +7,15 @@ import { useMutation } from "@tanstack/react-query";
 
 export const useStripeSubscription = () =>
   useMutation({
-    ...postStripeSubscriptionMutation({ credentials: "include" }),
+    ...postStripeSubscriptionMutation(),
   });
 
 export const useStripeUpdateSubscription = () =>
   useMutation({
-    ...patchStripeSubscriptionMutation({ credentials: "include" }),
+    ...patchStripeSubscriptionMutation(),
   });
 
 export const useStripeRevokeSubscription = () =>
   useMutation({
-    ...patchStripeSubscriptionRevokeMutation({ credentials: "include" }),
+    ...patchStripeSubscriptionRevokeMutation(),
   });
