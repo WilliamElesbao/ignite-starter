@@ -1,8 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { ButtonTailwind } from "./ButtonTailwind";
 
-interface ButtonProps {
+export interface ButtonProps {
   children: ReactNode;
   className?: string;
   appName: string;
@@ -10,12 +11,8 @@ interface ButtonProps {
 
 export const Button = ({ children, className, appName }: ButtonProps) => {
   return (
-    <button
-      type="button"
-      className={className}
-      onClick={() => alert(`Hello from your ${appName} app!`)}
-    >
+    <ButtonTailwind className={className} appName={appName}>
       {children}
-    </button>
+    </ButtonTailwind>
   );
 };
