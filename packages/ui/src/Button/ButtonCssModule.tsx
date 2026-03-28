@@ -3,8 +3,14 @@
 import type { ButtonProps } from "./Button";
 import styles from "./ButtonCssModule.module.css";
 
-export const ButtonCssModule = ({ children, className, appName }: ButtonProps) => {
-  const mergedClasses = className ? `${styles.button} ${className}` : styles.button;
+export const ButtonCssModule = ({
+  children,
+  className,
+  appName,
+}: ButtonProps) => {
+  const mergedClasses = className
+    ? `${styles.button} ${className}`
+    : styles.button;
 
   return (
     <button
