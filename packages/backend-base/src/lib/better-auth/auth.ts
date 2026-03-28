@@ -4,7 +4,6 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
 import { env } from "../../env";
 
-
 export const auth = betterAuth({
   // account: {
   //   accountLinking: {
