@@ -1,13 +1,13 @@
 import { Elysia } from "elysia";
-import authPLugin from "../../auth/auth.plugin";
 import { ErrorDto } from "../../shared/dtos/error.dto";
 import shared from "../../shared/shared.plugin";
+import authPlugin from "../auth/auth.plugin";
 import { UserResponseDto } from "./dtos/user-response.dto";
 import { UserService } from "./user.service";
 
-export const userPlugin = new Elysia({ tags: ["User"] })
+const userPlugin = new Elysia({ tags: ["User"] })
   .use(shared)
-  .use(authPLugin)
+  .use(authPlugin)
   .state((state) => ({
     ...state,
     userService: new UserService(state.db),
@@ -40,3 +40,4 @@ export const userPlugin = new Elysia({ tags: ["User"] })
   );
 
 export type UserPlugin = typeof userPlugin;
+export default userPlugin;

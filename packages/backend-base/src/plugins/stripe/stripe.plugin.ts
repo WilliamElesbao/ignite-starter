@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
-import authPLugin from "../../auth/auth.plugin";
 import { ErrorDto } from "../../shared/dtos/error.dto";
 import shared from "../../shared/shared.plugin";
+import authPLugin from "../auth/auth.plugin";
 import { ProductsResponseDto } from "./dtos/products-response.dto";
 import { SubscriptionBodyDto } from "./dtos/subscription/subscription-body.dto";
 import { SubscriptionDetailsResponseDto } from "./dtos/subscription/subscription-details-response.dto";
@@ -9,7 +9,7 @@ import { SubscriptionResponseDto } from "./dtos/subscription/subscription-respon
 import { WebhookResponseDto } from "./dtos/webhook-response.dto";
 import { StripeService } from "./stripe.service";
 
-export const stripePlugin = new Elysia({ tags: ["Stripe"] })
+const stripePlugin = new Elysia({ tags: ["Stripe"] })
   .use(shared)
   .use(authPLugin)
   .state((state) => ({
@@ -172,3 +172,4 @@ export const stripePlugin = new Elysia({ tags: ["Stripe"] })
   );
 
 export type StripePlugin = typeof stripePlugin;
+export default stripePlugin;

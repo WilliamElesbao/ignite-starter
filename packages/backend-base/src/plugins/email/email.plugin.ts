@@ -3,7 +3,7 @@ import shared from "../../shared/shared.plugin";
 import { EmailResponseDto } from "./dtos/email-response.dto";
 import { EmailService } from "./email.service";
 
-export const emailPlugin = new Elysia({ tags: ["Email"] })
+const emailPlugin = new Elysia({ tags: ["Email"] })
   .use(shared)
   .state((state) => ({
     ...state,
@@ -33,3 +33,4 @@ export const emailPlugin = new Elysia({ tags: ["Email"] })
   );
 
 export type EmailPlugin = typeof emailPlugin;
+export default emailPlugin;
