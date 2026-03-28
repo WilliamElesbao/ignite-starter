@@ -2,7 +2,7 @@
   "name": "@repo/api",
   "private": true,
   "scripts": {
-    "generate": "openapi-ts"
+    "generate": "bun --env-file .env openapi-ts"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.95.2"
