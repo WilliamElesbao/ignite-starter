@@ -5,7 +5,7 @@ import shared from "../../shared/shared.plugin";
 import { UserResponseDto } from "./dtos/user-response.dto";
 import { UserService } from "./user.service";
 
-const plugin = new Elysia({ tags: ["user"] })
+const plugin = new Elysia({ tags: ["User"] })
   .use(shared)
   .use(authPLugin)
   .state((state) => ({

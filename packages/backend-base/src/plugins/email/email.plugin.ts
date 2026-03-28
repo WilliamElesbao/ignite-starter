@@ -3,7 +3,7 @@ import shared from "../../shared/shared.plugin";
 import { EmailResponseDto } from "./dtos/email-response.dto";
 import { EmailService } from "./email.service";
 
-const plugin = new Elysia({ tags: ["email"] })
+const plugin = new Elysia({ tags: ["Email"] })
   .use(shared)
   .state((state) => ({
     ...state,
