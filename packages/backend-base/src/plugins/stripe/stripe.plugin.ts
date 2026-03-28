@@ -14,7 +14,7 @@ export const stripePlugin = new Elysia({ tags: ["Stripe"] })
   .use(authPLugin)
   .state((state) => ({
     ...state,
-    stripeService: new StripeService(state.db),
+    stripeService: new StripeService(state.db, state.stripe),
   }))
   .group("/stripe", (app) =>
     app

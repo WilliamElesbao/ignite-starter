@@ -4,20 +4,22 @@ import { eq } from "drizzle-orm";
 import type Stripe from "stripe";
 import { env } from "../../env";
 import type { SessionResponse } from "../../lib/better-auth/auth";
-import { stripe } from "../../lib/stripe";
 import type { db } from "../../shared/shared.plugin";
 import { safePromise } from "../../utils/safe-promise";
 import type { TSubscriptionBodyDto } from "./dtos/subscription/subscription-body.dto";
 
 export class StripeService {
-  constructor(private readonly db: db) {}
+  constructor(
+    private readonly db: db,
+    private readonly stripe: Stripe,
+  ) {}
 
   async getProducts() {
-    const prices = await stripe.prices.list({
+    const prices = await this.stripe.prices.list({
       limit: 3,
     });
 
-    const products = await stripe.products.list();
+    const products = await this.stripe.products.list();
 
     const normalizedProducts = prices.data.map((price) => {
       const product = products.data.find((p) => p.id === price.product);
@@ -38,7 +40,7 @@ export class StripeService {
     planName,
     user,
   }: TSubscriptionBodyDto & { user: SessionResponse["user"] }) {
-    const createSubscription = await stripe.checkout.sessions.create({
+    const createSubscription = await this.stripe.checkout.sessions.create({
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
       success_url: "http://localhost:3000",
@@ -69,14 +71,14 @@ export class StripeService {
     }
 
     const [currentSubscription, currentSubscriptionError] = await safePromise(
-      stripe.subscriptions.retrieve(subscription.stripeSubscriptionId),
+      this.stripe.subscriptions.retrieve(subscription.stripeSubscriptionId),
     );
 
     if (currentSubscriptionError) {
       return { error: "Failed to retrieve subscription" };
     }
 
-    const updated = await stripe.subscriptions.update(
+    const updated = await this.stripe.subscriptions.update(
       subscription.stripeSubscriptionId,
       {
         items: [
@@ -117,7 +119,7 @@ export class StripeService {
       };
     }
 
-    const subscriptionDetails = await stripe.subscriptions.retrieve(
+    const subscriptionDetails = await this.stripe.subscriptions.retrieve(
       subscription.stripeSubscriptionId,
     );
 
@@ -125,8 +127,8 @@ export class StripeService {
     const productId = subscriptionDetails.items.data[0]?.price
       ?.product as string;
 
-    const price = await stripe.prices.retrieve(priceId);
-    const product = await stripe.products.retrieve(productId);
+    const price = await this.stripe.prices.retrieve(priceId);
+    const product = await this.stripe.products.retrieve(productId);
 
     const current_period_start = dayjs
       .unix(subscriptionDetails.items.data[0].current_period_start)
@@ -170,7 +172,7 @@ export class StripeService {
       return { error: "Subscription not found" };
     }
 
-    await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+    await this.stripe.subscriptions.update(subscription.stripeSubscriptionId, {
       cancel_at_period_end: true,
     });
 
@@ -193,7 +195,7 @@ export class StripeService {
     let event: Stripe.Event;
 
     try {
-      event = await stripe.webhooks.constructEventAsync(
+      event = await this.stripe.webhooks.constructEventAsync(
         payload,
         signature,
         env.STRIPE_WEBHOOK_SECRET,
