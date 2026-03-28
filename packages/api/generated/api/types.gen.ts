@@ -51,6 +51,28 @@ export type Verification = {
   updatedAt: string;
 };
 
+export const StatusEnum = {
+  INCOMPLETE: "incomplete",
+  INCOMPLETE_EXPIRED: "incomplete_expired",
+  TRIALING: "trialing",
+  ACTIVE: "active",
+  PAST_DUE: "past_due",
+  CANCELED: "canceled",
+  UNPAID: "unpaid",
+  PAUSED: "paused",
+} as const;
+
+export type StatusEnum = (typeof StatusEnum)[keyof typeof StatusEnum];
+
+export const IntervalEnum = {
+  DAY: "day",
+  WEEK: "week",
+  MONTH: "month",
+  YEAR: "year",
+} as const;
+
+export type IntervalEnum = (typeof IntervalEnum)[keyof typeof IntervalEnum];
+
 export const RedirectEnum = { FALSE: false } as const;
 
 export type RedirectEnum = (typeof RedirectEnum)[keyof typeof RedirectEnum];
@@ -170,6 +192,232 @@ export type PostEmailSendResponses = {
 
 export type PostEmailSendResponse =
   PostEmailSendResponses[keyof PostEmailSendResponses];
+
+export type GetStripeProductsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/stripe/products";
+};
+
+export type GetStripeProductsResponses = {
+  /**
+   * Response for status 200
+   */
+  200: Array<{
+    id: string;
+    planName: string;
+    currency: string;
+    price: number | null | null;
+    recurring: {
+      interval: string;
+      interval_count: number;
+      meter: null | null;
+      trial_period_days: number | null | null;
+      usage_type: string;
+    } | null | null;
+  }>;
+};
+
+export type GetStripeProductsResponse =
+  GetStripeProductsResponses[keyof GetStripeProductsResponses];
+
+export type PatchStripeSubscriptionData = {
+  body: {
+    priceId: string;
+    planName: string;
+  };
+  path?: never;
+  query?: never;
+  url: "/stripe/subscription";
+};
+
+export type PatchStripeSubscriptionErrors = {
+  /**
+   * Response for status 401
+   */
+  401: {
+    message: string;
+  };
+  /**
+   * Response for status 500
+   */
+  500: {
+    message: string;
+  };
+};
+
+export type PatchStripeSubscriptionError =
+  PatchStripeSubscriptionErrors[keyof PatchStripeSubscriptionErrors];
+
+export type PatchStripeSubscriptionResponses = {
+  /**
+   * Response for status 204
+   */
+  204: null;
+};
+
+export type PostStripeSubscriptionData = {
+  body: {
+    priceId: string;
+    planName: string;
+  };
+  path?: never;
+  query?: never;
+  url: "/stripe/subscription";
+};
+
+export type PostStripeSubscriptionErrors = {
+  /**
+   * Response for status 401
+   */
+  401: {
+    message: string;
+  };
+  /**
+   * Response for status 500
+   */
+  500: {
+    message: string;
+  };
+};
+
+export type PostStripeSubscriptionError =
+  PostStripeSubscriptionErrors[keyof PostStripeSubscriptionErrors];
+
+export type PostStripeSubscriptionResponses = {
+  /**
+   * Response for status 200
+   */
+  200: {
+    url: string;
+  };
+};
+
+export type PostStripeSubscriptionResponse =
+  PostStripeSubscriptionResponses[keyof PostStripeSubscriptionResponses];
+
+export type GetStripeSubscriptionDetailsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/stripe/subscription/details";
+};
+
+export type GetStripeSubscriptionDetailsErrors = {
+  /**
+   * Response for status 401
+   */
+  401: {
+    message: string;
+  };
+};
+
+export type GetStripeSubscriptionDetailsError =
+  GetStripeSubscriptionDetailsErrors[keyof GetStripeSubscriptionDetailsErrors];
+
+export type GetStripeSubscriptionDetailsResponses = {
+  /**
+   * Response for status 200
+   */
+  200: {
+    message?: string;
+    id?: string;
+    status?: StatusEnum;
+    current_period_start?: string;
+    current_period_end?: string;
+    cancel_at_period_end?: boolean;
+    customer?:
+      | string
+      | {
+          [key: string]: null;
+        };
+    created?: string;
+    plan?: {
+      priceId: string;
+      amount: number | null | null;
+      currency: string;
+      interval?: IntervalEnum;
+    };
+    product?: {
+      id: string;
+      name: string;
+      description: string | null | null;
+    };
+  };
+};
+
+export type GetStripeSubscriptionDetailsResponse =
+  GetStripeSubscriptionDetailsResponses[keyof GetStripeSubscriptionDetailsResponses];
+
+export type PatchStripeSubscriptionRevokeData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/stripe/subscription/revoke";
+};
+
+export type PatchStripeSubscriptionRevokeErrors = {
+  /**
+   * Response for status 401
+   */
+  401: {
+    message: string;
+  };
+  /**
+   * Response for status 500
+   */
+  500: {
+    message: string;
+  };
+};
+
+export type PatchStripeSubscriptionRevokeError =
+  PatchStripeSubscriptionRevokeErrors[keyof PatchStripeSubscriptionRevokeErrors];
+
+export type PatchStripeSubscriptionRevokeResponses = {
+  /**
+   * Response for status 204
+   */
+  204: null;
+};
+
+export type PostStripeWebhookData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/stripe/webhook";
+};
+
+export type PostStripeWebhookErrors = {
+  /**
+   * Response for status 400
+   */
+  400: {
+    message: string;
+  };
+  /**
+   * Response for status 500
+   */
+  500: {
+    message: string;
+  };
+};
+
+export type PostStripeWebhookError =
+  PostStripeWebhookErrors[keyof PostStripeWebhookErrors];
+
+export type PostStripeWebhookResponses = {
+  /**
+   * Response for status 200
+   */
+  200: {
+    message: string;
+  };
+};
+
+export type PostStripeWebhookResponse =
+  PostStripeWebhookResponses[keyof PostStripeWebhookResponses];
 
 export type SocialSignInData = {
   body: {

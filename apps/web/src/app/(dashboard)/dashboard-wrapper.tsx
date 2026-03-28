@@ -11,7 +11,10 @@ import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { DialogProvider } from "@/context/dialog.context";
 import { useWelcomeToast } from "@/hooks/auth";
-import { useProducts, useSubscriptionDetails } from "@/hooks/stripe";
+import {
+  useGetStripeProducts,
+  useGetStripeSubscriptionDetails,
+} from "@/hooks/stripe/stripe.queries";
 import type { SessionResponse } from "@/lib/better-auth/auth-server";
 import data from "./data.json";
 
@@ -24,10 +27,8 @@ export function DashboardWrapper({ user }: DashboardWrapperProps) {
   const searchParams = useSearchParams();
   const isWelcome = searchParams.get("welcome") === "true";
 
-  const { data: products } = useProducts();
-  const { data: subscription } = useSubscriptionDetails({
-    stripeSubscriptionId: user?.stripeSubscriptionId ?? "",
-  });
+  const { data: products } = useGetStripeProducts();
+  const { data: subscription } = useGetStripeSubscriptionDetails();
 
   useWelcomeToast({
     showWelcomeToast: !!user?.id && isWelcome,

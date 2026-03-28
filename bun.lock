@@ -16,7 +16,7 @@
     },
     "apps/backend": {
       "name": "@apps/backend",
-      "version": "1.0.50",
+      "version": "0.0.0",
       "dependencies": {
         "@elysiajs/openapi": "^1.4.14",
         "@repo/backend-base": "workspace:*",
@@ -37,7 +37,6 @@
         "@dnd-kit/utilities": "^3.2.2",
         "@react-email/components": "1.0.10",
         "@repo/api": "workspace:*",
-        "@repo/db": "workspace:*",
         "@tabler/icons-react": "^3.40.0",
         "@tanstack/react-query": "^5.95.2",
         "@tanstack/react-table": "^8.21.3",
@@ -70,7 +69,7 @@
       "devDependencies": {
         "@biomejs/biome": "2.2.0",
         "@chromatic-com/storybook": "^5.0.2",
-        "@repo/typescript-config": "*",
+        "@repo/typescript-config": "workspace:*",
         "@storybook/addon-a11y": "^10.3.3",
         "@storybook/addon-docs": "^10.3.3",
         "@storybook/addon-onboarding": "^10.3.3",
@@ -99,7 +98,7 @@
       },
       "devDependencies": {
         "@hey-api/openapi-ts": "0.94.4",
-        "@repo/typescript-config": "*",
+        "@repo/typescript-config": "workspace:*",
       },
     },
     "packages/backend-base": {
@@ -110,11 +109,13 @@
         "@repo/emails": "workspace:*",
         "axios": "^1.13.6",
         "better-auth": "^1.5.6",
+        "dayjs": "^1.11.20",
         "dotenv": "^17.3.1",
         "drizzle-orm": "^0.45.1",
         "elysia": "latest",
         "pg": "^8.20.0",
         "resend": "^6.9.4",
+        "stripe": "^18.3.0",
         "zod": "^4.3.6",
       },
       "devDependencies": {

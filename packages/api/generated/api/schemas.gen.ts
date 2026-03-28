@@ -154,6 +154,25 @@ export const VerificationSchema = {
   required: ["identifier", "value", "expiresAt", "createdAt", "updatedAt"],
 } as const;
 
+export const StatusEnumSchema = {
+  enum: [
+    "incomplete",
+    "incomplete_expired",
+    "trialing",
+    "active",
+    "past_due",
+    "canceled",
+    "unpaid",
+    "paused",
+  ],
+  type: "string",
+} as const;
+
+export const IntervalEnumSchema = {
+  enum: ["day", "week", "month", "year"],
+  type: "string",
+} as const;
+
 export const RedirectEnumSchema = {
   type: "boolean",
   enum: [false],

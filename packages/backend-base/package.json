@@ -9,16 +9,18 @@
     "db:studio": "bunx --bun  drizzle-kit studio"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.4.1",
     "@repo/db": "workspace:*",
     "@repo/emails": "workspace:*",
-    "@elysiajs/cors": "^1.4.1",
     "axios": "^1.13.6",
     "better-auth": "^1.5.6",
+    "dayjs": "^1.11.20",
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.1",
     "elysia": "latest",
     "pg": "^8.20.0",
     "resend": "^6.9.4",
+    "stripe": "^18.3.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

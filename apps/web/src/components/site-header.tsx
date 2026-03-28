@@ -1,10 +1,10 @@
+import type { GetStripeSubscriptionDetailsResponse } from "@repo/api/generated/api/types.gen";
 import Link from "next/link";
 import * as IconsSi from "rocketicons/si";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { SessionResponse } from "@/lib/better-auth/auth-server";
-import type { SubscriptionDetailsResponseDto } from "@/services/stripe/dtos";
 import CancelSubscriptionDialog from "./origin-ui/cancel-plan-dialog";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -13,7 +13,7 @@ export function SiteHeader({
   subscription,
 }: Readonly<{
   user?: SessionResponse["user"];
-  subscription?: SubscriptionDetailsResponseDto | null;
+  subscription?: GetStripeSubscriptionDetailsResponse | null;
 }>) {
   const hasSubscription =
     !!user?.stripeSubscriptionId && !subscription?.cancel_at_period_end;

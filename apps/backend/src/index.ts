@@ -1,5 +1,10 @@
 import openapi from "@elysiajs/openapi";
-import { emailPlugin, OpenAPI, userPlugin } from "@repo/backend-base";
+import {
+  emailPlugin,
+  OpenAPI,
+  stripePlugin,
+  userPlugin,
+} from "@repo/backend-base";
 import { Elysia } from "elysia";
 
 const app = new Elysia()
@@ -12,7 +17,8 @@ const app = new Elysia()
     }),
   )
   .use(userPlugin)
-  .use(emailPlugin);
+  .use(emailPlugin)
+  .use(stripePlugin);
 
 app.listen(process.env.PORT ?? 3333);
 

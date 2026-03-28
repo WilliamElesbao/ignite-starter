@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useCancelSubscription } from "@/hooks/stripe";
+import { useCancelSubscription } from "@/hooks/stripe/use-subscription";
 
 const PHRASE = "Yes, I'd like to cancel my subscription";
 

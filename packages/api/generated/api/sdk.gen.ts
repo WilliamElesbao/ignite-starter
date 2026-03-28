@@ -35,6 +35,11 @@ import type {
   GetSessionData,
   GetSessionErrors,
   GetSessionResponses,
+  GetStripeProductsData,
+  GetStripeProductsResponses,
+  GetStripeSubscriptionDetailsData,
+  GetStripeSubscriptionDetailsErrors,
+  GetStripeSubscriptionDetailsResponses,
   GetUserByIdData,
   GetUserByIdErrors,
   GetUserByIdResponses,
@@ -47,6 +52,12 @@ import type {
   ListUserSessionsData,
   ListUserSessionsErrors,
   ListUserSessionsResponses,
+  PatchStripeSubscriptionData,
+  PatchStripeSubscriptionErrors,
+  PatchStripeSubscriptionResponses,
+  PatchStripeSubscriptionRevokeData,
+  PatchStripeSubscriptionRevokeErrors,
+  PatchStripeSubscriptionRevokeResponses,
   PostAuthCallbackByIdData,
   PostAuthCallbackByIdErrors,
   PostAuthGetAccessTokenData,
@@ -70,6 +81,12 @@ import type {
   PostEmailSendData,
   PostEmailSendErrors,
   PostEmailSendResponses,
+  PostStripeSubscriptionData,
+  PostStripeSubscriptionErrors,
+  PostStripeSubscriptionResponses,
+  PostStripeWebhookData,
+  PostStripeWebhookErrors,
+  PostStripeWebhookResponses,
   RequestPasswordResetData,
   RequestPasswordResetErrors,
   RequestPasswordResetResponses,
@@ -145,6 +162,96 @@ export const postEmailSend = <ThrowOnError extends boolean = false>(
     PostEmailSendErrors,
     ThrowOnError
   >({ url: "/email/send", ...options });
+
+/**
+ * Get all products from Stripe
+ */
+export const getStripeProducts = <ThrowOnError extends boolean = false>(
+  options?: Options<GetStripeProductsData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    GetStripeProductsResponses,
+    null,
+    ThrowOnError
+  >({ url: "/stripe/products", ...options });
+
+/**
+ * Update an existing subscription
+ */
+export const patchStripeSubscription = <ThrowOnError extends boolean = false>(
+  options: Options<PatchStripeSubscriptionData, ThrowOnError>,
+) =>
+  (options.client ?? client).patch<
+    PatchStripeSubscriptionResponses,
+    PatchStripeSubscriptionErrors,
+    ThrowOnError
+  >({
+    url: "/stripe/subscription",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Create a new subscription
+ */
+export const postStripeSubscription = <ThrowOnError extends boolean = false>(
+  options: Options<PostStripeSubscriptionData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    PostStripeSubscriptionResponses,
+    PostStripeSubscriptionErrors,
+    ThrowOnError
+  >({
+    url: "/stripe/subscription",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Get subscription details
+ */
+export const getStripeSubscriptionDetails = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetStripeSubscriptionDetailsData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    GetStripeSubscriptionDetailsResponses,
+    GetStripeSubscriptionDetailsErrors,
+    ThrowOnError
+  >({ url: "/stripe/subscription/details", ...options });
+
+/**
+ * Revoke subscription access immediately
+ */
+export const patchStripeSubscriptionRevoke = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<PatchStripeSubscriptionRevokeData, ThrowOnError>,
+) =>
+  (options?.client ?? client).patch<
+    PatchStripeSubscriptionRevokeResponses,
+    PatchStripeSubscriptionRevokeErrors,
+    ThrowOnError
+  >({ url: "/stripe/subscription/revoke", ...options });
+
+/**
+ * Stripe webhook
+ */
+export const postStripeWebhook = <ThrowOnError extends boolean = false>(
+  options?: Options<PostStripeWebhookData, ThrowOnError>,
+) =>
+  (options?.client ?? client).post<
+    PostStripeWebhookResponses,
+    PostStripeWebhookErrors,
+    ThrowOnError
+  >({ url: "/stripe/webhook", ...options });
 
 /**
  * Sign in with a social provider

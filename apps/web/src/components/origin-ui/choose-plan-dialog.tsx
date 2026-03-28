@@ -1,5 +1,9 @@
 "use client";
 
+import type {
+  GetStripeProductsResponse,
+  GetStripeSubscriptionDetailsResponse,
+} from "@repo/api/generated/api/types.gen";
 import { CheckIcon, RefreshCcwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,12 +17,11 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useDialog } from "@/context";
-import { useSubscription, useUpdateSubscription } from "@/hooks/stripe";
+import {
+  useSubscription,
+  useUpdateSubscription,
+} from "@/hooks/stripe/use-subscription";
 import type { SessionResponse } from "@/lib/better-auth/auth-server";
-import type {
-  ProductListDto,
-  SubscriptionDetailsResponseDto,
-} from "@/services/stripe/dtos";
 import { formatPrice } from "@/utils";
 import { Form, FormField } from "../ui/form";
 import Badge from "./badge";
@@ -29,8 +32,8 @@ export const ChoosePlanDialog = ({
   subscription,
 }: {
   user?: SessionResponse["user"];
-  products?: ProductListDto;
-  subscription?: SubscriptionDetailsResponseDto | null;
+  products?: GetStripeProductsResponse;
+  subscription?: GetStripeSubscriptionDetailsResponse | null;
 }) => {
   const { dialogIsOpen, setDialogIsOpen } = useDialog();
   const {
@@ -38,16 +41,14 @@ export const ChoosePlanDialog = ({
     onSubmit: subscriptionOnSubmit,
     isPending: isSubscriptionPending,
   } = useSubscription({
-    userId: user?.id,
-    priceId: subscription?.plan?.priceId,
+    priceId: subscription?.plan?.priceId ?? "",
   });
   const {
     form: updateSubscriptionForm,
     onSubmit: updateSubscriptionOnSubmit,
     isPending: isUpdateSubscriptionPending,
   } = useUpdateSubscription({
-    userId: user?.id,
-    priceId: subscription?.plan?.priceId,
+    priceId: subscription?.plan?.priceId ?? "",
   });
 
   const form = user?.stripeSubscriptionId

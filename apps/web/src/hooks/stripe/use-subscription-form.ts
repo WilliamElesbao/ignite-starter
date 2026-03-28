@@ -1,7 +1,13 @@
 // import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import type { z } from "zod";
-import type { SubscriptionPayloadDto } from "@/services/stripe/dtos";
+import { z } from "zod";
+
+const formSchema = z.object({
+  priceId: z.string(),
+  planName: z.string(),
+});
+
+export type SubscriptionFormValues = z.infer<typeof formSchema>;
 
 /**
  * Hook to create and manage the subscription form using React Hook Form and Zod.
@@ -10,18 +16,12 @@ import type { SubscriptionPayloadDto } from "@/services/stripe/dtos";
  * @param userId - The ID of the user subscribing.
  * @returns A configured form instance for the subscription.
  */
-export const useSubscriptionForm = ({
-  priceId,
-  userId,
-}: Partial<
-  Pick<z.infer<typeof SubscriptionPayloadDto>, "priceId" | "userId">
->) => {
-  const form = useForm<z.infer<typeof SubscriptionPayloadDto>>({
+export const useSubscriptionForm = ({ priceId }: { priceId: string }) => {
+  const form = useForm<SubscriptionFormValues>({
     // resolver: zodResolver(SubscriptionPayloadDto),
     defaultValues: {
       priceId: priceId ?? "free",
       planName: "",
-      userId: userId ?? "",
     },
     mode: "onChange",
   });

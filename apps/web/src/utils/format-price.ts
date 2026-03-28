@@ -1,4 +1,4 @@
-import type { ProductDto } from "@/services/stripe/dtos";
+import type { GetStripeProductsResponse } from "@repo/api/generated/api/types.gen";
 
 /**
  * Formats a product price from cents to readable currency string.
@@ -9,9 +9,9 @@ import type { ProductDto } from "@/services/stripe/dtos";
 export const formatPrice = ({
   currency,
   price,
-}: Pick<ProductDto, "currency" | "price">): string => {
+}: Pick<GetStripeProductsResponse[0], "currency" | "price">): string => {
   return new Intl.NumberFormat(currency === "usd" ? "en-US" : "pt-BR", {
     style: "currency",
     currency: currency.toUpperCase(),
-  }).format(price / 100);
+  }).format((price ?? 0) / 100);
 };

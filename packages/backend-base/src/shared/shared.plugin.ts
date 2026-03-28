@@ -8,7 +8,7 @@ const setup = new Elysia({ name: "shared" })
   .use(
     cors({
       origin: [Bun.env.WEB_URL ?? "http://localhost:3000"],
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
       credentials: true,
       allowedHeaders: ["Content-Type", "Authorization"],
     }),
