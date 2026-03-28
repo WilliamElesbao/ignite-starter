@@ -6,7 +6,7 @@
   },
   "scripts": {
     "build": "",
-    "db:schema": "bunx --bun @better-auth/cli@latest generate --config ../backend-base/src/lib/better-auth/auth.ts",
+    "db:schema": "bun run --env-file ../backend-base/.env -- bunx --bun @better-auth/cli@latest generate --config ../backend-base/src/lib/better-auth/auth.ts",
     "db:generate": "bun --env-file .env --bun drizzle-kit generate",
     "db:migrate": "bun --env-file .env --bun drizzle-kit migrate",
     "db:seed": "",
