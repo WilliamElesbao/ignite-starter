@@ -11,3 +11,4 @@
 - [Elysia](https://elysiajs.com/)
 - [Better Auth + Drizzle](https://better-auth.com/docs/adapters/drizzle)
 - [Drizzle](https://orm.drizzle.team/docs/get-started/postgresql-new)
+- [Stripe API](https://docs.stripe.com/api)
