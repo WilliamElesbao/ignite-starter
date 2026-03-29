@@ -11,6 +11,7 @@ import { Elysia } from "elysia";
 const app = new Elysia()
   .use(
     openapi({
+      provider: "scalar",
       documentation: {
         tags: [
           { name: "Better Auth", description: "Authentication endpoints" },
