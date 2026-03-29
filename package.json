@@ -4,6 +4,8 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "prepare": "husky",
+    "commitlint": "commitlint --edit",
     "lint": "turbo run lint --",
     "lint:fix": "turbo run lint -- --fix",
     "format": "turbo run format",
@@ -24,7 +26,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
     "@types/pg": "^8.20.0",
+    "husky": "^9.1.7",
     "turbo": "^2.8.20",
     "typescript": "5.9.2"
   }
