@@ -1,4 +1,7 @@
+<!-- @format -->
+
 # References
+
 - [Better Auth + Google Credentials](https://better-auth.com/docs/authentication/google#get-your-google-credentials)
 - [Setup OAuth to the Google Cloud Console](https://console.cloud.google.com/auth/clients?organizationId=682596896072&project=origin-starter)
 - [Install the Stripe CLI](https://docs.stripe.com/stripe-cli/install?install-method=docker)
@@ -12,3 +15,4 @@
 - [Better Auth + Drizzle](https://better-auth.com/docs/adapters/drizzle)
 - [Drizzle](https://orm.drizzle.team/docs/get-started/postgresql-new)
 - [Stripe API](https://docs.stripe.com/api)
+- [Elysia Crons](https://elysiajs.com/plugins/cron)
