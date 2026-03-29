@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useEmail } from "@/feature/emails/hooks/useSendWelcomeEmail";
+import { useEmail } from "@/hooks/email/useSendWelcomeEmail";
 
 export function NavMain({
   items,

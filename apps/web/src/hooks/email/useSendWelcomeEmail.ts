@@ -1,6 +1,6 @@
 import { toast } from "sonner";
-import { useSendEmail } from "@/hooks/email/email.mutation";
 import { safePromise } from "@/utils/safe-promise";
+import { useSendEmail } from "./email.mutation";
 
 export const useEmail = () => {
   const { mutateAsync } = useSendEmail();
