@@ -25,8 +25,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useDialog } from "@/context";
-import type { User } from "@/lib/better-auth";
-import { authClient } from "@/lib/better-auth/auth-client";
+import { authClient, type User } from "@/lib/better-auth";
 
 export function NavUser({ user }: Readonly<{ user: User }>) {
   const { isMobile } = useSidebar();

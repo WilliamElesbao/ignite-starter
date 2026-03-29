@@ -2,8 +2,6 @@ import type { GetSessionResponse } from "@repo/api/generated/api/types.gen";
 import { cookies } from "next/headers";
 import { safePromise } from "@/utils/safe-promise";
 
-export type User = NonNullable<GetSessionResponse>["user"];
-
 export async function getSession(): Promise<GetSessionResponse> {
   const cookieStore = await cookies();
 

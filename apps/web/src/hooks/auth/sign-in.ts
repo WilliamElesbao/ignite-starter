@@ -1,5 +1,5 @@
 import { WELCOME_TOAST } from "@/constants";
-import { authClient } from "@/lib/better-auth/auth-client";
+import { authClient } from "@/lib/better-auth";
 
 /**
  * Function to trigger Google Sign In flow.
