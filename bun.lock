@@ -86,7 +86,6 @@
         "@types/react-dom": "19.2.2",
         "@vitest/browser-playwright": "^4.1.1",
         "@vitest/coverage-v8": "^4.1.1",
-        "husky": "^9.1.7",
         "playwright": "^1.58.2",
         "storybook": "^10.3.3",
         "tailwindcss": "^4",
