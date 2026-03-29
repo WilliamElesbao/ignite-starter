@@ -1,39 +1,36 @@
-import axios from "axios";
+import type { GetSessionResponse } from "@repo/api/generated/api/types.gen";
 import { cookies } from "next/headers";
+import { safePromise } from "@/utils/safe-promise";
 
-// TODO: Use SessionResponse type from the backend package
-export interface SessionResponse {
-  session: {
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    userId: string;
-    expiresAt: Date;
-    token: string;
-    ipAddress?: string | null;
-    userAgent?: string | null;
-  };
-  user: {
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    email: string;
-    emailVerified: boolean;
-    name: string;
-    image?: string | null;
-    stripeSubscriptionId?: string | null;
-  };
-}
+export type User = NonNullable<GetSessionResponse>["user"];
 
-export async function getSession(): Promise<SessionResponse | null> {
+export async function getSession(): Promise<GetSessionResponse> {
   const cookieStore = await cookies();
 
-  const { data } = await axios.get<SessionResponse>(
-    `${process.env.API_URL}/auth/get-session`,
-    {
+  const [res, err] = await safePromise(
+    fetch(`${process.env.API_URL}/auth/get-session`, {
       headers: { Cookie: cookieStore.toString() },
-    },
+    }),
   );
+
+  if (err || !res.ok) {
+    console.error("Fetch error:", err);
+    return null;
+  }
+
+  const [json, jsonErr] = await safePromise(res.json());
+
+  if (jsonErr) {
+    console.error("JSON parse error:", jsonErr);
+    return null;
+  }
+
+  const data = json as GetSessionResponse; // Assuming the API response matches the SessionResponse type
+
+  if (!data) {
+    console.error("Invalid session data:", data);
+    return null;
+  }
 
   return data;
 }

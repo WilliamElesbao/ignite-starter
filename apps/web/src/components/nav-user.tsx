@@ -6,7 +6,6 @@ import {
   IconNotification,
   IconUserCircle,
 } from "@tabler/icons-react";
-import type { User } from "better-auth";
 import { Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,9 +25,10 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useDialog } from "@/context";
+import type { User } from "@/lib/better-auth";
 import { authClient } from "@/lib/better-auth/auth-client";
 
-export function NavUser({ user }: Readonly<{ user?: User | null }>) {
+export function NavUser({ user }: Readonly<{ user: User }>) {
   const { isMobile } = useSidebar();
   const { setDialogIsOpen } = useDialog();
   const router = useRouter();

@@ -4,7 +4,6 @@ import type {
   GetStripeProductsResponse,
   GetStripeSubscriptionDetailsResponse,
 } from "@repo/api/generated/api/types.gen";
-import type { SessionResponse } from "@repo/backend-base";
 import { CheckIcon, RefreshCcwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +21,7 @@ import {
   useSubscription,
   useUpdateSubscription,
 } from "@/hooks/stripe/use-subscription";
+import type { User } from "@/lib/better-auth";
 import { formatPrice } from "@/utils";
 import { Form, FormField } from "../ui/form";
 import Badge from "./badge";
@@ -31,7 +31,7 @@ export const ChoosePlanDialog = ({
   products,
   subscription,
 }: {
-  user?: SessionResponse["user"];
+  user: User;
   products?: GetStripeProductsResponse;
   subscription?: GetStripeSubscriptionDetailsResponse | null;
 }) => {

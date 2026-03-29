@@ -1,6 +1,5 @@
 "use client";
 
-import type { User } from "better-auth";
 import Link from "next/link";
 import type * as React from "react";
 import * as IconsGi from "rocketicons/gi";
@@ -18,12 +17,13 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { data } from "@/constants";
+import type { User } from "@/lib/better-auth";
 
 export function AppSidebar({
   user,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
-  user?: User;
+  user: User;
 }) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>

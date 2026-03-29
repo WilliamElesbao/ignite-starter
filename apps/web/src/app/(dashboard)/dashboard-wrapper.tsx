@@ -1,6 +1,5 @@
 "use client";
 
-import type { SessionResponse } from "@repo/backend-base";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { DataTable } from "@/components/data-table";
@@ -14,10 +13,11 @@ import {
   useGetStripeProducts,
   useGetStripeSubscriptionDetails,
 } from "@/hooks/stripe/stripe.queries";
+import type { User } from "@/lib/better-auth";
 import data from "./data.json";
 
 interface DashboardWrapperProps {
-  user?: SessionResponse["user"];
+  user: User;
 }
 
 export function DashboardWrapper({ user }: DashboardWrapperProps) {
