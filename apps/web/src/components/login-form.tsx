@@ -23,10 +23,10 @@ export function LoginForm({
               <div className="flex size-8 items-center justify-center rounded-md">
                 <IconsGi.GiFox className="size-8 text-primary" />
               </div>
-              <span className="sr-only">Fox Starter</span>
+              <span className="sr-only">Ignite Starter</span>
             </Link>
             <h1 className="font-bold text-xl">
-              Welcome to <span className="text-primary">Fox</span> Starter
+              Welcome to <span className="text-primary">Ignite</span> Starter
             </h1>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
