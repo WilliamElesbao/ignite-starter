@@ -181,8 +181,6 @@ export class StripeService {
       .set({ updatedAt: dayjs().toDate() })
       .where(eq(schema.users.id, user.id))
       .returning();
-
-    // TODO: Cron job to check for subscriptions that have passed their current_period_end and set stripeSubscriptionId to null
   }
 
   async webhookHandler({

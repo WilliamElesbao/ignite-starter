@@ -3,6 +3,7 @@ import {
   emailPlugin,
   OpenAPI,
   stripePlugin,
+  subscriptionExpirationCron,
   userPlugin,
 } from "@repo/backend-base";
 import { Elysia } from "elysia";
@@ -28,6 +29,7 @@ const app = new Elysia()
       },
     }),
   )
+  .use(subscriptionExpirationCron)
   .use(userPlugin)
   .use(emailPlugin)
   .use(stripePlugin);
