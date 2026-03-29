@@ -50,7 +50,9 @@ export function WelcomeEmail({ name, actionUrl }: Readonly<WelcomeEmailProps>) {
         <Body className="bg-white font-sans">
           <Container className="mx-auto py-12 px-4 max-w-xl">
             {/* Logo/Brand area */}
-            <Text className="text-2xl font-bold text-black">Ignite Starter</Text>
+            <Text className="text-2xl font-bold text-black">
+              Ignite Starter
+            </Text>
 
             {/* Main heading */}
             <Heading className="text-2xl font-bold text-gray-900 mt-8">
@@ -59,8 +61,8 @@ export function WelcomeEmail({ name, actionUrl }: Readonly<WelcomeEmailProps>) {
 
             {/* Body content */}
             <Text className="text-base text-gray-700 leading-6">
-              You just finished configuring your starter project, and you&apos;re
-              ready to build fast.
+              You just finished configuring your starter project, and
+              you&apos;re ready to build fast.
             </Text>
 
             <Text className="text-base text-gray-700 leading-6">
@@ -85,8 +87,8 @@ export function WelcomeEmail({ name, actionUrl }: Readonly<WelcomeEmailProps>) {
 
             {/* Footer */}
             <Text className="text-sm text-gray-500">
-              If you didn&apos;t set up Ignite Starter, you can safely ignore this
-              email.
+              If you didn&apos;t set up Ignite Starter, you can safely ignore
+              this email.
             </Text>
           </Container>
         </Body>
