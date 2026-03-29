@@ -4,6 +4,7 @@ import type {
   GetStripeProductsResponse,
   GetStripeSubscriptionDetailsResponse,
 } from "@repo/api/generated/api/types.gen";
+import type { SessionResponse } from "@repo/backend-base";
 import { CheckIcon, RefreshCcwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +22,6 @@ import {
   useSubscription,
   useUpdateSubscription,
 } from "@/hooks/stripe/use-subscription";
-import type { SessionResponse } from "@/lib/better-auth/auth-server";
 import { formatPrice } from "@/utils";
 import { Form, FormField } from "../ui/form";
 import Badge from "./badge";
@@ -58,8 +58,8 @@ export const ChoosePlanDialog = ({
     ? updateSubscriptionOnSubmit
     : subscriptionOnSubmit;
 
-  console.log("[ChoosePlanDialog] user", user);
-  console.log("[form]", form.getValues());
+  // console.log("[ChoosePlanDialog] user", user);
+  // console.log("[form]", form.getValues());
 
   const selectedPriceId = form.watch("priceId");
   const currentPriceId = subscription?.plan?.priceId;
