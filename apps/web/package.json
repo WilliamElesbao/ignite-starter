@@ -12,8 +12,7 @@
     "lint:fix": "biome check --fix --unsafe .",
     "ci": "biome ci .",
     "format": "biome format --write .",
-    "lint:watch": "bunx onchange . -- biome check --write --no-errors-on-unmatched {{changed}}",
-    "prepare": "husky"
+    "lint:watch": "bunx onchange . -- biome check --write --no-errors-on-unmatched {{changed}}"
   },
   "dependencies": {
     "@repo/api": "workspace:*",
