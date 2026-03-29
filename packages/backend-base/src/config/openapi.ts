@@ -14,6 +14,7 @@ export const OpenAPI = {
         reference[key] = paths[path];
 
         for (const method of Object.keys(paths[path])) {
+          // biome-ignore lint/suspicious/noExplicitAny: dynamic indexing from OpenAPI schema
           const operation = (reference[key] as any)[method];
 
           operation.tags = ["Better Auth"];
@@ -21,6 +22,8 @@ export const OpenAPI = {
       }
 
       return reference;
+      // biome-ignore lint/suspicious/noExplicitAny: schema typing limitation
     }) as Promise<any>,
+  // biome-ignore lint/suspicious/noExplicitAny: schema typing limitation
   components: getSchema().then(({ components }) => components) as Promise<any>,
 } as const;
