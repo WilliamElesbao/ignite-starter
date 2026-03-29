@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./*": "./src/*"
+    "./button": "./src/button/index.ts"
   },
   "scripts": {
     "generate:component": "turbo gen react-component",
