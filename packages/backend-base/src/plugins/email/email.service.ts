@@ -1,4 +1,5 @@
 import { WelcomeEmail } from "@repo/emails/templates";
+import { env } from "../../env";
 import { resend } from "../../lib/resend";
 
 const emailFrom = process.env.EMAIL_FROM ?? "";
@@ -11,7 +12,7 @@ export class EmailService {
         from: emailFrom,
         to: emailTo,
         subject: "Welcome to Origin Starter!",
-        react: WelcomeEmail({ name: "D3v" }),
+        react: WelcomeEmail({ name: "D3v", actionUrl: env.WEB_URL }),
       });
 
       return { data, error };
