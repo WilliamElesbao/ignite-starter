@@ -44,28 +44,33 @@ export function WelcomeEmail({ name, actionUrl }: Readonly<WelcomeEmailProps>) {
     <Html lang="en">
       <Head />
       {/* Preview text appears in email inbox list */}
-      <Preview>Welcome to Acme - Let&apos;s get started!</Preview>
+      <Preview>Nice! You just set up Ignite Starter.</Preview>
 
       <Tailwind>
         <Body className="bg-white font-sans">
           <Container className="mx-auto py-12 px-4 max-w-xl">
             {/* Logo/Brand area */}
-            <Text className="text-2xl font-bold text-black">Acme</Text>
+            <Text className="text-2xl font-bold text-black">Ignite Starter</Text>
 
             {/* Main heading */}
             <Heading className="text-2xl font-bold text-gray-900 mt-8">
-              Welcome aboard, {name}!
+              Nice setup, {name}! Welcome to Ignite Starter 🚀
             </Heading>
 
             {/* Body content */}
             <Text className="text-base text-gray-700 leading-6">
-              We&apos;re thrilled to have you join us. Your account is all set
-              up and ready to go.
+              You just finished configuring your starter project, and you&apos;re
+              ready to build fast.
             </Text>
 
             <Text className="text-base text-gray-700 leading-6">
-              Click the button below to access your dashboard and explore
-              everything Acme has to offer.
+              Ignite Starter gives you a solid monorepo foundation so you can
+              focus on shipping features instead of wiring everything from
+              scratch.
+            </Text>
+
+            <Text className="text-base text-gray-700 leading-6">
+              Open your dashboard to start your next project.
             </Text>
 
             {/* Call-to-action button */}
@@ -73,15 +78,15 @@ export function WelcomeEmail({ name, actionUrl }: Readonly<WelcomeEmailProps>) {
               href={actionUrl}
               className="bg-black text-white px-6 py-3 rounded-md font-medium mt-4 inline-block box-border"
             >
-              Go to Dashboard
+              Launch Dashboard
             </Button>
 
             <Hr className="border-gray-200 my-8" />
 
             {/* Footer */}
             <Text className="text-sm text-gray-500">
-              If you didn&apos;t create an account with Acme, you can safely
-              ignore this email.
+              If you didn&apos;t set up Ignite Starter, you can safely ignore this
+              email.
             </Text>
           </Container>
         </Body>
