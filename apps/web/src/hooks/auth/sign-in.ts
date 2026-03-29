@@ -1,3 +1,4 @@
+import { WELCOME_TOAST } from "@/constants";
 import { authClient } from "@/lib/better-auth/auth-client";
 
 /**
@@ -6,10 +7,12 @@ import { authClient } from "@/lib/better-auth/auth-client";
  */
 export const signIn = async () => {
   try {
+    sessionStorage.setItem(WELCOME_TOAST.key, WELCOME_TOAST.value);
+
     await authClient.signIn.social(
       {
         provider: "google",
-        callbackURL: `${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}/?welcome=true`,
+        callbackURL: `${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}`,
       },
       {
         onError: (context) => {

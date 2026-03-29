@@ -1,7 +1,5 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { DataTable } from "@/components/data-table";
@@ -23,24 +21,10 @@ interface DashboardWrapperProps {
 }
 
 export function DashboardWrapper({ user }: DashboardWrapperProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const isWelcome = searchParams.get("welcome") === "true";
-
   const { data: products } = useGetStripeProducts();
   const { data: subscription } = useGetStripeSubscriptionDetails();
 
-  useWelcomeToast({
-    showWelcomeToast: !!user?.id && isWelcome,
-  });
-
-  useEffect(() => {
-    if (isWelcome && user?.id) {
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.delete("welcome");
-      router.replace(newUrl.pathname + newUrl.search, { scroll: false });
-    }
-  }, [isWelcome, user?.id, router]);
+  useWelcomeToast();
 
   return (
     <DialogProvider>
