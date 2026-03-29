@@ -17,7 +17,6 @@ import {
  * Hook to handle new Stripe subscription flow.
  *
  * @param priceId - The ID of the Stripe price selected
- * @param userId - The ID of the user initiating the subscription
  * @returns Form instance and mutation handlers for subscription
  */
 export const useSubscription = ({ priceId }: { priceId: string }) => {
@@ -68,7 +67,6 @@ export const useSubscription = ({ priceId }: { priceId: string }) => {
  * Hook to handle updates to an existing subscription.
  *
  * @param priceId - The new Stripe price ID
- * @param userId - The user whose subscription is being updated
  * @returns Form instance and mutation handlers for updating subscription
  */
 export const useUpdateSubscription = ({ priceId }: { priceId: string }) => {
