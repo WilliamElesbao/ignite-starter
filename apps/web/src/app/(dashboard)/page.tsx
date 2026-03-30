@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
+import { DashboardWrapper } from "@/feature/dashboard/dashboard-wrapper";
 import { getSession } from "@/lib/better-auth/auth-server";
-import { DashboardWrapper } from "./dashboard-wrapper";
 
-export default async function Page() {
+export default async function DashboardPage() {
   const session = await getSession();
 
-  if (!session) redirect("/login");
+  if (!session) redirect("/sign-in");
 
   return <DashboardWrapper user={session.user} />;
 }
