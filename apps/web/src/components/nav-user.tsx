@@ -35,7 +35,7 @@ export function NavUser({ user }: Readonly<{ user: User }>) {
   const handleSignOut = async () => {
     try {
       await authClient.signOut();
-      router.replace("/login");
+      router.replace("/sign-in");
     } catch (error) {
       console.error("[NavUser] signOut error:", error);
     }
