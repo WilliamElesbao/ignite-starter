@@ -32,7 +32,7 @@ export const ChoosePlanDialog = ({
   products?: GetStripeProductsResponse;
   subscription?: GetStripeSubscriptionDetailsResponse | null;
 }) => {
-  const { form, onSubmit, isLoading, defaultValue, disableChangePlanButton } =
+  const { form, onSubmit, isLoading, disableChangePlanButton } =
     useSubscriptionForm({ user });
   const { dialogIsOpen, setDialogIsOpen } = useDialog();
 
@@ -67,7 +67,7 @@ export const ChoosePlanDialog = ({
               render={({ field }) => (
                 <RadioGroup
                   className="gap-2"
-                  value={field.value}
+                  value={field.value ?? "free"}
                   onValueChange={(value) => {
                     field.onChange(value);
                     const selectedProduct = products?.find(
@@ -77,7 +77,6 @@ export const ChoosePlanDialog = ({
                       form.setValue("planName", selectedProduct.planName);
                     }
                   }}
-                  defaultValue={defaultValue}
                 >
                   {/* Radio card #1 */}
                   <div className="border-input has-data-[state=checked]:border-primary/50 has-data-[state=checked]:bg-accent relative flex w-full items-center gap-2 rounded-md border px-4 py-3 shadow-xs outline-none">

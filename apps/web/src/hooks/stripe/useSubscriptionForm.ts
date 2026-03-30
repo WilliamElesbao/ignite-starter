@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { User } from "@repo/api/generated/api/types.gen";
+import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { useGetStripeSubscriptionDetails } from "./stripe.queries";
@@ -25,11 +26,18 @@ export const useSubscriptionForm = ({ user }: { user: User }) => {
   const form = useForm<SubscriptionFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      priceId: subscriptionDetails?.plan?.priceId,
-      planName: subscriptionDetails?.product?.name,
+      priceId: "free",
+      planName: "Free",
     },
     mode: "all",
   });
+
+  useEffect(() => {
+    form.reset({
+      priceId: subscriptionDetails?.plan?.priceId ?? "free",
+      planName: subscriptionDetails?.product?.name ?? "Free",
+    });
+  }, [subscriptionDetails, form]);
 
   const { onSubmit: subscriptionOnSubmit, isPending: isSubscriptionPending } =
     useSubscription();
@@ -42,23 +50,22 @@ export const useSubscriptionForm = ({ user }: { user: User }) => {
     ? updateSubscriptionOnSubmit
     : subscriptionOnSubmit;
 
-  const selectedPriceId = useWatch({ control: form.control, name: "priceId" });
+  const selectedPriceId = useWatch({
+    control: form.control,
+    name: "priceId",
+    defaultValue: "free",
+  });
   const currentPriceId = subscriptionDetails?.plan?.priceId;
   const isSamePlanSelected = selectedPriceId === currentPriceId;
   const isFreePlanSelected = selectedPriceId === "free";
   const isLoading = isSubscriptionPending || isUpdateSubscriptionPending;
   const disableChangePlanButton =
     isSamePlanSelected || isFreePlanSelected || isLoading;
-  const defaultValue =
-    (useWatch({ control: form.control, name: "priceId" }) ||
-      subscriptionDetails?.plan?.priceId) ??
-    "free";
 
   return {
     form,
     onSubmit,
     isLoading,
     disableChangePlanButton,
-    defaultValue,
   };
 };
