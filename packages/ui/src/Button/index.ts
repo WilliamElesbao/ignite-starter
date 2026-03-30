@@ -1,4 +1,3 @@
-export type { ButtonProps } from "./Button";
-export { Button } from "./Button";
-export { ButtonCssModule } from "./ButtonCssModule";
-export { ButtonTailwind } from "./ButtonTailwind";
+export * from "./Button";
+export * from "./ButtonCssModule";
+export * from "./ButtonTailwind";
