@@ -8,7 +8,7 @@ import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { DialogProvider } from "@/context/dialog.context";
-import { useWelcomeToast } from "@/hooks/auth";
+import { useWelcomeToast } from "@/feature/auth/hooks";
 import {
   useGetStripeProducts,
   useGetStripeSubscriptionDetails,

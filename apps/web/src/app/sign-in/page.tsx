@@ -1,3 +1,3 @@
-import { SignInWrapper } from "@/feature/sign-in/sign-in-wrapper";
+import { SignInPage } from "@/feature/auth";
 
-export default SignInWrapper;
+export default SignInPage;
