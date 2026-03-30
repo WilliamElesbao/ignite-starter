@@ -17,10 +17,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useDialog } from "@/context";
-import {
-  useSubscription,
-  useUpdateSubscription,
-} from "@/hooks/stripe/use-subscription";
+import { useSubscriptionForm } from "@/hooks/stripe/use-subscription-form";
 import type { User } from "@/lib/better-auth";
 import { formatPrice } from "@/utils";
 import { Form, FormField } from "../ui/form";
@@ -35,37 +32,9 @@ export const ChoosePlanDialog = ({
   products?: GetStripeProductsResponse;
   subscription?: GetStripeSubscriptionDetailsResponse | null;
 }) => {
+  const { form, onSubmit, isLoading, defaultValue, disableChangePlanButton } =
+    useSubscriptionForm({ user });
   const { dialogIsOpen, setDialogIsOpen } = useDialog();
-  const {
-    form: subscriptionForm,
-    onSubmit: subscriptionOnSubmit,
-    isPending: isSubscriptionPending,
-  } = useSubscription({
-    priceId: subscription?.plan?.priceId ?? "",
-  });
-  const {
-    form: updateSubscriptionForm,
-    onSubmit: updateSubscriptionOnSubmit,
-    isPending: isUpdateSubscriptionPending,
-  } = useUpdateSubscription({
-    priceId: subscription?.plan?.priceId ?? "",
-  });
-
-  const form = user?.stripeSubscriptionId
-    ? updateSubscriptionForm
-    : subscriptionForm;
-  const onSubmit = user?.stripeSubscriptionId
-    ? updateSubscriptionOnSubmit
-    : subscriptionOnSubmit;
-
-  // console.log("[ChoosePlanDialog] user", user);
-  // console.log("[form]", form.getValues());
-
-  const selectedPriceId = form.watch("priceId");
-  const currentPriceId = subscription?.plan?.priceId;
-  const isSamePlanSelected = selectedPriceId === currentPriceId;
-  const isFreePlanSelected = selectedPriceId === "free";
-  const isLoading = isSubscriptionPending || isUpdateSubscriptionPending;
 
   return (
     <Dialog open={dialogIsOpen} onOpenChange={(open) => setDialogIsOpen(open)}>
@@ -86,23 +55,29 @@ export const ChoosePlanDialog = ({
           </DialogHeader>
         </div>
         <Form {...form}>
-          <form className="space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            className="space-y-5"
+            onSubmit={form.handleSubmit(onSubmit, (err) => {
+              console.error("[ChoosePlanDialog] Form submission error:", err);
+            })}
+          >
             <FormField
               control={form.control}
               name="priceId"
               render={({ field }) => (
                 <RadioGroup
                   className="gap-2"
-                  defaultValue={field.value}
-                  onValueChange={(selectedId) => {
-                    field.onChange(selectedId);
-                    const selectedPlan = products?.find(
-                      (p) => p.id === selectedId,
+                  value={field.value}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    const selectedProduct = products?.find(
+                      (product) => product.id === value,
                     );
-                    if (selectedPlan) {
-                      form.setValue("planName", selectedPlan.planName);
+                    if (selectedProduct) {
+                      form.setValue("planName", selectedProduct.planName);
                     }
                   }}
+                  defaultValue={defaultValue}
                 >
                   {/* Radio card #1 */}
                   <div className="border-input has-data-[state=checked]:border-primary/50 has-data-[state=checked]:bg-accent relative flex w-full items-center gap-2 rounded-md border px-4 py-3 shadow-xs outline-none">
@@ -119,11 +94,9 @@ export const ChoosePlanDialog = ({
                       </p>
                     </div>
                   </div>
+
                   {products
-                    ?.toReversed()
-                    .filter(
-                      (product) => product.id !== subscription?.plan?.priceId,
-                    )
+                    ?.filter((product) => product.currency === "usd")
                     .map((product) => (
                       <div
                         key={product.id}
@@ -214,7 +187,7 @@ export const ChoosePlanDialog = ({
               <Button
                 type="submit"
                 className="w-full"
-                disabled={isSamePlanSelected || isFreePlanSelected || isLoading}
+                disabled={disableChangePlanButton}
               >
                 {isLoading ? "Loading..." : "Change plan"}
               </Button>

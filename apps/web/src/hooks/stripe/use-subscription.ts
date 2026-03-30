@@ -1,4 +1,4 @@
-import { getStripeSubscriptionDetailsOptions } from "@repo/api";
+import { getStripeSubscriptionDetailsQueryKey } from "@repo/api";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { useDialog } from "@/context";
@@ -8,10 +8,7 @@ import {
   useStripeSubscription,
   useStripeUpdateSubscription,
 } from "./stripe.mutations";
-import {
-  type SubscriptionFormValues,
-  useSubscriptionForm,
-} from "./use-subscription-form";
+import type { SubscriptionFormValues } from "./use-subscription-form";
 
 /**
  * Hook to handle new Stripe subscription flow.
@@ -19,9 +16,8 @@ import {
  * @param priceId - The ID of the Stripe price selected
  * @returns Form instance and mutation handlers for subscription
  */
-export const useSubscription = ({ priceId }: { priceId: string }) => {
+export const useSubscription = () => {
   const { mutateAsync, isPending } = useStripeSubscription();
-  const { form } = useSubscriptionForm({ priceId });
   const { setDialogIsOpen } = useDialog();
 
   const onSubmit = useCallback(
@@ -47,17 +43,15 @@ export const useSubscription = ({ priceId }: { priceId: string }) => {
             });
           },
           onSettled: () => {
-            form.reset();
             setDialogIsOpen(false);
           },
         },
       );
     },
-    [form, mutateAsync, setDialogIsOpen],
+    [mutateAsync, setDialogIsOpen],
   );
 
   return {
-    form,
     onSubmit,
     isPending,
   };
@@ -69,11 +63,8 @@ export const useSubscription = ({ priceId }: { priceId: string }) => {
  * @param priceId - The new Stripe price ID
  * @returns Form instance and mutation handlers for updating subscription
  */
-export const useUpdateSubscription = ({ priceId }: { priceId: string }) => {
+export const useUpdateSubscription = () => {
   const { mutateAsync, isPending } = useStripeUpdateSubscription();
-  const { queryKey: subscriptionDetailsQueryKey } =
-    getStripeSubscriptionDetailsOptions();
-  const { form } = useSubscriptionForm({ priceId });
   const { setDialogIsOpen } = useDialog();
 
   const onSubmit = useCallback(
@@ -86,10 +77,9 @@ export const useUpdateSubscription = ({ priceId }: { priceId: string }) => {
               description: "Your subscription has been updated.",
               position: "top-center",
             });
-            form.reset();
             setDialogIsOpen(false);
             queryClient.invalidateQueries({
-              queryKey: subscriptionDetailsQueryKey,
+              queryKey: getStripeSubscriptionDetailsQueryKey(),
             });
           },
           onError: (err) => {
@@ -103,11 +93,10 @@ export const useUpdateSubscription = ({ priceId }: { priceId: string }) => {
         },
       );
     },
-    [form, mutateAsync, setDialogIsOpen, subscriptionDetailsQueryKey],
+    [mutateAsync, setDialogIsOpen],
   );
 
   return {
-    form,
     onSubmit,
     isPending,
   };
