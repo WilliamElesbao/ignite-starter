@@ -8,10 +8,10 @@ export async function proxy(request: NextRequest) {
   try {
     const cookie = getSessionCookie(request);
     const isAuthenticated = Boolean(cookie);
-    const isLoginRoute = pathname === "/login";
+    const isLoginRoute = pathname === "/sign-in";
 
     if (!isAuthenticated && !isLoginRoute) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      return NextResponse.redirect(new URL("/sign-in", request.url));
     }
 
     if (isAuthenticated && isLoginRoute) {
@@ -21,7 +21,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   } catch (error) {
     console.error("[middleware] Error getting session:", error);
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 }
 
