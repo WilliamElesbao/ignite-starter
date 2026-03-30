@@ -4,17 +4,18 @@ import { type NextRequest, NextResponse } from "next/server";
 // This function can be marked `async` if using `await` inside
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const authRoutes = new Set(["/sign-in", "/sign-up"]);
 
   try {
     const cookie = getSessionCookie(request);
     const isAuthenticated = Boolean(cookie);
-    const isLoginRoute = pathname === "/sign-in";
+    const isAuthRoute = authRoutes.has(pathname);
 
-    if (!isAuthenticated && !isLoginRoute) {
+    if (!isAuthenticated && !isAuthRoute) {
       return NextResponse.redirect(new URL("/sign-in", request.url));
     }
 
-    if (isAuthenticated && isLoginRoute) {
+    if (isAuthenticated && isAuthRoute) {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
