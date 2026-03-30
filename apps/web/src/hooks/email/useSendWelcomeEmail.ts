@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { safePromise } from "@/utils/safe-promise";
+import { safePromise } from "@/utils";
 import { useSendEmail } from "./email.mutation";
 
 export const useEmail = () => {
