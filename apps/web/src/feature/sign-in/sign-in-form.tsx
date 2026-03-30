@@ -5,7 +5,7 @@ import * as IconsGi from "rocketicons/gi";
 import * as IconsSi from "rocketicons/si";
 import { Button } from "@/components/ui/button";
 import { signIn } from "@/hooks/auth";
-import { cn } from "@/utils";
+import { cn } from "@/lib/shadcn";
 
 export const SignInForm = ({
   className,

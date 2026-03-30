@@ -2,7 +2,7 @@
 
 import { RadioGroup as RadioGroupPrimitive } from "radix-ui";
 import type * as React from "react";
-import { cn } from "@/utils";
+import { cn } from "@/lib/shadcn";
 
 function RadioGroup({
   className,
