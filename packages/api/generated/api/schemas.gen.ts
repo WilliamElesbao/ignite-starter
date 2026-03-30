@@ -154,6 +154,67 @@ export const VerificationSchema = {
   required: ["identifier", "value", "expiresAt", "createdAt", "updatedAt"],
 } as const;
 
+export const CodeEnumSchema = {
+  enum: ["AUTH_UNAUTHORIZED"],
+  type: "string",
+} as const;
+
+export const CodeEnum2Schema = {
+  enum: ["USER_NOT_FOUND"],
+  type: "string",
+} as const;
+
+export const CodeEnum3Schema = {
+  enum: ["USER_FETCH_FAILED"],
+  type: "string",
+} as const;
+
+export const CodeEnum4Schema = {
+  enum: ["EMAIL_SEND_FAILED"],
+  type: "string",
+} as const;
+
+export const CodeEnum5Schema = {
+  enum: ["EMAIL_PROVIDER_ERROR"],
+  type: "string",
+} as const;
+
+export const CodeEnum6Schema = {
+  enum: ["STRIPE_INTERNAL_SERVER_ERROR"],
+  type: "string",
+} as const;
+
+export const CodeEnum7Schema = {
+  enum: ["STRIPE_PRICES_LIST_FAILED", "STRIPE_PRODUCTS_LIST_FAILED"],
+  type: "string",
+} as const;
+
+export const CodeEnum8Schema = {
+  enum: ["STRIPE_SUBSCRIPTION_NOT_FOUND"],
+  type: "string",
+} as const;
+
+export const CodeEnum9Schema = {
+  enum: ["STRIPE_CHECKOUT_CREATE_FAILED", "STRIPE_CHECKOUT_URL_MISSING"],
+  type: "string",
+} as const;
+
+export const CodeEnum10Schema = {
+  enum: [
+    "STRIPE_INTERNAL_SERVER_ERROR",
+    "STRIPE_USER_SUBSCRIPTION_PERSISTENCE_FAILED",
+  ],
+  type: "string",
+} as const;
+
+export const CodeEnum11Schema = {
+  enum: [
+    "STRIPE_SUBSCRIPTION_RETRIEVE_FAILED",
+    "STRIPE_SUBSCRIPTION_UPDATE_FAILED",
+  ],
+  type: "string",
+} as const;
+
 export const StatusEnumSchema = {
   enum: [
     "incomplete",
@@ -170,6 +231,35 @@ export const StatusEnumSchema = {
 
 export const IntervalEnumSchema = {
   enum: ["day", "week", "month", "year"],
+  type: "string",
+} as const;
+
+export const CodeEnum12Schema = {
+  enum: [
+    "STRIPE_SUBSCRIPTION_DETAILS_FAILED",
+    "STRIPE_SUBSCRIPTION_DATA_INVALID",
+    "STRIPE_PRICE_RETRIEVE_FAILED",
+    "STRIPE_PRODUCT_RETRIEVE_FAILED",
+  ],
+  type: "string",
+} as const;
+
+export const CodeEnum13Schema = {
+  enum: ["STRIPE_SUBSCRIPTION_REVOKE_FAILED"],
+  type: "string",
+} as const;
+
+export const CodeEnum14Schema = {
+  enum: [
+    "STRIPE_SIGNATURE_MISSING",
+    "STRIPE_WEBHOOK_INVALID_SIGNATURE",
+    "STRIPE_WEBHOOK_METADATA_MISSING",
+  ],
+  type: "string",
+} as const;
+
+export const CodeEnum15Schema = {
+  enum: ["STRIPE_INTERNAL_SERVER_ERROR", "STRIPE_WEBHOOK_USER_UPDATE_FAILED"],
   type: "string",
 } as const;
 

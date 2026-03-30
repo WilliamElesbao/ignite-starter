@@ -51,6 +51,69 @@ export type Verification = {
   updatedAt: string;
 };
 
+export const CodeEnum = { AUTH_UNAUTHORIZED: "AUTH_UNAUTHORIZED" } as const;
+
+export type CodeEnum = (typeof CodeEnum)[keyof typeof CodeEnum];
+
+export const CodeEnum2 = { USER_NOT_FOUND: "USER_NOT_FOUND" } as const;
+
+export type CodeEnum2 = (typeof CodeEnum2)[keyof typeof CodeEnum2];
+
+export const CodeEnum3 = { USER_FETCH_FAILED: "USER_FETCH_FAILED" } as const;
+
+export type CodeEnum3 = (typeof CodeEnum3)[keyof typeof CodeEnum3];
+
+export const CodeEnum4 = { EMAIL_SEND_FAILED: "EMAIL_SEND_FAILED" } as const;
+
+export type CodeEnum4 = (typeof CodeEnum4)[keyof typeof CodeEnum4];
+
+export const CodeEnum5 = {
+  EMAIL_PROVIDER_ERROR: "EMAIL_PROVIDER_ERROR",
+} as const;
+
+export type CodeEnum5 = (typeof CodeEnum5)[keyof typeof CodeEnum5];
+
+export const CodeEnum6 = {
+  STRIPE_INTERNAL_SERVER_ERROR: "STRIPE_INTERNAL_SERVER_ERROR",
+} as const;
+
+export type CodeEnum6 = (typeof CodeEnum6)[keyof typeof CodeEnum6];
+
+export const CodeEnum7 = {
+  STRIPE_PRICES_LIST_FAILED: "STRIPE_PRICES_LIST_FAILED",
+  STRIPE_PRODUCTS_LIST_FAILED: "STRIPE_PRODUCTS_LIST_FAILED",
+} as const;
+
+export type CodeEnum7 = (typeof CodeEnum7)[keyof typeof CodeEnum7];
+
+export const CodeEnum8 = {
+  STRIPE_SUBSCRIPTION_NOT_FOUND: "STRIPE_SUBSCRIPTION_NOT_FOUND",
+} as const;
+
+export type CodeEnum8 = (typeof CodeEnum8)[keyof typeof CodeEnum8];
+
+export const CodeEnum9 = {
+  STRIPE_CHECKOUT_CREATE_FAILED: "STRIPE_CHECKOUT_CREATE_FAILED",
+  STRIPE_CHECKOUT_URL_MISSING: "STRIPE_CHECKOUT_URL_MISSING",
+} as const;
+
+export type CodeEnum9 = (typeof CodeEnum9)[keyof typeof CodeEnum9];
+
+export const CodeEnum10 = {
+  STRIPE_INTERNAL_SERVER_ERROR: "STRIPE_INTERNAL_SERVER_ERROR",
+  STRIPE_USER_SUBSCRIPTION_PERSISTENCE_FAILED:
+    "STRIPE_USER_SUBSCRIPTION_PERSISTENCE_FAILED",
+} as const;
+
+export type CodeEnum10 = (typeof CodeEnum10)[keyof typeof CodeEnum10];
+
+export const CodeEnum11 = {
+  STRIPE_SUBSCRIPTION_RETRIEVE_FAILED: "STRIPE_SUBSCRIPTION_RETRIEVE_FAILED",
+  STRIPE_SUBSCRIPTION_UPDATE_FAILED: "STRIPE_SUBSCRIPTION_UPDATE_FAILED",
+} as const;
+
+export type CodeEnum11 = (typeof CodeEnum11)[keyof typeof CodeEnum11];
+
 export const StatusEnum = {
   INCOMPLETE: "incomplete",
   INCOMPLETE_EXPIRED: "incomplete_expired",
@@ -72,6 +135,36 @@ export const IntervalEnum = {
 } as const;
 
 export type IntervalEnum = (typeof IntervalEnum)[keyof typeof IntervalEnum];
+
+export const CodeEnum12 = {
+  STRIPE_SUBSCRIPTION_DETAILS_FAILED: "STRIPE_SUBSCRIPTION_DETAILS_FAILED",
+  STRIPE_SUBSCRIPTION_DATA_INVALID: "STRIPE_SUBSCRIPTION_DATA_INVALID",
+  STRIPE_PRICE_RETRIEVE_FAILED: "STRIPE_PRICE_RETRIEVE_FAILED",
+  STRIPE_PRODUCT_RETRIEVE_FAILED: "STRIPE_PRODUCT_RETRIEVE_FAILED",
+} as const;
+
+export type CodeEnum12 = (typeof CodeEnum12)[keyof typeof CodeEnum12];
+
+export const CodeEnum13 = {
+  STRIPE_SUBSCRIPTION_REVOKE_FAILED: "STRIPE_SUBSCRIPTION_REVOKE_FAILED",
+} as const;
+
+export type CodeEnum13 = (typeof CodeEnum13)[keyof typeof CodeEnum13];
+
+export const CodeEnum14 = {
+  STRIPE_SIGNATURE_MISSING: "STRIPE_SIGNATURE_MISSING",
+  STRIPE_WEBHOOK_INVALID_SIGNATURE: "STRIPE_WEBHOOK_INVALID_SIGNATURE",
+  STRIPE_WEBHOOK_METADATA_MISSING: "STRIPE_WEBHOOK_METADATA_MISSING",
+} as const;
+
+export type CodeEnum14 = (typeof CodeEnum14)[keyof typeof CodeEnum14];
+
+export const CodeEnum15 = {
+  STRIPE_INTERNAL_SERVER_ERROR: "STRIPE_INTERNAL_SERVER_ERROR",
+  STRIPE_WEBHOOK_USER_UPDATE_FAILED: "STRIPE_WEBHOOK_USER_UPDATE_FAILED",
+} as const;
+
+export type CodeEnum15 = (typeof CodeEnum15)[keyof typeof CodeEnum15];
 
 export const RedirectEnum = { FALSE: false } as const;
 
@@ -133,9 +226,24 @@ export type GetUserByIdData = {
 
 export type GetUserByIdErrors = {
   /**
+   * Response for status 401
+   */
+  401: {
+    code: CodeEnum;
+    message: string;
+  };
+  /**
    * Response for status 404
    */
   404: {
+    code: CodeEnum2;
+    message: string;
+  };
+  /**
+   * Response for status 500
+   */
+  500: {
+    code: CodeEnum3;
     message: string;
   };
 };
@@ -173,8 +281,15 @@ export type PostEmailSendErrors = {
    * Response for status 500
    */
   500: {
+    code: CodeEnum4;
     message: string;
-    success: boolean;
+  };
+  /**
+   * Response for status 502
+   */
+  502: {
+    code: CodeEnum5;
+    message: string;
   };
 };
 
@@ -199,6 +314,26 @@ export type GetStripeProductsData = {
   query?: never;
   url: "/stripe/products";
 };
+
+export type GetStripeProductsErrors = {
+  /**
+   * Response for status 500
+   */
+  500: {
+    code: CodeEnum6;
+    message: string;
+  };
+  /**
+   * Response for status 502
+   */
+  502: {
+    code: CodeEnum7;
+    message: string;
+  };
+};
+
+export type GetStripeProductsError =
+  GetStripeProductsErrors[keyof GetStripeProductsErrors];
 
 export type GetStripeProductsResponses = {
   /**
@@ -237,12 +372,28 @@ export type PatchStripeSubscriptionErrors = {
    * Response for status 401
    */
   401: {
+    code: CodeEnum;
+    message: string;
+  };
+  /**
+   * Response for status 404
+   */
+  404: {
+    code: CodeEnum8;
     message: string;
   };
   /**
    * Response for status 500
    */
   500: {
+    code: CodeEnum10;
+    message: string;
+  };
+  /**
+   * Response for status 502
+   */
+  502: {
+    code: CodeEnum11;
     message: string;
   };
 };
@@ -272,12 +423,28 @@ export type PostStripeSubscriptionErrors = {
    * Response for status 401
    */
   401: {
+    code: CodeEnum;
+    message: string;
+  };
+  /**
+   * Response for status 404
+   */
+  404: {
+    code: CodeEnum8;
     message: string;
   };
   /**
    * Response for status 500
    */
   500: {
+    code: CodeEnum6;
+    message: string;
+  };
+  /**
+   * Response for status 502
+   */
+  502: {
+    code: CodeEnum9;
     message: string;
   };
 };
@@ -309,6 +476,21 @@ export type GetStripeSubscriptionDetailsErrors = {
    * Response for status 401
    */
   401: {
+    code: CodeEnum;
+    message: string;
+  };
+  /**
+   * Response for status 500
+   */
+  500: {
+    code: CodeEnum6;
+    message: string;
+  };
+  /**
+   * Response for status 502
+   */
+  502: {
+    code: CodeEnum12;
     message: string;
   };
 };
@@ -321,6 +503,8 @@ export type GetStripeSubscriptionDetailsResponses = {
    * Response for status 200
    */
   200: {
+    hasActiveSubscription: boolean;
+    code?: string;
     message?: string;
     id?: string;
     status?: StatusEnum;
@@ -362,12 +546,28 @@ export type PatchStripeSubscriptionRevokeErrors = {
    * Response for status 401
    */
   401: {
+    code: CodeEnum;
+    message: string;
+  };
+  /**
+   * Response for status 404
+   */
+  404: {
+    code: CodeEnum8;
     message: string;
   };
   /**
    * Response for status 500
    */
   500: {
+    code: CodeEnum10;
+    message: string;
+  };
+  /**
+   * Response for status 502
+   */
+  502: {
+    code: CodeEnum13;
     message: string;
   };
 };
@@ -394,12 +594,14 @@ export type PostStripeWebhookErrors = {
    * Response for status 400
    */
   400: {
+    code: CodeEnum14;
     message: string;
   };
   /**
    * Response for status 500
    */
   500: {
+    code: CodeEnum15;
     message: string;
   };
 };

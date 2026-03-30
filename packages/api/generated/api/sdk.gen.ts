@@ -36,6 +36,7 @@ import type {
   GetSessionErrors,
   GetSessionResponses,
   GetStripeProductsData,
+  GetStripeProductsErrors,
   GetStripeProductsResponses,
   GetStripeSubscriptionDetailsData,
   GetStripeSubscriptionDetailsErrors,
@@ -171,7 +172,7 @@ export const getStripeProducts = <ThrowOnError extends boolean = false>(
 ) =>
   (options?.client ?? client).get<
     GetStripeProductsResponses,
-    null,
+    GetStripeProductsErrors,
     ThrowOnError
   >({ url: "/stripe/products", ...options });
 
