@@ -8,7 +8,7 @@ import {
   useStripeSubscription,
   useStripeUpdateSubscription,
 } from "./stripe.mutations";
-import type { SubscriptionFormValues } from "./use-subscription-form";
+import type { SubscriptionFormValues } from "./useSubscriptionForm";
 
 /**
  * Hook to handle new Stripe subscription flow.

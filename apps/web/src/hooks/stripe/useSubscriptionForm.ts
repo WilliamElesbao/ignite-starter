@@ -3,7 +3,7 @@ import type { User } from "@repo/api/generated/api/types.gen";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { useGetStripeSubscriptionDetails } from "./stripe.queries";
-import { useSubscription, useUpdateSubscription } from "./use-subscription";
+import { useSubscription, useUpdateSubscription } from "./useSubscription";
 
 const formSchema = z.object({
   priceId: z.string(),
