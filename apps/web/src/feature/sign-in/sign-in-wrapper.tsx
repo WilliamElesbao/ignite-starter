@@ -1,4 +1,4 @@
-import { SignInForm } from "@/feature/sign-in/sign-in-form";
+import { SignInForm } from "./sign-in-form";
 
 export const SignInWrapper = () => {
   return (
