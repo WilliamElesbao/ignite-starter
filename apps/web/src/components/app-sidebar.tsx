@@ -37,9 +37,7 @@ export function AppSidebar({
               <Link href="#">
                 <IconsGi.GiFox className="!size-5 text-primary" />
                 <span className="font-semibold text-base">
-                  <span className="font-semibold text-base text-primary">
-                    Fox{" "}
-                  </span>
+                  <span className="text-primary">Ignite </span>
                   Starter
                 </span>
               </Link>
