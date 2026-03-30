@@ -10,9 +10,6 @@
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true
-    // "paths": {
-    //   "@/*": ["./src/*"]
-    // }
   },
   "include": ["**/*.ts", "**/*.tsx"]
 }
