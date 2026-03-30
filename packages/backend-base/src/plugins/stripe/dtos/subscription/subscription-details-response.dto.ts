@@ -24,6 +24,8 @@ const StripeIntervalEnum = t.String({
 const StripeCustomer = t.Union([t.String(), t.Object({})]); // Simplified customer type
 
 const SubscriptionDetailsDataDto = t.Object({
+  hasActiveSubscription: t.Boolean(),
+  code: t.Optional(t.String()),
   message: t.Optional(t.String()),
   id: t.Optional(t.String()),
   status: t.Optional(StripeSubscriptionStatusEnum),
