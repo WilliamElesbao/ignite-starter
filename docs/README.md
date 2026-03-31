@@ -16,3 +16,4 @@
 - [Drizzle](https://orm.drizzle.team/docs/get-started/postgresql-new)
 - [Stripe API](https://docs.stripe.com/api)
 - [Elysia Crons](https://elysiajs.com/plugins/cron)
+- [Redis](https://github.com/redis/node-redis)
