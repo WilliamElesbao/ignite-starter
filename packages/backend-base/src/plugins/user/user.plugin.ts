@@ -27,7 +27,7 @@ const userPlugin = new Elysia({ tags: ["User"] })
   })
   .state((state) => ({
     ...state,
-    userService: new UserService(state.db),
+    userService: new UserService(state.db, state.logger),
   }))
   .group("/user", (app) =>
     app.get(

@@ -22,7 +22,7 @@ const emailPlugin = new Elysia({ tags: ["Email"] })
   })
   .state((state) => ({
     ...state,
-    emailService: new EmailService(),
+    emailService: new EmailService(state.logger),
   }))
   .group("/email", (app) =>
     app.post(

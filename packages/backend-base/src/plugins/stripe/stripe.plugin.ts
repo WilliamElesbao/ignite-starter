@@ -41,7 +41,12 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
   })
   .state((state) => ({
     ...state,
-    stripeService: new StripeService(state.db, state.stripe),
+    stripeService: new StripeService(
+      state.db,
+      state.stripe,
+      state.logger,
+      state.eventService,
+    ),
   }))
   .group("/stripe", (app) =>
     app

@@ -1,5 +1,6 @@
 import ms, { type StringValue } from "ms";
 import { createClient, type RedisClientType } from "redis";
+import { logger } from "../lib/logger";
 
 class RedisClient {
   private client: RedisClientType;
@@ -10,9 +11,10 @@ class RedisClient {
       socket: {
         reconnectStrategy: (retries) => {
           if (retries > 10) {
-            console.log(
-              "Max retry attempts reached. Please check your Redis server.",
-            );
+            logger.warn({
+              msg: "Max Redis retry attempts reached",
+              retries,
+            });
             return false;
           }
 
@@ -22,19 +24,19 @@ class RedisClient {
     });
 
     this.client.on("error", (error) => {
-      console.error("Redis Client Error", error);
+      logger.error({ msg: "Redis client error", error });
     });
 
     this.client.on("connect", () => {
-      console.log("Connected to Redis");
+      logger.info({ msg: "Connected to Redis" });
     });
 
     this.client.on("reconnecting", () => {
-      console.log("Reconnecting to Redis");
+      logger.warn({ msg: "Reconnecting to Redis" });
     });
 
     this.client.on("end", () => {
-      console.log("Disconnected from Redis");
+      logger.info({ msg: "Disconnected from Redis" });
     });
   }
 
@@ -46,7 +48,7 @@ class RedisClient {
         );
         await Promise.race([this.client.connect(), timeout]);
       } catch (error) {
-        console.error("Error connecting to Redis:", error);
+        logger.error({ msg: "Error connecting to Redis", error });
         throw error;
       }
     }
@@ -57,7 +59,7 @@ class RedisClient {
       try {
         this.client.destroy();
       } catch (error) {
-        console.error("Error disconnecting from Redis:", error);
+        logger.error({ msg: "Error disconnecting from Redis", error });
       }
     }
   }
@@ -73,7 +75,7 @@ class RedisClient {
 
       return null;
     } catch (error) {
-      console.error("Error getting key from Redis:", error);
+      logger.error({ msg: "Error getting key from Redis", key, error });
       throw error;
     }
   }
@@ -90,7 +92,7 @@ class RedisClient {
         PX: ms(ttl),
       });
     } catch (error) {
-      console.error("Error setting value in Redis:", error);
+      logger.error({ msg: "Error setting value in Redis", key, ttl, error });
       throw error;
     }
   }
@@ -101,7 +103,7 @@ class RedisClient {
     try {
       return await this.client.del(key);
     } catch (error) {
-      console.error("Error deleting key from Redis:", error);
+      logger.error({ msg: "Error deleting key from Redis", key, error });
       throw error;
     }
   }

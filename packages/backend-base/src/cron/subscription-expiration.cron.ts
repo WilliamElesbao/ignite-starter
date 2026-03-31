@@ -1,4 +1,5 @@
 import cron, { Patterns } from "@elysiajs/cron";
+import { logger } from "../lib/logger";
 import {
   CRON_NAME,
   fetchUsersWithSubscriptions,
@@ -25,18 +26,18 @@ const subscriptionExpirationCron = cron({
         (r) => r.status === "fulfilled" && r.value === true,
       ).length;
 
-      console.info({
+      logger.info({
+        msg: "Subscription expiration job completed",
         context: CRON_NAME,
         totalUsers: users.length,
         revokedCount,
         durationMs: Date.now() - start,
-        message: "Subscription expiration job completed",
       });
     } catch (error) {
-      console.error({
+      logger.error({
+        msg: "Subscription expiration job failed",
         context: CRON_NAME,
         error,
-        message: "Subscription expiration job failed",
       });
     }
   },

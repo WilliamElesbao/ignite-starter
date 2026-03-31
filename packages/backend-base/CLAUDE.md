@@ -319,4 +319,70 @@ This allows frontend to:
 - `packages/backend-base/src/plugins/user/user.errors.ts`
 - `packages/backend-base/src/plugins/user/dtos/errors/user-error.dto.ts`
 
+---
+
+## 13) Logging & Event tracking architecture
+
+### 13.1 Technical logs (Pino)
+
+Use Pino for runtime diagnostics:
+
+- request/runtime failures
+- provider/db integration failures
+- cron lifecycle visibility
+- startup/shutdown lifecycle
+
+Rules:
+
+- Always use structured payloads (`msg`, ids/context, `error` when applicable).
+- Avoid `console.*` inside `packages/backend-base`; prefer Pino logger.
+- Keep logs technical (debugging/operations), not business audit records.
+
+Main files:
+
+- `packages/backend-base/src/lib/logger/index.ts`
+- `packages/backend-base/src/shared/shared.plugin.ts`
+- `packages/backend-base/src/shared/redis.client.ts`
+- `packages/backend-base/src/plugins/**/**/*.ts`
+- `packages/backend-base/src/cron/subscription-expiration.cron.ts`
+- `apps/backend/src/index.ts`
+
+Current implementation note:
+
+- In `services` and feature plugins, logger/event dependencies are injected via constructors/state.
+- `cron` and `redis` currently import logger directly from `src/lib/logger`.
+- `apps/backend/src/index.ts` still uses a startup `console.log`.
+
+### 13.2 Business events (database)
+
+Business/audit events are persisted to the `events` table and are distinct from technical logs.
+
+Use DB events for important domain/security events, for example:
+
+- `STRIPE_PAYMENT_FAILED`
+- `SUBSCRIPTION_CANCELED`
+- `LOGIN_SUSPICIOUS`
+
+Main files:
+
+- `packages/database/src/schema/events.ts`
+- `packages/backend-base/src/services/event.service.ts`
+
+### 13.3 Mandatory separation
+
+- Logs answer: **what failed technically**.
+- Events answer: **what happened in the business domain**.
+
+When relevant, write both:
+
+1. Pino log with technical context.
+2. Persist event for audit/business traceability.
+
+### 13.4 Dependency injection boundaries (current)
+
+- `EventService` receives `db` + logger in constructor.
+- Feature services (`email`, `user`, `stripe`) receive logger (and event service where needed) via constructor.
+- `shared.plugin.ts` is the composition root for shared runtime dependencies (`db`, `cache`, `stripe`, logger, `eventService`).
+- `subscriptionExpirationCron` currently uses direct logger import rather than constructor/factory injection.
+
 Use these as source of truth for this pattern.

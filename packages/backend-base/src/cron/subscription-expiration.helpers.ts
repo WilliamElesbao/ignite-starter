@@ -2,6 +2,7 @@ import { db, schema } from "@repo/db";
 import dayjs from "dayjs";
 import { eq, isNotNull } from "drizzle-orm";
 import type Stripe from "stripe";
+import { logger } from "../lib/logger";
 import { stripe } from "../lib/stripe";
 
 export const CRON_NAME = "subscription-expiration";
@@ -62,12 +63,12 @@ export const processUser = async (user: {
 
     return true;
   } catch (error) {
-    console.error({
+    logger.error({
+      msg: "Failed to process user subscription",
       context: CRON_NAME,
       userId: user.id,
       subscriptionId: user.stripeSubscriptionId,
       error,
-      message: "Failed to process user subscription",
     });
 
     return false;

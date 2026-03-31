@@ -4,8 +4,14 @@ import { eq } from "drizzle-orm";
 import type Stripe from "stripe";
 import { env } from "../../env";
 import type { SessionResponse } from "../../lib/better-auth/auth";
+import {
+  EVENT_TYPE,
+  type EventService,
+  type EventType,
+} from "../../services/event.service";
 import { AppError } from "../../shared/errors/app-error";
 import type { db } from "../../shared/shared.plugin";
+import type { LoggerErrorDependency } from "../../shared/types/logger-dependency";
 import { safePromise } from "../../utils/safe-promise";
 import type { TSubscriptionBodyDto } from "./dtos/subscription/subscription-body.dto";
 import { STRIPE_ERROR_MAP, StripeErrorCode } from "./stripe.errors";
@@ -14,7 +20,21 @@ export class StripeService {
   constructor(
     private readonly db: db,
     private readonly stripe: Stripe,
+    private readonly logger: LoggerErrorDependency,
+    private readonly eventService: EventService,
   ) {}
+
+  private async trackBusinessEvent({
+    type,
+    userId,
+    payload,
+  }: {
+    type: EventType;
+    userId?: string;
+    payload?: unknown;
+  }) {
+    await this.eventService.createEvent({ type, userId, payload });
+  }
 
   async getProducts() {
     const [prices, pricesError] = await safePromise(
@@ -24,6 +44,11 @@ export class StripeService {
     );
 
     if (pricesError) {
+      this.logger.error({
+        msg: "Failed to list Stripe prices",
+        error: pricesError,
+      });
+
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_PRICES_LIST_FAILED,
         catalog: STRIPE_ERROR_MAP,
@@ -36,6 +61,11 @@ export class StripeService {
     );
 
     if (productsError) {
+      this.logger.error({
+        msg: "Failed to list Stripe products",
+        error: productsError,
+      });
+
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_PRODUCTS_LIST_FAILED,
         catalog: STRIPE_ERROR_MAP,
@@ -78,6 +108,24 @@ export class StripeService {
     );
 
     if (createSubscriptionError) {
+      this.logger.error({
+        msg: "Failed to create Stripe checkout session",
+        userId: user.id,
+        planName,
+        priceId,
+        error: createSubscriptionError,
+      });
+
+      await this.trackBusinessEvent({
+        type: EVENT_TYPE.STRIPE_PAYMENT_FAILED,
+        userId: user.id,
+        payload: {
+          planName,
+          priceId,
+          reason: "CHECKOUT_CREATE_FAILED",
+        },
+      });
+
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_CHECKOUT_CREATE_FAILED,
         catalog: STRIPE_ERROR_MAP,
@@ -142,6 +190,15 @@ export class StripeService {
     );
 
     if (updateError) {
+      this.logger.error({
+        msg: "Failed to update Stripe subscription",
+        userId: user.id,
+        subscriptionId: subscription.stripeSubscriptionId,
+        planName,
+        priceId,
+        error: updateError,
+      });
+
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_SUBSCRIPTION_UPDATE_FAILED,
         catalog: STRIPE_ERROR_MAP,
@@ -189,6 +246,13 @@ export class StripeService {
     );
 
     if (subscriptionDetailsError) {
+      this.logger.error({
+        msg: "Failed to retrieve Stripe subscription details",
+        userId: user.id,
+        subscriptionId: subscription.stripeSubscriptionId,
+        error: subscriptionDetailsError,
+      });
+
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_SUBSCRIPTION_DETAILS_FAILED,
         catalog: STRIPE_ERROR_MAP,
@@ -282,6 +346,13 @@ export class StripeService {
     );
 
     if (revokeError) {
+      this.logger.error({
+        msg: "Failed to revoke Stripe subscription",
+        userId: user.id,
+        subscriptionId: subscription.stripeSubscriptionId,
+        error: revokeError,
+      });
+
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_SUBSCRIPTION_REVOKE_FAILED,
         catalog: STRIPE_ERROR_MAP,
@@ -305,6 +376,14 @@ export class StripeService {
         details: updateUserError,
       });
     }
+
+    await this.trackBusinessEvent({
+      type: EVENT_TYPE.SUBSCRIPTION_CANCELED,
+      userId: user.id,
+      payload: {
+        subscriptionId: subscription.stripeSubscriptionId,
+      },
+    });
   }
 
   async webhookHandler({
@@ -323,6 +402,11 @@ export class StripeService {
         env.STRIPE_WEBHOOK_SECRET,
       );
     } catch (error) {
+      this.logger.error({
+        msg: "Invalid Stripe webhook signature",
+        error,
+      });
+
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_WEBHOOK_INVALID_SIGNATURE,
         catalog: STRIPE_ERROR_MAP,
@@ -364,6 +448,32 @@ export class StripeService {
             details: updateUserError,
           });
         }
+
+        return {
+          message: "Webhook processed",
+        };
+      }
+
+      case "invoice.payment_failed": {
+        const invoice = event.data.object;
+        const customerId =
+          typeof invoice.customer === "string" ? invoice.customer : undefined;
+
+        this.logger.error({
+          msg: "Stripe payment failed",
+          stripeEventId: event.id,
+          customerId,
+        });
+
+        await this.trackBusinessEvent({
+          type: EVENT_TYPE.STRIPE_PAYMENT_FAILED,
+          payload: {
+            stripeEventId: event.id,
+            customerId,
+            amountDue: invoice.amount_due,
+            currency: invoice.currency,
+          },
+        });
 
         return {
           message: "Webhook processed",

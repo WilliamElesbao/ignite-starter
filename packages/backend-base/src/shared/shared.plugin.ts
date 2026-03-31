@@ -1,7 +1,9 @@
 import { cors } from "@elysiajs/cors";
 import { db as Database } from "@repo/db";
 import { Elysia } from "elysia";
+import { logger } from "../lib/logger";
 import { stripe } from "../lib/stripe";
+import { EventService } from "../services/event.service";
 import { SHARED_ERROR_MAP, SharedErrorCode } from "./errors/shared.errors";
 import { toErrorResponse } from "./errors/to-error-response";
 import redisClient from "./redis.client";
@@ -9,6 +11,10 @@ import redisClient from "./redis.client";
 export type cache = typeof redisClient;
 
 export type db = typeof Database;
+
+export type appLogger = typeof logger;
+
+const eventService = new EventService(Database, logger);
 
 const setup = new Elysia({ name: "shared" })
   .use(
@@ -22,7 +28,17 @@ const setup = new Elysia({ name: "shared" })
   .state("db", Database)
   .state("cache", redisClient)
   .state("stripe", stripe)
-  .onError(({ code, error, set }) => {
+  .state("logger", logger)
+  .state("eventService", eventService)
+  .onError(({ code, error, set, path, request }) => {
+    logger.error({
+      msg: "Unhandled error",
+      code,
+      path,
+      method: request.method,
+      error,
+    });
+
     const response =
       code === "VALIDATION"
         ? toErrorResponse(error, {
@@ -36,7 +52,7 @@ const setup = new Elysia({ name: "shared" })
   });
 
 setup.onStop(() => {
-  console.log("onStop on shared plugin");
+  logger.info({ msg: "Stopping shared plugin" });
   Database.$client.end();
   redisClient.disconnect();
 });

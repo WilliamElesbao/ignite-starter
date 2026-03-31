@@ -5,6 +5,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
 import { env } from "../../env";
 import redisClient from "../../shared/redis.client";
+import { logger } from "../logger";
 
 export const auth = betterAuth({
   basePath: "/auth",
@@ -14,8 +15,19 @@ export const auth = betterAuth({
     disableColors: false,
     level: "warn",
     log: (level, message, ...args) => {
-      // Custom logging implementation
-      console.log(`[${level}] ${message}`, ...args);
+      const metadata = { msg: message, source: "better-auth", args };
+
+      if (level === "error") {
+        logger.error(metadata);
+        return;
+      }
+
+      if (level === "warn") {
+        logger.warn(metadata);
+        return;
+      }
+
+      logger.info(metadata);
     },
   },
   plugins: [
@@ -56,7 +68,7 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     cookieCache: {
-      enabled: true,
+      enabled: false,
       maxAge: 60 * 5, // 5 minutes
     },
   },
