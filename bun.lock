@@ -26,7 +26,7 @@
         "elysia": "latest",
       },
       "devDependencies": {
-        "@repo/typescript-config": "*",
+        "@repo/typescript-config": "workspace:*",
         "bun-types": "latest",
       },
     },
@@ -91,17 +91,21 @@
     "packages/backend-base": {
       "name": "@repo/backend-base",
       "dependencies": {
+        "@better-auth/api-key": "^1.5.6",
         "@elysiajs/cors": "^1.4.1",
         "@elysiajs/cron": "^1.4.1",
         "@repo/db": "workspace:*",
         "@repo/emails": "workspace:*",
+        "@types/ms": "^2.1.0",
         "axios": "^1.13.6",
         "better-auth": "^1.5.6",
         "dayjs": "^1.11.20",
         "dotenv": "^17.3.1",
         "drizzle-orm": "^0.45.1",
         "elysia": "latest",
+        "ms": "^2.1.3",
         "pg": "^8.20.0",
+        "redis": "^5.11.0",
         "resend": "^6.9.4",
         "stripe": "^18.3.0",
         "zod": "^4.3.6",
@@ -342,6 +346,8 @@
     "@babel/types": ["@babel/types@7.29.0", "", { "dependencies": { "@babel/helper-string-parser": "^7.27.1", "@babel/helper-validator-identifier": "^7.28.5" } }, "sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A=="],
 
     "@bcoe/v8-coverage": ["@bcoe/v8-coverage@1.0.2", "", {}, "sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA=="],
+
+    "@better-auth/api-key": ["@better-auth/api-key@1.5.6", "", { "dependencies": { "zod": "^4.3.6" }, "peerDependencies": { "@better-auth/core": "1.5.6", "@better-auth/utils": "0.3.1", "better-auth": "1.5.6" } }, "sha512-jr3m4/caFxn9BuY9pGDJ4B1HP1Qoqmyd7heBHm4KUFel+a9Whe/euROgZ/L+o7mbmUdZtreneaU15dpn0tJZ5g=="],
 
     "@better-auth/core": ["@better-auth/core@1.5.6", "", { "dependencies": { "@opentelemetry/semantic-conventions": "^1.39.0", "@standard-schema/spec": "^1.1.0", "zod": "^4.3.6" }, "peerDependencies": { "@better-auth/utils": "0.3.1", "@better-fetch/fetch": "1.1.21", "@cloudflare/workers-types": ">=4", "@opentelemetry/api": "^1.9.0", "better-call": "1.3.2", "jose": "^6.1.0", "kysely": "^0.28.5", "nanostores": "^1.0.1" }, "optionalPeers": ["@cloudflare/workers-types"] }, "sha512-Ez9DZdIMFyxHremmoLz1emFPGNQomDC1jqqBPnZ6Ci+6TiGN3R9w/Y03cJn6I8r1ycKgOzeVMZtJ/erOZ27Gsw=="],
 
@@ -905,6 +911,16 @@
 
     "@react-native/virtualized-lists": ["@react-native/virtualized-lists@0.84.1", "", { "dependencies": { "invariant": "^2.2.4", "nullthrows": "^1.1.1" }, "peerDependencies": { "@types/react": "^19.2.0", "react": "*", "react-native": "*" }, "optionalPeers": ["@types/react"] }, "sha512-sJoDunzhci8ZsqxlUiKoLut4xQeQcmbIgvDHGQKeBz6uEq9HgU+hCWOijMRr6sLP0slQVfBAza34Rq7IbXZZOA=="],
 
+    "@redis/bloom": ["@redis/bloom@5.11.0", "", { "peerDependencies": { "@redis/client": "^5.11.0" } }, "sha512-KYiVilAhAFN3057afUb/tfYJpsEyTkQB+tQcn5gVVA7DgcNOAj8lLxe4j8ov8BF6I9C1Fe/kwlbuAICcTMX8Lw=="],
+
+    "@redis/client": ["@redis/client@5.11.0", "", { "dependencies": { "cluster-key-slot": "1.1.2" }, "peerDependencies": { "@node-rs/xxhash": "^1.1.0" }, "optionalPeers": ["@node-rs/xxhash"] }, "sha512-GHoprlNQD51Xq2Ztd94HHV94MdFZQ3CVrpA04Fz8MVoHM0B7SlbmPEVIjwTbcv58z8QyjnrOuikS0rWF03k5dQ=="],
+
+    "@redis/json": ["@redis/json@5.11.0", "", { "peerDependencies": { "@redis/client": "^5.11.0" } }, "sha512-1iAy9kAtcD0quB21RbPTbUqqy+T2Uu2JxucwE+B4A+VaDbIRvpZR6DMqV8Iqaws2YxJYB3GC5JVNzPYio2ErUg=="],
+
+    "@redis/search": ["@redis/search@5.11.0", "", { "peerDependencies": { "@redis/client": "^5.11.0" } }, "sha512-g1l7f3Rnyk/xI99oGHIgWHSKFl45Re5YTIcO8j/JE8olz389yUFyz2+A6nqVy/Zi031VgPDWscbbgOk8hlhZ3g=="],
+
+    "@redis/time-series": ["@redis/time-series@5.11.0", "", { "peerDependencies": { "@redis/client": "^5.11.0" } }, "sha512-TWFeOcU4xkj0DkndnOyhtxvX1KWD+78UHT3XX3x3XRBUGWeQrKo3jqzDsZwxbggUgf9yLJr/akFHXru66X5UQA=="],
+
     "@repo/api": ["@repo/api@workspace:packages/api"],
 
     "@repo/backend-base": ["@repo/backend-base@workspace:packages/backend-base"],
@@ -1117,6 +1133,8 @@
 
     "@types/mdx": ["@types/mdx@2.0.13", "", {}, "sha512-+OWZQfAYyio6YkJb3HLxDrvnx6SWWDbC0zVPfBRzUk0/nqoDyf6dNxQi3eArPe8rJ473nobTMQ/8Zk+LxJ+Yuw=="],
 
+    "@types/ms": ["@types/ms@2.1.0", "", {}, "sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA=="],
+
     "@types/node": ["@types/node@22.19.15", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-F0R/h2+dsy5wJAUe3tAU6oqa2qbWY5TpNfL/RGmo1y38hiyO1w3x2jPtt76wmuaJI4DQnOBu21cNXQ2STIUUWg=="],
 
     "@types/pg": ["@types/pg@8.20.0", "", { "dependencies": { "@types/node": "*", "pg-protocol": "*", "pg-types": "^2.2.0" } }, "sha512-bEPFOaMAHTEP1EzpvHTbmwR8UsFyHSKsRisLIHVMXnpNefSbGA1bD6CVy+qKjGSqmZqNqBDV2azOBo8TgkcVow=="],
@@ -1308,6 +1326,8 @@
     "cliui": ["cliui@8.0.1", "", { "dependencies": { "string-width": "^4.2.0", "strip-ansi": "^6.0.1", "wrap-ansi": "^7.0.0" } }, "sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ=="],
 
     "clsx": ["clsx@2.1.1", "", {}, "sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA=="],
+
+    "cluster-key-slot": ["cluster-key-slot@1.1.2", "", {}, "sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA=="],
 
     "code-block-writer": ["code-block-writer@13.0.3", "", {}, "sha512-Oofo0pq3IKnsFtuHqSF7TqBfr71aeyZDVJ0HpmqB7FBM2qEigL0iPONSCZSO9pE9dZTAxANe5XHG9Uy0YMv8cg=="],
 
@@ -2208,6 +2228,8 @@
     "recharts-scale": ["recharts-scale@0.4.5", "", { "dependencies": { "decimal.js-light": "^2.4.1" } }, "sha512-kivNFO+0OcUNu7jQquLXAxz1FIwZj8nrj+YkOKc5694NbjCvcT6aSZiIzNzd2Kul4o4rTto8QVR9lMNtxD4G1w=="],
 
     "redent": ["redent@3.0.0", "", { "dependencies": { "indent-string": "^4.0.0", "strip-indent": "^3.0.0" } }, "sha512-6tDA8g98We0zd0GvVeMT9arEOnTw9qM03L9cJXaCjrip1OO764RDBLBfrB4cwzNGDj5OA5ioymC9GkizgWJDUg=="],
+
+    "redis": ["redis@5.11.0", "", { "dependencies": { "@redis/bloom": "5.11.0", "@redis/client": "5.11.0", "@redis/json": "5.11.0", "@redis/search": "5.11.0", "@redis/time-series": "5.11.0" } }, "sha512-YwXjATVDT+AuxcyfOwZn046aml9jMlQPvU1VXIlLDVAExe0u93aTfPYSeRgG4p9Q/Jlkj+LXJ1XEoFV+j2JKcQ=="],
 
     "regenerate": ["regenerate@1.4.2", "", {}, "sha512-zrceR/XhGYU/d/opr2EKO7aRHUeiBI8qjtfHqADTwZd6Szfy16la6kqD0MIUs5z5hx6AaKa+PixpPrR289+I0A=="],
 

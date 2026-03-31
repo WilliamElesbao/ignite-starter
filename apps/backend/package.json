@@ -6,8 +6,8 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
-    "@repo/backend-base": "workspace:*",
     "@elysiajs/openapi": "^1.4.14",
+    "@repo/backend-base": "workspace:*",
     "elysia": "latest"
   },
   "devDependencies": {
