@@ -42,15 +42,6 @@ export type Account = {
   updatedAt: string;
 };
 
-export type Verification = {
-  id?: string;
-  identifier: string;
-  value: string;
-  expiresAt: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
 export const CodeEnum = { AUTH_UNAUTHORIZED: "AUTH_UNAUTHORIZED" } as const;
 
 export type CodeEnum = (typeof CodeEnum)[keyof typeof CodeEnum];
