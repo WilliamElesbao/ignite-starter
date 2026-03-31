@@ -1,20 +1,40 @@
+import { apiKey } from "@better-auth/api-key";
 import { db } from "@repo/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
 import { env } from "../../env";
+import redisClient from "../../shared/redis.client";
 
 export const auth = betterAuth({
-  // account: {
-  //   accountLinking: {
-  //     enabled: true,
-  //     trustedProviders: ["google"],
-  //     allowDifferentEmails: false,
-  //   },
-  // },
   basePath: "/auth",
   trustedOrigins: [env.WEB_URL],
-  plugins: [openAPI()],
+  logger: {
+    disabled: false,
+    disableColors: false,
+    level: "warn",
+    log: (level, message, ...args) => {
+      // Custom logging implementation
+      console.log(`[${level}] ${message}`, ...args);
+    },
+  },
+  plugins: [
+    openAPI(),
+    apiKey({
+      storage: "secondary-storage",
+      fallbackToDatabase: true,
+    }),
+  ],
+  secondaryStorage: {
+    get: async (key) => await redisClient.get(key),
+    set: async (key, value, ttl) => {
+      if (ttl) await redisClient.set(key, value, `${ttl}s`);
+      else await redisClient.set(key, value, `${60 * 60 * 24}s`); // Default to 24 hours if no TTL is provided
+    },
+    delete: async (key) => {
+      await redisClient.delete(key);
+    },
+  },
   database: drizzleAdapter(db, {
     provider: "pg",
     usePlural: true,

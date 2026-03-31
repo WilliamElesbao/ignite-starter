@@ -4,6 +4,9 @@ import { Elysia } from "elysia";
 import { stripe } from "../lib/stripe";
 import { SHARED_ERROR_MAP, SharedErrorCode } from "./errors/shared.errors";
 import { toErrorResponse } from "./errors/to-error-response";
+import redisClient from "./redis.client";
+
+export type cache = typeof redisClient;
 
 export type db = typeof Database;
 
@@ -17,6 +20,7 @@ const setup = new Elysia({ name: "shared" })
     }),
   )
   .state("db", Database)
+  .state("cache", redisClient)
   .state("stripe", stripe)
   .onError(({ code, error, set }) => {
     const response =
@@ -34,6 +38,7 @@ const setup = new Elysia({ name: "shared" })
 setup.onStop(() => {
   console.log("onStop on shared plugin");
   Database.$client.end();
+  redisClient.disconnect();
 });
 
 export default setup;
