@@ -1,4 +1,3 @@
-import { apiKey } from "@better-auth/api-key";
 import { db } from "@repo/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -30,13 +29,7 @@ export const auth = betterAuth({
       logger.info(metadata);
     },
   },
-  plugins: [
-    openAPI(),
-    apiKey({
-      storage: "secondary-storage",
-      fallbackToDatabase: true,
-    }),
-  ],
+  plugins: [openAPI()],
   secondaryStorage: {
     get: async (key) => await redisClient.get(key),
     set: async (key, value, ttl) => {
