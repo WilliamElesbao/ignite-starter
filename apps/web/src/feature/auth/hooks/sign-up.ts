@@ -20,6 +20,7 @@ export const signUpWithEmail = async (values: SignUpFormValues) => {
     {
       onSuccess: (context) => {
         console.log("[useSignupForm] - Sign-up successful:", context.data);
+        window.location.replace("/");
       },
       onError: (context) => {
         toast.error(`Sign-up failed: ${context.error.message}`);
