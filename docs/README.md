@@ -17,3 +17,4 @@
 - [Stripe API](https://docs.stripe.com/api)
 - [Elysia Crons](https://elysiajs.com/plugins/cron)
 - [Redis](https://github.com/redis/node-redis)
+- [Internationalization for Next.js](https://next-intl.dev/)
