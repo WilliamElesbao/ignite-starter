@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { toast } from "sonner";
 import { useDialog } from "@/context";
 import { queryClient } from "@/lib/react-query";
+import { delay } from "@/utils/delay";
 import {
   useStripeRevokeSubscription,
   useStripeSubscription,
@@ -27,11 +28,14 @@ export const useSubscription = () => {
       await mutateAsync(
         { body: data },
         {
-          onSuccess: (ctx) => {
+          onSuccess: async (ctx) => {
             toast.info(t("redirecting-to-stripe-for-subscription"), {
               description: t("please-wait-while-we-set-up-your-subscription"),
               position: "top-center",
             });
+
+            await delay(2);
+
             if (ctx?.url) {
               window.location.href = ctx.url;
             }
@@ -122,6 +126,9 @@ export const useCancelSubscription = () => {
       {},
       {
         onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: getStripeSubscriptionDetailsQueryKey(),
+          });
           toast.info(t("your-subscription-has-been-canceled"), {
             description: t(
               "you-will-not-be-charged-for-the-next-billing-cycle",
