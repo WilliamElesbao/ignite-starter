@@ -46,7 +46,7 @@ export const useSubscriptionForm = ({ user }: { user: User }) => {
     isPending: isUpdateSubscriptionPending,
   } = useUpdateSubscription();
 
-  const onSubmit = user?.stripeSubscriptionId
+  const onSubmit = subscriptionDetails?.hasActiveSubscription
     ? updateSubscriptionOnSubmit
     : subscriptionOnSubmit;
 
