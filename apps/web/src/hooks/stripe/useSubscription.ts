@@ -1,4 +1,5 @@
 import { getStripeSubscriptionDetailsQueryKey } from "@repo/api";
+import { useTranslations } from "next-intl";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { useDialog } from "@/context";
@@ -17,6 +18,7 @@ import type { SubscriptionFormValues } from "./useSubscriptionForm";
  * @returns Form instance and mutation handlers for subscription
  */
 export const useSubscription = () => {
+  const t = useTranslations("dashboard.toast.subscription");
   const { mutateAsync, isPending } = useStripeSubscription();
   const { setDialogIsOpen } = useDialog();
 
@@ -26,8 +28,8 @@ export const useSubscription = () => {
         { body: data },
         {
           onSuccess: (ctx) => {
-            toast.info("Redirecting to Stripe for subscription...", {
-              description: "Please wait while we set up your subscription.",
+            toast.info(t("redirecting-to-stripe-for-subscription"), {
+              description: t("please-wait-while-we-set-up-your-subscription"),
               position: "top-center",
             });
             if (ctx?.url) {
@@ -36,9 +38,10 @@ export const useSubscription = () => {
           },
           onError: (err) => {
             console.error("[Hook][useSubscription] onError:", err);
-            toast.error("Failed to create subscription.", {
-              description:
-                "An error occurred while creating your subscription. Please try again.",
+            toast.error(t("failed-to-create-subscription"), {
+              description: t(
+                "an-error-occurred-while-creating-your-subscription",
+              ),
               position: "top-center",
             });
           },
@@ -48,7 +51,7 @@ export const useSubscription = () => {
         },
       );
     },
-    [mutateAsync, setDialogIsOpen],
+    [mutateAsync, setDialogIsOpen, t],
   );
 
   return {
@@ -64,6 +67,7 @@ export const useSubscription = () => {
  * @returns Form instance and mutation handlers for updating subscription
  */
 export const useUpdateSubscription = () => {
+  const t = useTranslations("dashboard.toast.update-subscription");
   const { mutateAsync, isPending } = useStripeUpdateSubscription();
   const { setDialogIsOpen } = useDialog();
 
@@ -73,8 +77,8 @@ export const useUpdateSubscription = () => {
         { body: data },
         {
           onSuccess: () => {
-            toast.success("Subscription updated successfully!", {
-              description: "Your subscription has been updated.",
+            toast.success(t("subscription-updated-successfully"), {
+              description: t("your-subscription-has-been-updated"),
               position: "top-center",
             });
             setDialogIsOpen(false);
@@ -84,16 +88,17 @@ export const useUpdateSubscription = () => {
           },
           onError: (err) => {
             console.error("[Hook][useUpdateSubscription] onSubmit error:", err);
-            toast.error("Failed to update subscription.", {
-              description:
-                "An error occurred while updating your subscription. Please try again.",
+            toast.error(t("failed-to-update-subscription"), {
+              description: t(
+                "an-error-occurred-while-updating-your-subscription",
+              ),
               position: "top-center",
             });
           },
         },
       );
     },
-    [mutateAsync, setDialogIsOpen],
+    [mutateAsync, setDialogIsOpen, t],
   );
 
   return {
@@ -108,6 +113,7 @@ export const useUpdateSubscription = () => {
  * @returns Mutation handler and submission method for canceling a subscription
  */
 export const useCancelSubscription = () => {
+  const t = useTranslations("dashboard.toast.cancel-subscription");
   const mutation = useStripeRevokeSubscription();
   const { setDialogIsOpen } = useDialog();
 
@@ -116,24 +122,26 @@ export const useCancelSubscription = () => {
       {},
       {
         onSuccess: () => {
-          toast.info("Your subscription has been canceled.", {
-            description:
-              "You will not be charged for the next billing cycle.\nBut you can still access your account until the end of the current period.",
+          toast.info(t("your-subscription-has-been-canceled"), {
+            description: t(
+              "you-will-not-be-charged-for-the-next-billing-cycle",
+            ),
             position: "top-center",
           });
           setDialogIsOpen(false);
         },
         onError: (err) => {
           console.error("[Hook][useCancelSubscription] onSubmit error:", err);
-          toast.error("Failed to cancel subscription.", {
-            description:
-              "An error occurred while canceling your subscription. Please try again.",
+          toast.error(t("failed-to-cancel-subscription"), {
+            description: t(
+              "an-error-occurred-while-canceling-your-subscription",
+            ),
             position: "top-center",
           });
         },
       },
     );
-  }, [mutation, setDialogIsOpen]);
+  }, [mutation, setDialogIsOpen, t]);
 
   return {
     onSubmit,

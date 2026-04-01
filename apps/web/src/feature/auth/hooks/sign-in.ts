@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { WELCOME_TOAST } from "@/constants";
 import type { SignInFormValues } from "@/feature/auth/sign-in/hooks/form.schema";
@@ -32,6 +33,8 @@ export const signInWithGoogle = async () => {
 };
 
 export const signInWithEmail = async (values: SignInFormValues) => {
+  const t = useTranslations("sign-in");
+
   sessionStorage.setItem(WELCOME_TOAST.key, WELCOME_TOAST.value);
 
   await authClient.signIn.email(
@@ -41,7 +44,7 @@ export const signInWithEmail = async (values: SignInFormValues) => {
     },
     {
       onError: (context) => {
-        toast.error("Login failed", {
+        toast.error(t("toast.login-failed"), {
           description: context.error.message,
         });
       },

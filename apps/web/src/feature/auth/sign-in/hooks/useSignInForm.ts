@@ -5,7 +5,7 @@ import { type SignInFormValues, signInFormSchema } from "./form.schema";
 
 export const useSignInForm = () => {
   const form = useForm<SignInFormValues>({
-    resolver: zodResolver(signInFormSchema),
+    resolver: zodResolver(signInFormSchema()),
     defaultValues: {
       email: "",
       password: "",

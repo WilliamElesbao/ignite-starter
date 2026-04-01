@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { AuthForm } from "@/feature/auth/components";
 import { cn } from "@/lib/shadcn/utils";
 import { signInWithGoogle } from "../hooks";
@@ -9,6 +10,7 @@ export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const t = useTranslations();
   const { form, onSubmit } = useSignupForm();
 
   return (
@@ -18,24 +20,24 @@ export function SignUpForm({
         <AuthForm.Field
           form={form}
           name="name"
-          label="Name"
-          placeholder="John Doe"
+          label={t("common.name")}
+          placeholder="Ignite Starter"
         />
         <AuthForm.Field
           form={form}
           name="email"
-          label="Email"
+          label={t("common.email")}
           type="email"
-          placeholder="m@example.com"
+          placeholder="ignite@starter.com"
         />
         <AuthForm.Field
           form={form}
           name="password"
-          label="Password"
+          label={t("common.password")}
           type="password"
           placeholder="••••••••"
         />
-        <AuthForm.Submit>Create Account</AuthForm.Submit>
+        <AuthForm.Submit>{t("sign-up.create-account")}</AuthForm.Submit>
         <AuthForm.Separator />
         <AuthForm.Socials signInWithGoogle={signInWithGoogle} />
       </AuthForm.Form>

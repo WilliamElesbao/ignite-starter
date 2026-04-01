@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { GiFox } from "rocketicons/gi";
 import { RcRocketIcon } from "rocketicons/rc";
 import { FieldDescription } from "@/components/ui/field";
@@ -8,22 +9,24 @@ interface AuthFormHeaderProps {
 }
 
 export const AuthFormHeader = ({ mode = "sign-in" }: AuthFormHeaderProps) => {
+  const t = useTranslations();
+
   const content =
     mode === "sign-in"
       ? {
           icon: <GiFox className="size-8 text-primary" />,
-          description: "Don't have an account?",
+          description: t("sign-in.dont-have-an-account"),
           link: {
             href: "/sign-up",
-            text: "Sign up",
+            text: t("common.sign-up"),
           },
         }
       : {
           icon: <RcRocketIcon className="size-6 text-primary" />,
-          description: "Already have an account?",
+          description: t("sign-up.already-have-an-account"),
           link: {
             href: "/sign-in",
-            text: "Sign in",
+            text: t("common.sign-in"),
           },
         };
 
@@ -47,9 +50,13 @@ export const AuthFormHeader = ({ mode = "sign-in" }: AuthFormHeaderProps) => {
 };
 
 const Title = () => {
+  const t = useTranslations("sign-in");
+
   return (
     <h1 className="text-xl font-bold">
-      Welcome to <span className="text-primary">Ignite Starter </span>
+      {t.rich("welcome-to-ignite-starter", {
+        highlight: (chunks) => <span className="text-primary">{chunks}</span>,
+      })}
     </h1>
   );
 };

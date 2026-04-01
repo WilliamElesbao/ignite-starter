@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { AuthForm } from "@/feature/auth/components";
 import { signInWithGoogle } from "@/feature/auth/hooks";
 import { useSignInForm } from "@/feature/auth/sign-in/hooks/useSignInForm";
@@ -9,6 +10,7 @@ export function SignInForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const t = useTranslations("common");
   const { form, onSubmit } = useSignInForm();
 
   return (
@@ -18,18 +20,18 @@ export function SignInForm({
         <AuthForm.Field
           form={form}
           name="email"
-          label="Email"
+          label={t("email")}
           type="email"
-          placeholder="m@example.com"
+          placeholder="ignite@starter.com"
         />
         <AuthForm.Field
           form={form}
           name="password"
-          label="Password"
+          label={t("password")}
           type="password"
           placeholder="••••••••"
         />
-        <AuthForm.Submit>Login</AuthForm.Submit>
+        <AuthForm.Submit>{t("login")}</AuthForm.Submit>
         <AuthForm.Separator />
         <AuthForm.Socials signInWithGoogle={signInWithGoogle} />
       </AuthForm.Form>
