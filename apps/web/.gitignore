@@ -50,3 +50,6 @@ storybook-static
 
 # react-email-starter
 /emails/node_modules
+
+# next-intl
+/src/lib/i18n/locales/*.d.json.ts

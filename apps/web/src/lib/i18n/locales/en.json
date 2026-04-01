@@ -1,0 +1,75 @@
+{
+  "common": {
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "login": "Login",
+    "or": "Or",
+    "continue-with": "Continue with {provider}",
+    "sign-in": "Sign in",
+    "sign-up": "Sign up",
+    "language": "Language",
+    "change-language": "Change language"
+  },
+  "languages": {
+    "en": "English",
+    "pt-BR": "Portuguese (Brazil)"
+  },
+  "sign-in": {
+    "welcome-to-ignite-starter": "Welcome to <highlight>Ignite Starter</highlight>",
+    "dont-have-an-account": "Don't have an account?",
+    "project-description": "This project is an open-source starter kit built for developers who want to accelerate product development with best practices. By clicking continue, you'll unlock the features of this developer-friendly open-source starter.",
+    "toast": {
+      "login-failed": "Login failed"
+    }
+  },
+  "sign-up": {
+    "already-have-an-account": "Already have an account?",
+    "create-account": "Create Account",
+    "toast": {
+      "sign-up-failed": "Sign up failed"
+    }
+  },
+  "dashboard": {
+    "toast": {
+      "welcome": {
+        "title": "Hey D3v!",
+        "description": "Welcome to Ignite Starter, Wow, the authentication worked perfectly!"
+      },
+      "send-email": {
+        "failed-to-send-email": "Failed to send email. Please try again later.",
+        "email-sent-successfully": "Email sent successfully!"
+      },
+      "subscription": {
+        "redirecting-to-stripe-for-subscription": "Redirecting to Stripe for subscription...",
+        "please-wait-while-we-set-up-your-subscription": "Please wait while we set up your subscription.",
+        "failed-to-create-subscription": "Failed to create subscription.",
+        "an-error-occurred-while-creating-your-subscription": "An error occurred while creating your subscription. Please try again."
+      },
+      "update-subscription": {
+        "subscription-updated-successfully": "Subscription updated successfully!",
+        "your-subscription-has-been-updated": "Your subscription has been updated.",
+        "failed-to-update-subscription": "Failed to update subscription.",
+        "an-error-occurred-while-updating-your-subscription": "An error occurred while updating your subscription. Please try again."
+      },
+      "cancel-subscription": {
+        "your-subscription-has-been-canceled": "Your subscription has been canceled.",
+        "you-will-not-be-charged-for-the-next-billing-cycle": "You will not be charged for the next billing cycle\nBut you can still access your account until the end of the current period.",
+        "failed-to-cancel-subscription": "Failed to cancel subscription.",
+        "an-error-occurred-while-canceling-your-subscription": "An error occurred while canceling your subscription. Please try again."
+      }
+    }
+  },
+  "validation": {
+    "name": {
+      "min-length": "Name must be at least {min} characters long"
+    },
+    "email": {
+      "please-enter-a-valid-email": "Please enter a valid email address"
+    },
+    "password": {
+      "password-is-required": "Password is required",
+      "min-length": "Password must be at least {min} characters long"
+    }
+  }
+}

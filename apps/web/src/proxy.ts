@@ -1,5 +1,9 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
+import createMiddleware from "next-intl/middleware";
+import { routing } from "@/lib/i18n/routing";
+
+const handleI18nRouting = createMiddleware(routing);
 
 // Cookies set by BetterAuth that must be cleared when a session is invalidated.
 const BETTER_AUTH_COOKIES = [
@@ -8,18 +12,31 @@ const BETTER_AUTH_COOKIES = [
 ];
 
 export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
   const authRoutes = new Set(["/sign-in", "/sign-up"]);
+  const response = handleI18nRouting(request);
+
+  if (!response.ok) {
+    return response;
+  }
+
+  const rewritten = response.headers.get("x-middleware-rewrite") ?? request.url;
+  const pathname = new URL(rewritten).pathname;
+  const localeMatch = pathname.match(/^\/(en|pt-BR)(?=\/|$)/);
+  const locale = localeMatch?.[1] ?? routing.defaultLocale;
+  const pathnameWithoutLocale =
+    pathname.replace(/^\/(en|pt-BR)(?=\/|$)/, "") || "/";
 
   try {
     const sessionToken = getSessionCookie(request);
-    const isAuthRoute = authRoutes.has(pathname);
+    const isAuthRoute = authRoutes.has(pathnameWithoutLocale);
 
     if (!sessionToken) {
       if (!isAuthRoute) {
-        return NextResponse.redirect(new URL("/sign-in", request.url));
+        return NextResponse.redirect(
+          new URL(`/${locale}/sign-in`, request.url),
+        );
       }
-      return NextResponse.next();
+      return response;
     }
 
     // Cookie exists — verify with the backend that the session is still valid.
@@ -37,21 +54,23 @@ export async function proxy(request: NextRequest) {
     if (!session) {
       // Backend no longer recognises this session. Delete the stale cookies so
       // the next request is treated as unauthenticated, then go to sign-in.
-      const response = NextResponse.redirect(new URL("/sign-in", request.url));
+      const redirectResponse = NextResponse.redirect(
+        new URL(`/${locale}/sign-in`, request.url),
+      );
       for (const name of BETTER_AUTH_COOKIES) {
-        response.cookies.delete(name);
+        redirectResponse.cookies.delete(name);
       }
-      return response;
+      return redirectResponse;
     }
 
     if (isAuthRoute) {
-      return NextResponse.redirect(new URL("/", request.url));
+      return NextResponse.redirect(new URL(`/${locale}`, request.url));
     }
 
-    return NextResponse.next();
+    return response;
   } catch (error) {
     console.error("[middleware] Error getting session:", error);
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.redirect(new URL(`/${locale}/sign-in`, request.url));
   }
 }
 
@@ -64,6 +83,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico, sitemap.xml, robots.txt (metadata files)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+    "/((?!api|trpc|_next|_vercel|.*\\..*).*)",
   ],
 };

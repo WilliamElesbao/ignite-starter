@@ -1,0 +1,75 @@
+{
+  "common": {
+    "name": "Nome",
+    "email": "Email",
+    "password": "Senha",
+    "login": "Entrar",
+    "or": "Ou",
+    "continue-with": "Continuar com {provider}",
+    "sign-in": "Entrar",
+    "sign-up": "Inscrever-se",
+    "language": "Idioma",
+    "change-language": "Mudar idioma"
+  },
+  "languages": {
+    "en": "Inglês",
+    "pt-BR": "Português (Brasil)"
+  },
+  "sign-in": {
+    "welcome-to-ignite-starter": "Bem-vindo ao <highlight>Ignite Starter</highlight>",
+    "dont-have-an-account": "Não tem uma conta?",
+    "project-description": "Este projeto é um kit de inicialização de código aberto construído para desenvolvedores que querem acelerar o desenvolvimento de produtos com as melhores práticas. Ao clicar em continuar, você desbloqueará os recursos deste kit de inicialização de código aberto amigável para desenvolvedores.",
+    "toast": {
+      "login-failed": "Falha no login"
+    }
+  },
+  "sign-up": {
+    "already-have-an-account": "Já tem uma conta?",
+    "create-account": "Criar Conta",
+    "toast": {
+      "sign-up-failed": "Falha no cadastro"
+    }
+  },
+  "dashboard": {
+    "toast": {
+      "welcome": {
+        "title": "Eai D3v!",
+        "description": "Bem-vindo ao Ignite Starter, Wow, a autenticação funcionou perfeitamente!"
+      },
+      "send-email": {
+        "failed-to-send-email": "Falha ao enviar email. Por favor, tente novamente mais tarde.",
+        "email-sent-successfully": "Email enviado com sucesso!"
+      },
+      "subscription": {
+        "redirecting-to-stripe-for-subscription": "Redirecionando para Stripe para assinatura...",
+        "please-wait-while-we-set-up-your-subscription": "Por favor, aguarde enquanto configuramos sua assinatura.",
+        "failed-to-create-subscription": "Falha ao criar assinatura.",
+        "an-error-occurred-while-creating-your-subscription": "Ocorreu um erro ao criar sua assinatura. Por favor, tente novamente."
+      },
+      "update-subscription": {
+        "subscription-updated-successfully": "Assinatura atualizada com sucesso!",
+        "your-subscription-has-been-updated": "Sua assinatura foi atualizada.",
+        "failed-to-update-subscription": "Falha ao atualizar assinatura.",
+        "an-error-occurred-while-updating-your-subscription": "Ocorreu um erro ao atualizar sua assinatura. Por favor, tente novamente."
+      },
+      "cancel-subscription": {
+        "your-subscription-has-been-canceled": "Sua assinatura foi cancelada.",
+        "you-will-not-be-charged-for-the-next-billing-cycle": "Você não será cobrado pelo próximo ciclo de cobrança\nMas você ainda pode acessar sua conta até o final do período atual.",
+        "failed-to-cancel-subscription": "Falha ao cancelar assinatura.",
+        "an-error-occurred-while-canceling-your-subscription": "Ocorreu um erro ao cancelar sua assinatura. Por favor, tente novamente."
+      }
+    }
+  },
+  "validation": {
+    "name": {
+      "min-length": "O nome deve ter pelo menos {min} caracteres"
+    },
+    "email": {
+      "please-enter-a-valid-email": "Por favor, insira um endereço de email válido"
+    },
+    "password": {
+      "password-is-required": "Senha é obrigatória",
+      "min-length": "A senha deve ter pelo menos {min} caracteres"
+    }
+  }
+}
