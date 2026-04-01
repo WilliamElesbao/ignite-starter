@@ -4,14 +4,14 @@ import { useTranslations } from "next-intl";
 import { AuthForm } from "@/feature/auth/components";
 import { cn } from "@/lib/shadcn/utils";
 import { signInWithGoogle } from "../hooks";
-import { useSignupForm } from "./hooks/useSignupForm";
+import { useSignUpForm } from "./hooks/useSignUpForm";
 
 export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const t = useTranslations();
-  const { form, onSubmit } = useSignupForm();
+  const { form, onSubmit } = useSignUpForm();
 
   return (
     <AuthForm className={cn(className)} {...props}>

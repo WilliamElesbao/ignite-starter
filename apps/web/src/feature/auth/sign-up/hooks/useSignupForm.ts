@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { signUpWithEmail } from "@/feature/auth/hooks";
 import { type SignUpFormValues, signUpFormSchema } from "./form.schema";
 
-export const useSignupForm = () => {
+export const useSignUpForm = () => {
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpFormSchema()),
     defaultValues: {
