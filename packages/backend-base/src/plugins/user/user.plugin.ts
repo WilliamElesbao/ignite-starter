@@ -32,13 +32,22 @@ const userPlugin = new Elysia({ tags: ["User"] })
   .group("/user", (app) =>
     app.get(
       "/:id",
-      async ({ params: { id }, store: { userService }, user }) => {
+      async ({ params: { id }, store: { userService, attributes }, user }) => {
+        attributes["plugin.name"] = "user";
+        attributes["app.user.target_id"] = id;
+
         if (!user) {
+          attributes["auth.authenticated"] = false;
+
           throw AppError.fromCatalog({
             code: AuthErrorCode.AUTH_UNAUTHORIZED,
             catalog: AUTH_ERROR_MAP,
           });
         }
+
+        attributes["auth.authenticated"] = true;
+        attributes["user.id"] = user.id;
+        attributes["has.subscription"] = Boolean(user.stripeSubscriptionId);
 
         const userById = await userService.getUserById({ id });
 

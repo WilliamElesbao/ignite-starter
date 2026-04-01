@@ -3,7 +3,7 @@ import { AppError } from "../../shared/errors/app-error";
 import { toErrorResponse } from "../../shared/errors/to-error-response";
 import shared from "../../shared/shared.plugin";
 import { AUTH_ERROR_MAP, AuthErrorCode } from "../auth/auth.errors";
-import authPLugin from "../auth/auth.plugin";
+import authPlugin from "../auth/auth.plugin";
 import {
   stripeCreateSubscription404ErrorDto,
   stripeCreateSubscription502ErrorDto,
@@ -29,7 +29,7 @@ import { StripeService } from "./stripe.service";
 
 const stripePlugin = new Elysia({ tags: ["Stripe"] })
   .use(shared)
-  .use(authPLugin)
+  .use(authPlugin)
   .onError(({ error, set }) => {
     const response = toErrorResponse(error, {
       code: StripeErrorCode.STRIPE_INTERNAL_SERVER_ERROR,
@@ -52,7 +52,9 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
     app
       .get(
         "/products",
-        async ({ store: { stripeService } }) => {
+        async ({ store: { stripeService, attributes } }) => {
+          attributes["plugin.name"] = "stripe";
+
           const products = await stripeService.getProducts();
           return products;
         },
@@ -67,13 +69,23 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
       )
       .post(
         "/subscription",
-        async ({ store: { stripeService }, body, user }) => {
+        async ({ store: { stripeService, attributes }, body, user }) => {
+          attributes["plugin.name"] = "stripe";
+          attributes["app.plan.name"] = body.planName;
+          attributes["app.plan.price_id"] = body.priceId;
+
           if (!user) {
+            attributes["auth.authenticated"] = false;
+
             throw AppError.fromCatalog({
               code: AuthErrorCode.AUTH_UNAUTHORIZED,
               catalog: AUTH_ERROR_MAP,
             });
           }
+
+          attributes["auth.authenticated"] = true;
+          attributes["user.id"] = user.id;
+          attributes["has.subscription"] = Boolean(user.stripeSubscriptionId);
 
           const { url } = await stripeService.createSubscription({
             ...body,
@@ -97,16 +109,23 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
       )
       .get(
         "/subscription/details",
-        async ({ store: { stripeService }, user }) => {
+        async ({ store: { stripeService, attributes }, user }) => {
+          attributes["plugin.name"] = "stripe";
+
           if (!user) {
+            attributes["auth.authenticated"] = false;
+
             throw AppError.fromCatalog({
               code: AuthErrorCode.AUTH_UNAUTHORIZED,
               catalog: AUTH_ERROR_MAP,
             });
           }
 
-          const res = await stripeService.subscriptionDetails({ user });
+          attributes["auth.authenticated"] = true;
+          attributes["user.id"] = user.id;
+          attributes["has.subscription"] = Boolean(user.stripeSubscriptionId);
 
+          const res = await stripeService.subscriptionDetails({ user });
           return res;
         },
         {
@@ -122,13 +141,23 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
       )
       .patch(
         "/subscription",
-        async ({ store: { stripeService }, body, set, user }) => {
+        async ({ store: { stripeService, attributes }, body, set, user }) => {
+          attributes["plugin.name"] = "stripe";
+          attributes["app.plan.name"] = body.planName;
+          attributes["app.plan.price_id"] = body.priceId;
+
           if (!user) {
+            attributes["auth.authenticated"] = false;
+
             throw AppError.fromCatalog({
               code: AuthErrorCode.AUTH_UNAUTHORIZED,
               catalog: AUTH_ERROR_MAP,
             });
           }
+
+          attributes["auth.authenticated"] = true;
+          attributes["user.id"] = user.id;
+          attributes["has.subscription"] = Boolean(user.stripeSubscriptionId);
 
           await stripeService.updateSubscription({
             ...body,
@@ -153,13 +182,21 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
       )
       .patch(
         "/subscription/revoke",
-        async ({ store: { stripeService }, set, user }) => {
+        async ({ store: { stripeService, attributes }, set, user }) => {
+          attributes["plugin.name"] = "stripe";
+
           if (!user) {
+            attributes["auth.authenticated"] = false;
+
             throw AppError.fromCatalog({
               code: AuthErrorCode.AUTH_UNAUTHORIZED,
               catalog: AUTH_ERROR_MAP,
             });
           }
+
+          attributes["auth.authenticated"] = true;
+          attributes["user.id"] = user.id;
+          attributes["has.subscription"] = Boolean(user.stripeSubscriptionId);
 
           await stripeService.revokeSubscription({ user });
 
@@ -180,7 +217,9 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
       )
       .post(
         "/webhook",
-        async ({ request, store: { stripeService } }) => {
+        async ({ request, store: { stripeService, attributes } }) => {
+          attributes["plugin.name"] = "stripe";
+
           const signature = request.headers.get("stripe-signature");
 
           if (!signature) {

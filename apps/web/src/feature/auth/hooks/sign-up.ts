@@ -1,4 +1,3 @@
-import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { WELCOME_TOAST } from "@/constants";
 import type { SignUpFormValues } from "@/feature/auth/sign-up/hooks/form.schema";
@@ -9,10 +8,12 @@ import { authClient } from "@/lib/better-auth";
  * Displays a welcome toast on successful sign-up and an error toast on failure.
  *
  * @param values - The sign-up form values containing name, email, and password.
+ * @param signUpFailedMessage - Translated fallback message shown when sign-up fails.
  */
-export const signUpWithEmail = async (values: SignUpFormValues) => {
-  const t = useTranslations("sign-up");
-
+export const signUpWithEmail = async (
+  values: SignUpFormValues,
+  signUpFailedMessage: string,
+) => {
   sessionStorage.setItem(WELCOME_TOAST.key, WELCOME_TOAST.value);
 
   await authClient.signUp.email(
@@ -26,7 +27,7 @@ export const signUpWithEmail = async (values: SignUpFormValues) => {
         window.location.replace("/");
       },
       onError: (context) => {
-        toast.error(`${t("toast.sign-up-failed")}: ${context.error.message}`);
+        toast.error(`${signUpFailedMessage}: ${context.error.message}`);
       },
     },
   );

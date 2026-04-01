@@ -1,14 +1,38 @@
 import { db } from "@repo/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { createAuthMiddleware } from "better-auth/api";
 import { openAPI } from "better-auth/plugins";
 import { env } from "../../env";
 import redisClient from "../../shared/redis.client";
 import { logger } from "../logger";
+import { setAuthSpanTelemetry } from "../telemetry/auth-span-telemetry";
 
 export const auth = betterAuth({
   basePath: "/auth",
   trustedOrigins: [env.WEB_URL],
+  hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      setAuthSpanTelemetry(ctx);
+      return;
+    }),
+    after: createAuthMiddleware(async (ctx) => {
+      const returned = (ctx as { context?: { returned?: unknown } }).context
+        ?.returned;
+
+      const statusCode =
+        returned instanceof Response
+          ? returned.status
+          : (returned as { status?: unknown } | undefined)?.status;
+
+      setAuthSpanTelemetry(
+        ctx,
+        typeof statusCode === "number" ? statusCode : 200,
+      );
+
+      return;
+    }),
+  },
   logger: {
     disabled: false,
     disableColors: false,

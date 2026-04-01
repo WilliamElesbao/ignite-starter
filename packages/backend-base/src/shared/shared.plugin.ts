@@ -7,6 +7,7 @@ import { EventService } from "../services/event.service";
 import { SHARED_ERROR_MAP, SharedErrorCode } from "./errors/shared.errors";
 import { toErrorResponse } from "./errors/to-error-response";
 import redisClient from "./redis.client";
+import { telemetryPlugin } from "./telemetry.plugin";
 
 export type cache = typeof redisClient;
 
@@ -17,6 +18,7 @@ export type appLogger = typeof logger;
 const eventService = new EventService(Database, logger);
 
 const setup = new Elysia({ name: "shared" })
+  .use(telemetryPlugin)
   .use(
     cors({
       origin: [Bun.env.WEB_URL ?? "http://localhost:3000"],
