@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { User } from "@repo/api/generated/api/types.gen";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -20,7 +19,7 @@ export type SubscriptionFormValues = z.infer<typeof formSchema>;
  * @param userId - The ID of the user subscribing.
  * @returns A configured form instance for the subscription.
  */
-export const useSubscriptionForm = ({ user }: { user: User }) => {
+export const useSubscriptionForm = () => {
   const { data: subscriptionDetails } = useGetStripeSubscriptionDetails();
 
   const form = useForm<SubscriptionFormValues>({

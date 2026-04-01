@@ -38,7 +38,7 @@ export function DashboardWrapper({ user }: DashboardWrapperProps) {
       >
         <AppSidebar variant="inset" user={user} />
         <SidebarInset>
-          <SiteHeader user={user} subscription={subscription} />
+          <SiteHeader subscription={subscription} />
           <div className="flex flex-1 flex-col">
             <div className="@container/main flex flex-1 flex-col gap-2">
               <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
@@ -52,11 +52,7 @@ export function DashboardWrapper({ user }: DashboardWrapperProps) {
           </div>
         </SidebarInset>
 
-        <ChoosePlanDialog
-          user={user}
-          subscription={subscription}
-          products={products}
-        />
+        <ChoosePlanDialog subscription={subscription} products={products} />
       </SidebarProvider>
     </DialogProvider>
   );

@@ -18,22 +18,19 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useDialog } from "@/context";
 import { useSubscriptionForm } from "@/hooks/stripe/useSubscriptionForm";
-import type { User } from "@/lib/better-auth";
 import { formatPrice } from "@/utils";
 import { Form, FormField } from "../ui/form";
 import Badge from "./badge";
 
 export const ChoosePlanDialog = ({
-  user,
   products,
   subscription,
 }: {
-  user: User;
   products?: GetStripeProductsResponse;
   subscription?: GetStripeSubscriptionDetailsResponse | null;
 }) => {
   const { form, onSubmit, isLoading, disableChangePlanButton } =
-    useSubscriptionForm({ user });
+    useSubscriptionForm();
   const { dialogIsOpen, setDialogIsOpen } = useDialog();
 
   return (

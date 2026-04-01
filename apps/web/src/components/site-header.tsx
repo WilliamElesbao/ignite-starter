@@ -4,16 +4,13 @@ import * as IconsSi from "rocketicons/si";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import type { User } from "@/lib/better-auth";
 import { LanguageSwitcher } from "./language-switcher";
 import CancelSubscriptionDialog from "./origin-ui/cancel-plan-dialog";
 import { ThemeToggle } from "./theme-toggle";
 
 export function SiteHeader({
-  user,
   subscription,
 }: Readonly<{
-  user: User;
   subscription?: GetStripeSubscriptionDetailsResponse | null;
 }>) {
   const shouldShowRevokeButton =
