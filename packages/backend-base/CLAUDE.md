@@ -1,388 +1,246 @@
-# AI Agent Error Handling Guide (Backend Base)
+# CLAUDE.md — packages/backend-base
 
-This document is for coding agents (Claude, Copilot, etc.) working in `packages/backend-base`.
+## Overview
 
-It defines the **mandatory error-handling contract** and the expected implementation pattern for new or modified features.
-
----
-
-## 1) Why this exists
-
-The backend uses typed, feature-scoped error codes so the frontend can:
-
-- render backend messages directly, or
-- map error codes to localized/custom UI messages.
-
-This keeps API behavior predictable and maintenance scalable as the project grows.
+All backend business logic lives here as composable Elysia plugins. This package is consumed by `apps/backend`, which is a thin entry point that assembles plugins and starts the HTTP server. Features are organized as self-contained plugins, each with a service class, DTOs, and a typed error catalog.
 
 ---
 
-## 2) Non-negotiable API error contract
+## Package Role
+
+`packages/backend-base` exports:
+- Feature plugins: `authPlugin`, `userPlugin`, `emailPlugin`, `stripePlugin`
+- Infrastructure: `sharedPlugin`, `OpenAPI`, `subscriptionExpirationCron`
+- Lib singletons: configured Stripe, Resend, Pino logger, BetterAuth instance
+- Shared error utilities: `AppError`, `toErrorResponse`, `ErrorCatalog`
+
+`apps/backend/src/index.ts` imports and composes these — it does not contain any route or business logic.
+
+---
+
+## Directory Structure
+
+```
+src/
+├── config/         # OpenAPI documentation config
+├── cron/           # Scheduled jobs (subscription expiration)
+├── env.ts          # Validated environment variables (Zod)
+├── lib/            # Singleton library clients (logger, stripe, resend, better-auth)
+├── plugins/        # Feature plugins — one folder per domain
+│   ├── auth/
+│   ├── email/
+│   ├── stripe/
+│   └── user/
+├── services/       # Cross-cutting services (EventService)
+├── shared/         # Infrastructure: plugin base, Redis client, error system, DTOs
+└── utils/          # safePromise utility
+```
+
+---
+
+## Plugin Architecture
+
+Each feature domain follows the same structure:
+
+```
+plugins/<feature>/
+├── <feature>.plugin.ts    # Elysia plugin — routes, macros, onError handler
+├── <feature>.service.ts   # Service class — business logic, DB queries
+├── <feature>.errors.ts    # Typed error enum + ErrorCatalog map
+└── dtos/
+    ├── <response>.dto.ts  # Response shapes (Elysia t.Object)
+    └── errors/
+        └── <feature>-error.dto.ts  # Error response DTOs (createErrorDto)
+```
+
+### Shared Plugin — `src/shared/shared.plugin.ts`
+
+The root plugin injected into every feature plugin. Responsibilities:
+- Mounts `@elysiajs/cors` configured for `WEB_URL`.
+- Injects shared state: `db`, `cache` (Redis), `stripe`, `logger`, `eventService`.
+- Global `onError` handler that serializes all errors via `toErrorResponse` into `{ code, message }`.
+- Graceful shutdown: closes DB connection and disconnects Redis.
+
+### Auth Plugin — `src/plugins/auth/auth.plugin.ts`
+
+- Mounts BetterAuth's HTTP handler at `/auth/*`.
+- Exposes an `auth: true` macro. Routes decorated with `{ auth: true }` automatically resolve the session and return 401 if no session exists.
+- On session resolution failure, fires a `LOGIN_SUSPICIOUS` event before returning 503.
+
+### Feature Plugins (user, email, stripe)
+
+Each plugin:
+1. Extends the shared plugin for access to `db`, `cache`, `stripe`, `logger`.
+2. Instantiates its service class via Elysia's `.derive()` or constructor injection.
+3. Defines typed routes with full response schemas (200, 401, 404, 500, etc.).
+4. Has its own `.onError()` that calls `toErrorResponse` and sets `set.status`.
+5. Uses the `auth: true` macro on protected routes.
+
+---
+
+## Error System
+
+### Contract
 
 All API error responses must return:
-
 ```json
-{
-  "code": "SOME_ERROR_CODE",
-  "message": "Human-readable message"
-}
+{ "code": "SOME_ERROR_CODE", "message": "Human-readable message" }
 ```
 
-`code` is **required**.
-`message` is **required**.
+Both fields are required. This is enforced by `src/shared/dtos/error.dto.ts`.
 
-In code, this is enforced by:
+### Components
 
-- `src/shared/dtos/error.dto.ts`
+| File | Role |
+|---|---|
+| `shared/errors/error-catalog.ts` | `ErrorCatalog<TCode>` type — maps string codes to `{ message, status }` |
+| `shared/errors/app-error.ts` | `AppError extends Error` — `fromCatalog()`, `fromUnknown()` |
+| `shared/errors/to-error-response.ts` | Normalizes any error to `{ status, body: { code, message } }` |
+| `shared/errors/shared.errors.ts` | Shared infra codes: `INTERNAL_SERVER_ERROR` (500), `REQUEST_VALIDATION_FAILED` (422) |
+| `shared/dtos/error.dto.ts` | `createErrorDto(codes)` — Elysia DTO with enum-constrained `code` |
 
-```ts
-export const ErrorDto = t.Object({
-  code: t.String(),
-  message: t.String(),
-});
-```
+### Per-Feature Error Files
 
----
+Each feature owns an `<feature>.errors.ts` with:
+1. An `enum <Feature>ErrorCode` — string enum values in the format `FEATURE_CONTEXT_FAILURE`.
+2. A `<FEATURE>_ERROR_MAP: ErrorCatalog<<Feature>ErrorCode>` mapping codes to `{ message, status }`.
 
-## 3) Architecture overview
+Never add feature errors to shared enums.
 
-### 3.1 Shared base
+### Layer Responsibilities
 
-- `src/shared/errors/error-catalog.ts`
-  - `ErrorCatalog<TCode>`
-  - `ErrorDefinition` (`message`, `status`)
-- `src/shared/errors/app-error.ts`
-  - `AppError`
-  - `AppError.fromCatalog(...)`
-  - `AppError.fromUnknown(...)`
-- `src/shared/errors/to-error-response.ts`
-  - `toErrorResponse(error, fallback?)`
-  - normalizes unknown errors to `{ status, body: { code, message } }`
-- `src/shared/errors/shared.errors.ts`
-  - shared infra errors for global fallback (`INTERNAL_SERVER_ERROR`, validation, etc.)
-- `src/shared/shared.plugin.ts`
-  - global `onError` hook
-  - single place that serializes API errors
+**Service layer** — throws `AppError.fromCatalog(...)` for expected domain failures (not found, provider errors). Never returns `{ error: ... }` ad-hoc objects.
 
-### 3.2 Feature-scoped error files
+**Plugin/route layer** — throws typed errors for auth/guard failures. Relies on global `onError` for HTTP serialization. Avoids repetitive try/catch.
 
-Each feature owns its own enum + map:
+**Global `onError`** — catches all thrown errors, calls `toErrorResponse`, sets status and returns `{ code, message }`.
 
-- `src/plugins/auth/auth.errors.ts`
-- `src/plugins/email/email.errors.ts`
-- `src/plugins/stripe/stripe.errors.ts`
-- `src/plugins/user/user.errors.ts`
-
-Each file defines:
-
-1. `enum <Feature>ErrorCode`
-2. `<FEATURE>_ERROR_MAP: ErrorCatalog<<Feature>ErrorCode>`
-
-### 3.3 Error response DTOs (organized by feature)
-
-Error response schemas used in route `response` docs must live in DTO folders, not inline inside plugins.
-
-Pattern:
-
-- `src/plugins/<feature>/dtos/errors/*.dto.ts`
-
-Examples currently used:
-
-- `src/plugins/auth/dtos/auth-error.dto.ts`
-- `src/plugins/email/dtos/errors/email-error.dto.ts`
-- `src/plugins/user/dtos/errors/user-error.dto.ts`
-- `src/plugins/stripe/dtos/errors/stripe-error.dto.ts`
-
-These DTOs should be created with `createErrorDto([...codes])` so OpenAPI includes enum-constrained `code` values per endpoint/status.
-
----
-
-## 4) Mandatory rules for agents
-
-1. **Never introduce optional `code` in API errors.**
-2. **Never return error payloads without `code`.**
-3. **Never add new feature errors to shared/global enums.**
-4. **Always define errors in the feature-specific `*.errors.ts`.**
-5. **Always include both `code` and `message` in plugin error responses.**
-6. **Use `AppError.fromCatalog` in services for expected failures.**
-7. **Use global `onError` + `toErrorResponse` for HTTP serialization.**
-8. **Match route OpenAPI/DTO responses (`ErrorDto`) for error status codes.**
-9. **In plugins/routes, prefer throwing typed errors instead of local `try/catch` blocks.**
-10. **For expected domain states (not technical failures), prefer `200` payload semantics instead of forcing error HTTP codes.**
-11. **Do not define error DTO constants inline in plugin files; place them under `dtos/errors`.**
-12. **For documented error responses, use `createErrorDto([...codes])` to expose possible error enums in generated clients.**
-
----
-
-## 5) How to add a new error (feature workflow)
-
-### Step 1: Add enum value + map entry
-
-In `<feature>.errors.ts`:
+### Adding a New Error
 
 ```ts
+// 1. feature.errors.ts
 export enum BillingErrorCode {
   BILLING_INVOICE_NOT_FOUND = "BILLING_INVOICE_NOT_FOUND",
 }
-
 export const BILLING_ERROR_MAP: ErrorCatalog<BillingErrorCode> = {
-  [BillingErrorCode.BILLING_INVOICE_NOT_FOUND]: {
-    message: "Invoice not found",
-    status: 404,
-  },
+  [BillingErrorCode.BILLING_INVOICE_NOT_FOUND]: { message: "Invoice not found", status: 404 },
 };
+
+// 2. service
+throw AppError.fromCatalog({ code: BillingErrorCode.BILLING_INVOICE_NOT_FOUND, catalog: BILLING_ERROR_MAP });
+
+// 3. plugin response schema
+response: { 404: billingInvoiceNotFoundErrorDto }
+
+// 4. dtos/errors/billing-error.dto.ts
+export const billingInvoiceNotFoundErrorDto = createErrorDto([BillingErrorCode.BILLING_INVOICE_NOT_FOUND]);
 ```
 
-### Step 2: Throw typed errors in service layer
+### Error Naming Convention
+
+`<FEATURE>_<CONTEXT>_<FAILURE_TYPE>` — e.g., `STRIPE_SUBSCRIPTION_RETRIEVE_FAILED`, `USER_FETCH_FAILED`.
+
+---
+
+## Service Classes
+
+Service classes encapsulate all database queries and third-party API calls. They are instantiated with their dependencies injected via constructor (logger, db, stripe, eventService as needed).
 
 ```ts
-throw AppError.fromCatalog({
-  code: BillingErrorCode.BILLING_INVOICE_NOT_FOUND,
-  catalog: BILLING_ERROR_MAP,
-});
-```
+class UserService {
+  constructor(private readonly db: DB, private readonly logger: Logger) {}
 
-### Step 3: Normalize and return in plugin layer
-
-```ts
-if (!user) {
-  throw AppError.fromCatalog({
-    code: AuthErrorCode.AUTH_UNAUTHORIZED,
-    catalog: AUTH_ERROR_MAP,
-  });
-}
-
-const result = await billingService.getInvoice(...);
-return result;
-```
-
-The global `onError` in `shared.plugin.ts` serializes any thrown error via `toErrorResponse`.
-
-### Step 4: Keep route response contract updated
-
-Ensure error statuses reference `ErrorDto`:
-
-```ts
-response: {
-  200: SuccessDto,
-  400: ErrorDto,
-  404: ErrorDto,
-  500: ErrorDto,
+  async getUserById(id: string) {
+    const [user, error] = await safePromise(
+      this.db.select().from(users).where(eq(users.id, id))
+    );
+    if (error) throw AppError.fromCatalog({ code: UserErrorCode.USER_FETCH_FAILED, catalog: USER_ERROR_MAP });
+    return user[0] ?? null;
+  }
 }
 ```
 
-When possible, prefer feature DTO exports built with enum-constrained codes, for example:
-
-```ts
-// dtos/errors/user-error.dto.ts
-export const userNotFoundErrorDto = createErrorDto([
-  UserErrorCode.USER_NOT_FOUND,
-] as const);
-
-// plugin response
-response: {
-  404: userNotFoundErrorDto,
-}
-```
+Services use `safePromise` from `src/utils/safe-promise.ts` — a Go-style `[value, error]` tuple — instead of try/catch.
 
 ---
 
-## 6) Layer responsibilities
+## DTOs
 
-### Service layer
+All route request bodies, response shapes, and error formats are defined as Elysia `t.Object()` schemas. DTOs live in `plugins/<feature>/dtos/`. Error DTOs live in `dtos/errors/` and use `createErrorDto([...codes])` to generate enum-constrained `code` fields for OpenAPI accuracy.
 
-- Encapsulates domain/provider/db failures.
-- Throws `AppError` built from feature catalog.
-- May override default `message`/`status` when needed.
-- Should not return ad-hoc `{ error: ... }` objects.
-
-### Plugin/controller layer
-
-- Handles HTTP concerns (`set.status`, response payload).
-- Should throw typed errors for business/auth/guard failures.
-- Should avoid repetitive route-level `try/catch` unless there is a specific local reason.
-- Relies on global `onError` to return standardized payload: `{ code, message }`.
-- Can return valid `200` state payloads when business state is expected (e.g., user has no active subscription).
-- Should import error response DTOs from `dtos/errors` rather than declaring them locally.
-
-### Global `onError` layer (`shared.plugin.ts`)
-
-- Catches thrown errors across routes using `shared` plugin.
-- Calls `toErrorResponse` to normalize unknown or typed errors.
-- Sets HTTP status and returns the mandatory API contract (`code`, `message`).
+Never define DTOs inline inside plugin route definitions — always import from the `dtos/` folder.
 
 ---
 
-## 7) Auth-specific rule
+## Logging and Events
 
-For unauthorized access, reuse auth feature errors:
+Two separate systems — never conflate them:
 
-- `AuthErrorCode.AUTH_UNAUTHORIZED`
-- `AUTH_ERROR_MAP[AuthErrorCode.AUTH_UNAUTHORIZED]`
+| System | Tool | When to use |
+|---|---|---|
+| Technical logs | Pino (`src/lib/logger/`) | Runtime failures, DB errors, provider errors, lifecycle events |
+| Business events | `EventService` + `events` table | Domain-significant events (payment failed, subscription canceled, suspicious login) |
 
-Do not hardcode `"Unauthorized"` or raw `401` in scattered places when the auth catalog should be used.
+Use `logger` for debugging and operations. Use `EventService.createEvent(...)` for audit records. When relevant, write both.
 
----
-
-## 8) Do / Don’t
-
-### Do
-
-- Add errors per feature.
-- Keep error names explicit and stable.
-- Use provider-specific codes where helpful (Stripe, Email, etc.).
-- Preserve frontend contract (`code` + `message`).
-
-### Don’t
-
-- Reintroduce global mixed enums for all features.
-- Return plain `{ message }` for errors.
-- Throw raw strings or untyped objects.
-- Hide failures in service `catch` blocks without throwing.
-- Duplicate error serialization logic in many route handlers.
-- Declare route error DTOs inline inside plugin files.
+`EventService.createEvent` is fire-and-forget — errors are logged but not thrown, so a failed event write never breaks the main request flow.
 
 ---
 
-## 9) Suggested naming convention
+## Cron Jobs — `src/cron/`
 
-Format:
+Scheduled tasks use `@elysiajs/cron`. The `subscriptionExpirationCron` runs every hour, fetches users with active `stripeSubscriptionId`, checks subscription status via Stripe, and nullifies the `stripeSubscriptionId` for expired/canceled subscriptions.
 
-`<FEATURE>_<CONTEXT>_<FAILURE_TYPE>`
-
-Examples:
-
-- `STRIPE_SUBSCRIPTION_RETRIEVE_FAILED`
-- `EMAIL_PROVIDER_ERROR`
-- `USER_FETCH_FAILED`
-- `AUTH_SESSION_RESOLVE_FAILED`
+Cron errors are logged but do not throw — they use `Promise.allSettled` to process users in parallel without a single failure aborting the batch.
 
 ---
 
-## 10) Quality checklist before finishing a change
+## Infrastructure Singletons — `src/lib/`
 
-- [ ] Feature has its own `*.errors.ts`
-- [ ] New errors added to feature enum + map
-- [ ] Services throw `AppError.fromCatalog(...)`
-- [ ] Plugins throw typed errors for guard/business failures
-- [ ] Global `onError` + `toErrorResponse` is used for serialization
-- [ ] Every error response returns `code` and `message`
-- [ ] Expected domain states that are not technical failures are modeled as `200` payloads
-- [ ] Route response schema includes `ErrorDto` for error statuses
-- [ ] Route error DTOs are stored in `dtos/errors` and imported into plugin files
-- [ ] Enum-constrained `code` values are documented per endpoint/status (via `createErrorDto`)
-- [ ] Typecheck passes (`bunx tsc -p packages/backend-base/tsconfig.json --noEmit`)
+| Path | What it exports |
+|---|---|
+| `lib/better-auth/auth.ts` | Configured `betterAuth` instance + `SessionResponse` type |
+| `lib/logger/index.ts` | Pino logger (pretty in dev, JSON in prod) |
+| `lib/stripe/index.ts` | Stripe client (API version pinned) |
+| `lib/resend/index.ts` | Resend email client (validated at startup) |
+
+All singletons validate required env vars at module load time and throw if missing.
 
 ---
 
-## 11) Special case: Stripe subscription details endpoint
+## Redis Client — `src/shared/redis.client.ts`
 
-Endpoint: `GET /stripe/subscription/details`
+`RedisClient` wraps the `redis` npm package with:
+- Lazy connect on first use (3-second timeout).
+- Exponential backoff reconnect (up to 10 retries, max 3s delay).
+- Typed `get<T>` (JSON.parse) and `set(key, value, ttl)` (JSON.stringify + PX expiry via `ms()`).
+- All events piped to Pino logger.
 
-Behavior rules:
-
-- If user has active subscription: return `200` with `hasActiveSubscription: true` and normalized subscription details.
-- If user has no active subscription: return `200` with `hasActiveSubscription: false` and an informational `code` + `message`.
-- Do **not** return `404` for this case; "no subscription" is an expected user state, not a missing API resource.
-
-Recommended shape when no subscription exists:
-
-```json
-{
-  "hasActiveSubscription": false,
-  "code": "STRIPE_SUBSCRIPTION_NOT_FOUND",
-  "message": "User has no active subscription"
-}
-```
-
-This allows frontend to:
-
-- branch safely using `hasActiveSubscription`, and
-- optionally use `code` for custom UX decisions.
+Used as BetterAuth's secondary storage (session caching) and available in all plugins via `store.cache`.
 
 ---
 
-## 12) Reference files (current implementation)
+## Adding a New Feature Plugin
 
-- `packages/backend-base/src/shared/errors/app-error.ts`
-- `packages/backend-base/src/shared/errors/error-catalog.ts`
-- `packages/backend-base/src/shared/errors/to-error-response.ts`
-- `packages/backend-base/src/shared/errors/shared.errors.ts`
-- `packages/backend-base/src/shared/shared.plugin.ts`
-- `packages/backend-base/src/shared/dtos/error.dto.ts`
-- `packages/backend-base/src/plugins/auth/auth.errors.ts`
-- `packages/backend-base/src/plugins/auth/dtos/auth-error.dto.ts`
-- `packages/backend-base/src/plugins/email/email.errors.ts`
-- `packages/backend-base/src/plugins/email/dtos/errors/email-error.dto.ts`
-- `packages/backend-base/src/plugins/stripe/stripe.errors.ts`
-- `packages/backend-base/src/plugins/stripe/dtos/errors/stripe-error.dto.ts`
-- `packages/backend-base/src/plugins/user/user.errors.ts`
-- `packages/backend-base/src/plugins/user/dtos/errors/user-error.dto.ts`
+1. Create `src/plugins/<feature>/` with the structure: `<feature>.plugin.ts`, `<feature>.service.ts`, `<feature>.errors.ts`, `dtos/`.
+2. Define the error enum and catalog in `<feature>.errors.ts`.
+3. Implement the service class in `<feature>.service.ts`.
+4. Define response and error DTOs in `dtos/`.
+5. Create the Elysia plugin in `<feature>.plugin.ts` using `sharedPlugin` as base.
+6. Export from `packages/backend-base/src/index.ts` (or the package's main export).
+7. Register the plugin in `apps/backend/src/index.ts`.
 
 ---
 
-## 13) Logging & Event tracking architecture
+## Key Conventions
 
-### 13.1 Technical logs (Pino)
-
-Use Pino for runtime diagnostics:
-
-- request/runtime failures
-- provider/db integration failures
-- cron lifecycle visibility
-- startup/shutdown lifecycle
-
-Rules:
-
-- Always use structured payloads (`msg`, ids/context, `error` when applicable).
-- Avoid `console.*` inside `packages/backend-base`; prefer Pino logger.
-- Keep logs technical (debugging/operations), not business audit records.
-
-Main files:
-
-- `packages/backend-base/src/lib/logger/index.ts`
-- `packages/backend-base/src/shared/shared.plugin.ts`
-- `packages/backend-base/src/shared/redis.client.ts`
-- `packages/backend-base/src/plugins/**/**/*.ts`
-- `packages/backend-base/src/cron/subscription-expiration.cron.ts`
-- `apps/backend/src/index.ts`
-
-Current implementation note:
-
-- In `services` and feature plugins, logger/event dependencies are injected via constructors/state.
-- `cron` and `redis` currently import logger directly from `src/lib/logger`.
-- `apps/backend/src/index.ts` still uses a startup `console.log`.
-
-### 13.2 Business events (database)
-
-Business/audit events are persisted to the `events` table and are distinct from technical logs.
-
-Use DB events for important domain/security events, for example:
-
-- `STRIPE_PAYMENT_FAILED`
-- `SUBSCRIPTION_CANCELED`
-- `LOGIN_SUSPICIOUS`
-
-Main files:
-
-- `packages/database/src/schema/events.ts`
-- `packages/backend-base/src/services/event.service.ts`
-
-### 13.3 Mandatory separation
-
-- Logs answer: **what failed technically**.
-- Events answer: **what happened in the business domain**.
-
-When relevant, write both:
-
-1. Pino log with technical context.
-2. Persist event for audit/business traceability.
-
-### 13.4 Dependency injection boundaries (current)
-
-- `EventService` receives `db` + logger in constructor.
-- Feature services (`email`, `user`, `stripe`) receive logger (and event service where needed) via constructor.
-- `shared.plugin.ts` is the composition root for shared runtime dependencies (`db`, `cache`, `stripe`, logger, `eventService`).
-- `subscriptionExpirationCron` currently uses direct logger import rather than constructor/factory injection.
-
-Use these as source of truth for this pattern.
+| Topic | Rule |
+|---|---|
+| Error format | Always `{ code, message }`. Never optional. Never raw strings. |
+| Error ownership | Each feature owns its error codes. Never add to shared enums. |
+| Service failures | Throw `AppError.fromCatalog(...)`. Never return `{ error }` objects. |
+| Expected states | Model expected business states (e.g., "no subscription") as `200` payloads, not 4xx errors. |
+| DTOs | Always defined in `dtos/`. Never inline in plugin route definitions. |
+| Logging | Pino for technical diagnostics. `EventService` for business audit records. |
+| `safePromise` | Preferred over try/catch in service layer. |
+| Auth guard | Use `auth: true` macro on routes that require authentication. |
