@@ -11,13 +11,7 @@ const plugin = new Elysia({ name: "better-auth", tags: ["auth"] })
   .mount(auth.handler)
   .macro({
     auth: {
-      async resolve({
-        request,
-        status,
-        store: { logger, eventService, attributes },
-      }) {
-        attributes["plugin.name"] = "auth";
-
+      async resolve({ request, status, store: { logger, eventService } }) {
         try {
           const session = await auth.api.getSession({
             headers: request.headers,
@@ -28,8 +22,6 @@ const plugin = new Elysia({ name: "better-auth", tags: ["auth"] })
               code: AuthErrorCode.AUTH_UNAUTHORIZED,
               catalog: AUTH_ERROR_MAP,
             });
-
-            attributes["auth.authenticated"] = false;
 
             logger.warn({
               msg: "Unauthorized request in auth macro",
@@ -43,20 +35,12 @@ const plugin = new Elysia({ name: "better-auth", tags: ["auth"] })
             });
           }
 
-          attributes["auth.authenticated"] = true;
-          attributes["user.id"] = session.user.id;
-          attributes["has.subscription"] = Boolean(
-            session.user.stripeSubscriptionId,
-          );
-
           return session;
         } catch (error) {
           const normalizedError = AppError.fromUnknown(error, {
             code: AuthErrorCode.AUTH_SESSION_RESOLVE_FAILED,
             catalog: AUTH_ERROR_MAP,
           });
-
-          attributes["auth.authenticated"] = false;
 
           logger.error({
             msg: "Failed to resolve auth session",

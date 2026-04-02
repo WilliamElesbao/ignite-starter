@@ -27,9 +27,7 @@ const emailPlugin = new Elysia({ tags: ["Email"] })
   .group("/email", (app) =>
     app.post(
       "/send",
-      async ({ store: { emailService, attributes } }) => {
-        attributes["plugin.name"] = "email";
-
+      async ({ store: { emailService } }) => {
         await emailService.sendWelcomeEmail();
 
         return { message: "Email sent successfully", success: true };

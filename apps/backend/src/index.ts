@@ -7,9 +7,6 @@ import {
   userPlugin,
 } from "@repo/backend-base";
 import { Elysia } from "elysia";
-import { startOpenTelemetry } from "./instrumentation";
-
-await startOpenTelemetry();
 
 const app = new Elysia()
   .use(
