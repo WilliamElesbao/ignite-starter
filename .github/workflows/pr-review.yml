@@ -1,0 +1,30 @@
+name: PR Review — Biome Annotations
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  biome-annotations:
+    name: Biome Lint (inline PR comments)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.3
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Biome — GitHub Annotations Reporter
+        # --reporter=github emits ::error file=... annotations that GitHub Actions
+        # automatically converts into inline comments on the PR diff
+        run: bun biome check --reporter=github .
+        continue-on-error: true
