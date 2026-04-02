@@ -3,9 +3,7 @@ import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import {
   BatchSpanProcessor,
-  ConsoleSpanExporter,
   type ReadableSpan,
-  SimpleSpanProcessor,
   type Span,
   type SpanProcessor,
 } from "@opentelemetry/sdk-trace-base";
@@ -58,46 +56,16 @@ class SignozListViewAttributesProcessor implements SpanProcessor {
   async shutdown(): Promise<void> {}
 }
 
-const getTracesExportUrl = () => {
-  const explicitTracesEndpoint = process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT;
-  if (explicitTracesEndpoint) {
-    return explicitTracesEndpoint;
-  }
-
-  const baseEndpoint = (
-    process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? "http://localhost:4318"
-  ).replace(/\/$/, "");
-
-  return `${baseEndpoint}/v1/traces`;
-};
-
 export async function startOpenTelemetry() {
   if (globalThis.__otelSdk) return;
 
-  if (!process.env.OTEL_SERVICE_NAME) {
-    process.env.OTEL_SERVICE_NAME = "backend";
-  }
-
-  const tracesExportUrl = getTracesExportUrl();
-  console.info(
-    `[otel] service=${process.env.OTEL_SERVICE_NAME} traces=${tracesExportUrl}`,
-  );
-
-  const traceExporter = new OTLPTraceExporter({
-    url: tracesExportUrl,
-  });
-
-  const spanProcessors: SpanProcessor[] = [
-    new SignozListViewAttributesProcessor(),
-    new BatchSpanProcessor(traceExporter),
-  ];
-
-  if (process.env.OTEL_DEBUG_CONSOLE_EXPORTER === "true") {
-    spanProcessors.push(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-  }
+  const traceExporter = new OTLPTraceExporter();
 
   const sdk = new NodeSDK({
-    spanProcessors,
+    spanProcessors: [
+      new SignozListViewAttributesProcessor(),
+      new BatchSpanProcessor(traceExporter),
+    ],
     instrumentations: [getNodeAutoInstrumentations()],
   });
 

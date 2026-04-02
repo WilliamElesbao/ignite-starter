@@ -14,16 +14,23 @@ export const auth = betterAuth({
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
       setAuthSpanTelemetry(ctx);
+      return;
     }),
-
     after: createAuthMiddleware(async (ctx) => {
-      const returned = ctx.context.returned;
-      const status =
+      const returned = (ctx as { context?: { returned?: unknown } }).context
+        ?.returned;
+
+      const statusCode =
         returned instanceof Response
           ? returned.status
-          : (returned as Response | undefined)?.status;
+          : (returned as { status?: unknown } | undefined)?.status;
 
-      setAuthSpanTelemetry(ctx, status ?? 200);
+      setAuthSpanTelemetry(
+        ctx,
+        typeof statusCode === "number" ? statusCode : 200,
+      );
+
+      return;
     }),
   },
   logger: {

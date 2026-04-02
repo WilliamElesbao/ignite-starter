@@ -9,7 +9,6 @@ import stripePlugin, {
   type StripePlugin,
 } from "./src/plugins/stripe/stripe.plugin";
 import userPlugin, { type UserPlugin } from "./src/plugins/user/user.plugin";
-import { telemetryPlugin } from "./src/shared/telemetry.plugin";
 
 export {
   OpenAPI,
@@ -23,5 +22,4 @@ export {
   type SessionResponse,
   stripePlugin,
   type StripePlugin,
-  telemetryPlugin,
 };
