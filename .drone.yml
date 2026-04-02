@@ -4,6 +4,9 @@ name: CI
 platform:
   os: linux
   arch: arm64
+trigger:
+  event:
+    - push
 
 clone:
   depth: 50
