@@ -1,22 +1,20 @@
 # Reference
 
-<!-- Add any relevant link (issue, ticket, doc, etc) -->
-
--
+[Add any relevant link (issue, ticket, doc, etc)]
 
 ## Changes
 
 - **Added:**
-  -
+  - ...
 - **Updated:**
-  -
+  - ...
 - **Fixed:**
-  -
+  - ...
 
 ## Considerations
 
-<!-- Optional: any important notes about the implementation -->
+[Any considerations about the code changes (remove section if not used)]
 
 ## Screenshots
 
-<!-- Optional: add screenshots if applicable -->
+[Any screenshots of changes (remove if not applied)]
