@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { WELCOME_TOAST } from "@/constants";
 import { authClient } from "@/lib/better-auth/auth-client";
 
@@ -17,10 +18,9 @@ export const signInWithGoogle = async () => {
       },
       {
         onError: (context) => {
-          console.error(
-            "[signIn] - Error during sign-in:",
-            context.error.message,
-          );
+          toast.error("Google sign-in failed", {
+            description: context.error.message,
+          });
         },
       },
     );
