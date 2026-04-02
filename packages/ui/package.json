@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "generate:component": "turbo gen react-component",
-    "storybook": "storybook dev -p 6006",
+    "storybook": "concurrently 'storybook dev -p 6006' 'tcm -w src'",
     "build-storybook": "storybook build"
   },
   "dependencies": {
