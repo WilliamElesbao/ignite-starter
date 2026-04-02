@@ -9,6 +9,13 @@ import Elysia from "elysia";
 
 const tracer = trace.getTracer("backend-base");
 
+type TelemetryRequestState = {
+  span: Span;
+  attributes: Attributes;
+};
+
+const requestTelemetryState = new WeakMap<Request, TelemetryRequestState>();
+
 const getClientAddress = (request: Request) => {
   const forwardedFor = request.headers.get("x-forwarded-for");
   if (forwardedFor) {
@@ -46,10 +53,50 @@ const getStatusCodeFromResponse = (response: unknown) => {
   return undefined;
 };
 
+const finalizeSpan = ({
+  request,
+  setStatus,
+  responseValue,
+}: {
+  request: Request;
+  setStatus: unknown;
+  responseValue: unknown;
+}) => {
+  const state = requestTelemetryState.get(request);
+
+  if (!state) {
+    return;
+  }
+
+  const { span, attributes } = state;
+
+  const responseStatusCode = getStatusCodeFromResponse(responseValue);
+  const statusCode =
+    typeof responseStatusCode === "number"
+      ? responseStatusCode
+      : getStatusCode(setStatus);
+
+  attributes["http.status_code"] = statusCode;
+  attributes["http.response.status_code"] = statusCode;
+  attributes.response_status_code = statusCode;
+
+  span.setAttributes(attributes);
+  span.setStatus({
+    code: statusCode >= 400 ? SpanStatusCode.ERROR : SpanStatusCode.OK,
+  });
+
+  span.end();
+
+  requestTelemetryState.delete(request);
+};
+
 export const telemetryPlugin = new Elysia({ name: "telemetry" })
-  .state("span", undefined as Span | undefined)
   .state("attributes", {} as Attributes)
   .onRequest(({ request, store }) => {
+    if (requestTelemetryState.has(request)) {
+      return;
+    }
+
     const url = new URL(request.url);
     const route = url.pathname;
     const userAgent = request.headers.get("user-agent") ?? undefined;
@@ -59,8 +106,7 @@ export const telemetryPlugin = new Elysia({ name: "telemetry" })
       kind: SpanKind.SERVER,
     });
 
-    store.span = span;
-    store.attributes = {
+    const attributes: Attributes = {
       "http.method": request.method,
       "http.request.method": request.method,
       http_method: request.method,
@@ -81,52 +127,42 @@ export const telemetryPlugin = new Elysia({ name: "telemetry" })
     };
 
     if (route.startsWith("/auth")) {
-      store.attributes["auth.route"] = true;
-      store.attributes["auth.path"] = route;
+      attributes["auth.route"] = true;
+      attributes["auth.path"] = route;
     }
 
-    const activeSpan = trace.getActiveSpan();
-    if (activeSpan) {
-      activeSpan.setAttributes(store.attributes);
-    }
-  })
-  .onAfterHandle(({ set, store, responseValue }) => {
-    const span = store.span;
+    span.setAttributes(attributes);
+    store.attributes = attributes;
 
-    if (!span) {
-      return;
-    }
-
-    const responseStatusCode = getStatusCodeFromResponse(responseValue);
-    const statusCode =
-      typeof responseStatusCode === "number"
-        ? responseStatusCode
-        : getStatusCode(set.status);
-
-    store.attributes["http.status_code"] = statusCode;
-    store.attributes["http.response.status_code"] = statusCode;
-    store.attributes.response_status_code = statusCode;
-
-    span.setAttributes(store.attributes);
-    span.setStatus({
-      code: statusCode >= 400 ? SpanStatusCode.ERROR : SpanStatusCode.OK,
+    requestTelemetryState.set(request, {
+      span,
+      attributes,
     });
-
-    const activeSpan = trace.getActiveSpan();
-    if (activeSpan && activeSpan !== span) {
-      activeSpan.setAttributes(store.attributes);
-      activeSpan.setStatus({
-        code: statusCode >= 400 ? SpanStatusCode.ERROR : SpanStatusCode.OK,
-      });
-    }
-
-    span.end();
-
-    store.span = undefined;
-    store.attributes = {};
   })
-  .onError(({ error, store }) => {
-    const span = store.span;
+  .onAfterHandle(({ request, set, responseValue }) => {
+    finalizeSpan({
+      request,
+      setStatus: set.status,
+      responseValue,
+    });
+  })
+  .mapResponse(({ request, set, responseValue }) => {
+    finalizeSpan({
+      request,
+      setStatus: set.status,
+      responseValue,
+    });
+  })
+  .onAfterResponse(({ request, set, responseValue }) => {
+    finalizeSpan({
+      request,
+      setStatus: set.status,
+      responseValue,
+    });
+  })
+  .onError(({ error, request }) => {
+    const state = requestTelemetryState.get(request);
+    const span = state?.span;
     const activeSpan = trace.getActiveSpan();
 
     if (activeSpan) {
@@ -134,12 +170,15 @@ export const telemetryPlugin = new Elysia({ name: "telemetry" })
       activeSpan.setStatus({ code: SpanStatusCode.ERROR });
     }
 
-    if (!span) {
+    if (!span || !state) {
       return;
     }
 
-    span.setAttributes(store.attributes);
+    span.setAttributes(state.attributes);
 
     span.recordException(error as Error);
     span.setStatus({ code: SpanStatusCode.ERROR });
+
+    span.end();
+    requestTelemetryState.delete(request);
   });

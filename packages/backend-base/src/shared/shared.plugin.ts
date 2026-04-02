@@ -1,4 +1,5 @@
 import { cors } from "@elysiajs/cors";
+import type { Attributes } from "@opentelemetry/api";
 import { db as Database } from "@repo/db";
 import { Elysia } from "elysia";
 import { logger } from "../lib/logger";
@@ -7,7 +8,6 @@ import { EventService } from "../services/event.service";
 import { SHARED_ERROR_MAP, SharedErrorCode } from "./errors/shared.errors";
 import { toErrorResponse } from "./errors/to-error-response";
 import redisClient from "./redis.client";
-import { telemetryPlugin } from "./telemetry.plugin";
 
 export type cache = typeof redisClient;
 
@@ -18,7 +18,6 @@ export type appLogger = typeof logger;
 const eventService = new EventService(Database, logger);
 
 const setup = new Elysia({ name: "shared" })
-  .use(telemetryPlugin)
   .use(
     cors({
       origin: [Bun.env.WEB_URL ?? "http://localhost:3000"],
@@ -32,6 +31,7 @@ const setup = new Elysia({ name: "shared" })
   .state("stripe", stripe)
   .state("logger", logger)
   .state("eventService", eventService)
+  .state("attributes", {} as Attributes)
   .onError(({ code, error, set, path, request }) => {
     logger.error({
       msg: "Unhandled error",
