@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useDialog } from "@/context";
+import { useDialog } from "@/context/dialog.context";
 import { useSubscriptionForm } from "@/hooks/stripe/useSubscriptionForm";
 import { formatPrice } from "@/utils";
 import { Form, FormField } from "../ui/form";

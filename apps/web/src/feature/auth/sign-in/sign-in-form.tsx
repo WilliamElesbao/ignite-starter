@@ -2,9 +2,9 @@
 
 import { useTranslations } from "next-intl";
 import { AuthForm } from "@/feature/auth/components";
-import { signInWithGoogle } from "@/feature/auth/hooks";
 import { useSignInForm } from "@/feature/auth/sign-in/hooks/useSignInForm";
 import { cn } from "@/lib/shadcn/utils";
+import { signInWithGoogle } from "../hooks/sign-in";
 
 export function SignInForm({
   className,

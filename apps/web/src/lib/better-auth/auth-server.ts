@@ -1,3 +1,5 @@
+"use server";
+
 import type { GetSessionResponse } from "@repo/api/generated/api/types.gen";
 import { cookies } from "next/headers";
 import { safePromise } from "@/utils";

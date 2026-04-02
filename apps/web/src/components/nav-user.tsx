@@ -24,8 +24,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useDialog } from "@/context";
-import { authClient, type User } from "@/lib/better-auth";
+import { useDialog } from "@/context/dialog.context";
+import type { User } from "@/lib/better-auth/auth.types";
+import { authClient } from "@/lib/better-auth/auth-client";
 import { getInitials } from "@/utils";
 
 export function NavUser({ user }: Readonly<{ user: User }>) {

@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { data } from "@/constants";
-import type { User } from "@/lib/better-auth";
+import type { User } from "@/lib/better-auth/auth.types";
 
 export function AppSidebar({
   user,

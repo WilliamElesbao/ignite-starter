@@ -8,19 +8,19 @@ import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { DialogProvider } from "@/context/dialog.context";
-import { useWelcomeToast } from "@/feature/auth/hooks";
 import {
   useGetStripeProducts,
   useGetStripeSubscriptionDetails,
 } from "@/hooks/stripe/stripe.queries";
-import type { User } from "@/lib/better-auth";
+import type { User } from "@/lib/better-auth/auth.types";
+import { useWelcomeToast } from "../auth/hooks/useWelcomeToast";
 import data from "./data.json";
 
 interface DashboardWrapperProps {
   user: User;
 }
 
-export function DashboardWrapper({ user }: DashboardWrapperProps) {
+export function DashboardPage({ user }: DashboardWrapperProps) {
   const { data: products } = useGetStripeProducts();
   const { data: subscription } = useGetStripeSubscriptionDetails();
 

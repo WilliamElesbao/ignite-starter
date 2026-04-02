@@ -1,15 +1,14 @@
 "use client";
 
 import { QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import type { PropsWithChildren } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { queryClient } from "@/lib/react-query";
-import { ThemeProvider } from "@/providers/theme-provider";
 
-export function Providers({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export function Providers({ children }: PropsWithChildren) {
   return (
-    <ThemeProvider
+    <NextThemesProvider
       attribute="class"
       defaultTheme="system"
       enableSystem
@@ -19,6 +18,6 @@ export function Providers({
         {children}
         <Toaster richColors />
       </QueryClientProvider>
-    </ThemeProvider>
+    </NextThemesProvider>
   );
 }
