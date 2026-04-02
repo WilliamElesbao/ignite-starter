@@ -141,3 +141,30 @@ The frontend imports from `@repo/api`. After any backend route change, regenerat
 ### Stripe Integration
 
 Stripe subscription lifecycle is managed in `packages/backend-base/src/plugins/stripe/`. A cron job (`src/cron/subscription-expiration.cron.ts`) handles expiration logic. Webhooks are received at `POST /stripe/webhook`. For local development, the `stripe` service in `docker-compose.yml` forwards Stripe events to `http://host.docker.internal:3333/stripe/webhook`.
+
+### Observability (SigNoz)
+
+SigNoz runs as a separate Docker Compose stack (it ships its own config files for ClickHouse, ZooKeeper, and the OTel Collector).
+
+**First-time setup** (run once, outside this repo):
+
+```bash
+git clone -b main https://github.com/SigNoz/signoz.git
+cd signoz/deploy/docker
+docker compose up -d --remove-orphans
+```
+
+**SigNoz UI:** `http://localhost:8080`
+
+**OTLP Collector endpoints:**
+- HTTP: `http://localhost:4318` (used by the backend — matches `OTEL_EXPORTER_OTLP_ENDPOINT`)
+- gRPC: `localhost:4317`
+
+The backend's `apps/backend/.env` already has the correct values:
+
+```
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
+OTEL_SERVICE_NAME=origin-backend
+```
+
+After starting both SigNoz and the backend, make any HTTP request and traces will appear in the SigNoz UI under the `origin-backend` service. The OpenTelemetry plugin is configured in `apps/backend/src/instrumentation.ts` and preloaded via `apps/backend/bunfig.toml`.
