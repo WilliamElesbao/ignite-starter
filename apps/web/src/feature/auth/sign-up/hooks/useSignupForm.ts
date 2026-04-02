@@ -8,7 +8,7 @@ import { type SignUpFormValues, signUpFormSchema } from "./form.schema";
 
 /**
  * Manages sign-up form state and submission logic with email authentication.
- * 
+ *
  * @returns Form instance and submit handler for user registration
  */
 export const useSignUpForm = () => {

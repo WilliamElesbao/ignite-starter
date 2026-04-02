@@ -5,7 +5,7 @@ import { useSendEmail } from "./email.mutation";
 
 /**
  * Hook for sending welcome emails with toast notifications.
- * 
+ *
  * @returns Object containing sendWelcomeEmail function
  */
 export const useEmail = () => {

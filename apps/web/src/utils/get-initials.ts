@@ -1,6 +1,6 @@
 /**
  * Extracts and formats initials from a full name string.
- * 
+ *
  * @param name - Full name to extract initials from
  * @returns Uppercase initials from the name
  */

@@ -5,7 +5,7 @@ type Locale = (typeof routing.locales)[number];
 
 /**
  * Returns a function that maps locale codes to their translated display labels.
- * 
+ *
  * @returns Function that accepts a locale code and returns its translated label
  */
 export const useLocaleLabel = () => {

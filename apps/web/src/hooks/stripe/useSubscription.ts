@@ -14,7 +14,7 @@ import type { SubscriptionFormValues } from "./useSubscriptionForm";
 
 /**
  * Manages the creation of a new Stripe subscription with checkout redirect.
- * 
+ *
  * @returns Object containing onSubmit handler and isPending state
  */
 export const useSubscription = () => {
@@ -65,7 +65,7 @@ export const useSubscription = () => {
 
 /**
  * Manages updates to an existing Stripe subscription.
- * 
+ *
  * @returns Object containing onSubmit handler and isPending state
  */
 export const useUpdateSubscription = () => {
@@ -111,7 +111,7 @@ export const useUpdateSubscription = () => {
 
 /**
  * Manages cancellation of an active Stripe subscription.
- * 
+ *
  * @returns Object containing onSubmit handler and mutation state
  */
 export const useCancelSubscription = () => {

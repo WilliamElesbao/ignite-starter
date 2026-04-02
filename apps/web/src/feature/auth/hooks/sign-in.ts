@@ -3,7 +3,7 @@ import { authClient } from "@/lib/better-auth/auth-client";
 
 /**
  * Initiates Google OAuth sign-in flow and sets welcome toast flag.
- * 
+ *
  * @returns Promise that resolves when sign-in is initiated
  */
 export const signInWithGoogle = async () => {
