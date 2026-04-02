@@ -13,11 +13,10 @@ const formSchema = z.object({
 export type SubscriptionFormValues = z.infer<typeof formSchema>;
 
 /**
- * Hook to create and manage the subscription form using React Hook Form and Zod.
- *
- * @param priceId - The Stripe price ID (defaults to `"free"`).
- * @param userId - The ID of the user subscribing.
- * @returns A configured form instance for the subscription.
+ * Manages subscription form state and submission logic for creating or updating Stripe subscriptions.
+ * Automatically detects whether to create a new subscription or update an existing one.
+ * 
+ * @returns Object containing form instance, submit handler, loading state, and button disable state
  */
 export const useSubscriptionForm = () => {
   const { data: subscriptionDetails } = useGetStripeSubscriptionDetails();

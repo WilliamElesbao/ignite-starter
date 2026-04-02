@@ -6,6 +6,11 @@ import { WELCOME_TOAST } from "@/constants";
 import { authClient } from "@/lib/better-auth/auth-client";
 import { type SignInFormValues, signInFormSchema } from "./form.schema";
 
+/**
+ * Manages sign-in form state and submission with email/password authentication.
+ * 
+ * @returns Object containing the form instance and submit handler
+ */
 export const useSignInForm = () => {
   const t = useTranslations("sign-in");
 
@@ -19,7 +24,6 @@ export const useSignInForm = () => {
   });
 
   const onSubmit = async (values: SignInFormValues) => {
-    // await signInWithEmail(values);
     sessionStorage.setItem(WELCOME_TOAST.key, WELCOME_TOAST.value);
 
     await authClient.signIn.email(

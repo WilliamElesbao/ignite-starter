@@ -13,10 +13,9 @@ import {
 import type { SubscriptionFormValues } from "./useSubscriptionForm";
 
 /**
- * Hook to handle new Stripe subscription flow.
- *
- * @param priceId - The ID of the Stripe price selected
- * @returns Form instance and mutation handlers for subscription
+ * Manages the creation of a new Stripe subscription with checkout redirect.
+ * 
+ * @returns Object containing onSubmit handler and isPending state
  */
 export const useSubscription = () => {
   const t = useTranslations("dashboard.toast.subscription");
@@ -65,10 +64,9 @@ export const useSubscription = () => {
 };
 
 /**
- * Hook to handle updates to an existing subscription.
- *
- * @param priceId - The new Stripe price ID
- * @returns Form instance and mutation handlers for updating subscription
+ * Manages updates to an existing Stripe subscription.
+ * 
+ * @returns Object containing onSubmit handler and isPending state
  */
 export const useUpdateSubscription = () => {
   const t = useTranslations("dashboard.toast.update-subscription");
@@ -112,9 +110,9 @@ export const useUpdateSubscription = () => {
 };
 
 /**
- * Hook to handle cancellation of an active subscription.
- *
- * @returns Mutation handler and submission method for canceling a subscription
+ * Manages cancellation of an active Stripe subscription.
+ * 
+ * @returns Object containing onSubmit handler and mutation state
  */
 export const useCancelSubscription = () => {
   const t = useTranslations("dashboard.toast.cancel-subscription");

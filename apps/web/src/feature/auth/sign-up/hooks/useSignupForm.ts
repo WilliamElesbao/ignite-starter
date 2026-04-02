@@ -6,6 +6,11 @@ import { WELCOME_TOAST } from "@/constants";
 import { authClient } from "@/lib/better-auth/auth-client";
 import { type SignUpFormValues, signUpFormSchema } from "./form.schema";
 
+/**
+ * Manages sign-up form state and submission logic with email authentication.
+ * 
+ * @returns Form instance and submit handler for user registration
+ */
 export const useSignUpForm = () => {
   const t = useTranslations("sign-up");
 

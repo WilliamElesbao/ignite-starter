@@ -2,8 +2,9 @@ import { WELCOME_TOAST } from "@/constants";
 import { authClient } from "@/lib/better-auth/auth-client";
 
 /**
- * Function to trigger Google Sign In flow.
- * This function redirects the user to Google's OAuth.
+ * Initiates Google OAuth sign-in flow and sets welcome toast flag.
+ * 
+ * @returns Promise that resolves when sign-in is initiated
  */
 export const signInWithGoogle = async () => {
   try {
