@@ -7,6 +7,10 @@
   },
   "dependencies": {
     "@elysiajs/openapi": "^1.4.14",
+    "@elysiajs/opentelemetry": "latest",
+    "@opentelemetry/exporter-trace-otlp-proto": "latest",
+    "@opentelemetry/instrumentation-pg": "latest",
+    "@opentelemetry/sdk-trace-node": "latest",
     "@repo/backend-base": "workspace:*",
     "elysia": "latest"
   },

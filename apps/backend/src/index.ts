@@ -7,8 +7,10 @@ import {
   userPlugin,
 } from "@repo/backend-base";
 import { Elysia } from "elysia";
+import { instrumentation } from "./instrumentation";
 
 const app = new Elysia()
+  .use(instrumentation)
   .use(
     openapi({
       provider: "scalar",
