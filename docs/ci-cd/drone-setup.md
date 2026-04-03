@@ -100,6 +100,16 @@ Update your `drone-docker-compose.yml` with this URL:
 
 Also update the GitHub OAuth App callback URL to match.
 
+**Important:** Cloudflare tunnel URLs change each time you restart the tunnel. When the URL changes:
+
+1. Update `DRONE_SERVER_HOST` in `drone-docker-compose.yml` with the new URL
+2. Restart Drone services: `docker compose -f drone-docker-compose.yml restart`
+3. Update the GitHub OAuth App callback URL
+4. Navigate to your repository settings in Drone (e.g., `https://your-new-url.trycloudflare.com/your-username/your-repo/settings`)
+5. Disable the repository
+6. Re-activate the repository
+7. This will recreate the webhook with the new URL
+
 ## Step 4: Start Drone Server
 
 ```bash
