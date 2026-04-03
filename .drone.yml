@@ -1,0 +1,44 @@
+kind: pipeline
+type: docker
+name: CI
+
+platform:
+  arch: arm64
+
+clone:
+  depth: 100
+
+trigger:
+  branch:
+    - main
+  event:
+    - push
+    - pull_request
+    - tag
+
+steps:
+  - name: install
+    image: oven/bun:1.3.3
+    commands:
+      - bun install
+
+  - name: typecheck
+    image: oven/bun:1.3.3
+    commands:
+      - (cd apps/web && bun tsc --noEmit)
+      - (cd apps/backend && bun tsc --noEmit)
+      - (cd packages/backend-base && bun tsc --noEmit)
+      - (cd packages/database && bun tsc --noEmit)
+      - (cd packages/emails && bun tsc --noEmit)
+      - (cd packages/api && bun tsc --noEmit)
+      - (cd packages/ui && bun tsc --noEmit)
+    depends_on:
+      - install
+
+  - name: lint
+    image: oven/bun:1.3.3
+    commands:
+      - bun biome ci .
+
+    depends_on:
+      - typecheck

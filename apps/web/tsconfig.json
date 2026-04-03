@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2023",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "types": ["bun-types"],
+    "types": ["node"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,

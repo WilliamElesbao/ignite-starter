@@ -1,6 +1,21 @@
-<!-- @format -->
+# Documentation
 
-# References
+## Setup Guides
+
+- [Local Setup](./local-setup/local-setup.md) - Getting started with local development
+- [Google OAuth Setup](./google/google-oauth-setup.md) - Configure Google authentication
+- [Stripe Setup](./stripe/stripe-setup.md) - Configure payment processing
+
+## CI/CD
+
+- [CI/CD Overview](./ci-cd/README.md) - Complete CI/CD pipeline documentation
+- [Pipeline Architecture](./ci-cd/pipeline-architecture.md) - Visual overview and execution flow
+- [Drone CI Setup](./ci-cd/drone-setup.md) - Self-hosted CI configuration
+- [SonarCloud Setup](./ci-cd/sonarcloud-setup.md) - Code quality analysis
+- [GitHub Configuration](./ci-cd/github-configuration.md) - Secrets and branch protection
+- [Configuration Files](./ci-cd/configuration-files.md) - Reference for all config files
+
+## External References
 
 - [Better Auth + Google Credentials](https://better-auth.com/docs/authentication/google#get-your-google-credentials)
 - [Setup OAuth to the Google Cloud Console](https://console.cloud.google.com/auth/clients?organizationId=682596896072&project=origin-starter)
@@ -9,7 +24,6 @@
 - [Storybook](https://storybook.js.org/docs/get-started/frameworks/nextjs-vite)
 - [Vitest](https://vitest.dev/api/test.html)
 - [Turborepo](https://turborepo.dev/docs)
-- [Prisma setup and configuration](https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/introduction)
 - [Biome](https://biomejs.dev/guides/getting-started/)
 - [Elysia](https://elysiajs.com/)
 - [Better Auth + Drizzle](https://better-auth.com/docs/adapters/drizzle)

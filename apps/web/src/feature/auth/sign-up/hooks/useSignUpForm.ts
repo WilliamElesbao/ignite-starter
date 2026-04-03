@@ -35,7 +35,7 @@ export const useSignUpForm = () => {
       {
         onSuccess: (context) => {
           console.log("[useSignupForm] - Sign-up successful:", context.data);
-          window.location.replace("/");
+          globalThis.location.replace("/");
         },
         onError: (context) => {
           toast.error(`${t("toast.sign-up-failed")}: ${context.error.message}`);
