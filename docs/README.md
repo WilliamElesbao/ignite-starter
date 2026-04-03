@@ -1,12 +1,10 @@
-<!-- @format -->
-
 # Documentation
 
 ## Setup Guides
 
-- [Local Setup](./local-setup.md) - Getting started with local development
-- [Google OAuth Setup](./google-oauth-setup.md) - Configure Google authentication
-- [Stripe Setup](./stripe-setup.md) - Configure payment processing
+- [Local Setup](./local-setup/local-setup.md) - Getting started with local development
+- [Google OAuth Setup](./google/google-oauth-setup.md) - Configure Google authentication
+- [Stripe Setup](./stripe/stripe-setup.md) - Configure payment processing
 
 ## CI/CD
 

@@ -1,22 +1,22 @@
-# Setup local do projeto Ignite Starter
+# Local Setup Guide for Origin Starter
 
-Este guia descreve o passo a passo completo para rodar o projeto **localmente** usando Docker, Prisma e Bun/Node.
+This guide describes the complete step-by-step process to run the project **locally** using Docker, Drizzle, and Bun/Node.
 
-> Siga as etapas na ordem. Ao final, você deve conseguir rodar `bun dev` e testar o app em `http://localhost:3000`.
+> Follow the steps in order. At the end, you should be able to run `bun dev` and test the app at `http://localhost:3000`.
 
 ---
 
-## 1. Pré‑requisitos
+## 1. Prerequisites
 
-Antes de começar, tenha instalado na sua máquina:
+Before starting, make sure you have installed on your machine:
 
 - **Git**
-- **Node.js 22+** (recomendado se for usar `npm`/`npx`)
-- **[Bun](https://bun.sh/)** (recomendado para este projeto)
-- **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** (com Docker Compose)
-- **[Stripe CLI](https://stripe.com/docs/stripe-cli)** (para webhooks, se quiser rodar fora do container)
+- **Node.js 22+** (recommended if using `npm`/`npx`)
+- **[Bun](https://bun.sh/)** (recommended for this project)
+- **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** (with Docker Compose)
+- **[Stripe CLI](https://stripe.com/docs/stripe-cli)** (for webhooks, if you want to run outside the container)
 
-Verifique rapidamente:
+Quick verification:
 
 ```bash
 node -v
@@ -27,33 +27,33 @@ stripe --version
 
 ---
 
-## 2. Clonar o repositório e instalar dependências
+## 2. Clone repository and install dependencies
 
 ```bash
-# 1) Clonar o projeto
+# 1) Clone the project
 git clone git@github.com:WilliamElesbao/origin-starter.git
 cd origin-starter
 
-# 2) Instalar dependências (recomendado)
+# 2) Install dependencies (recommended)
 bun install
 
-# (Opcional) Se preferir npm
+# (Optional) If you prefer npm
 # npm install
 ```
 
 ---
 
-## 3. Configurar variáveis de ambiente
+## 3. Configure environment variables
 
-O projeto já possui um arquivo de exemplo: `.env.example`.
+The project already has an example file: `.env.example`.
 
-1. Crie o arquivo `.env` na raiz a partir do exemplo:
+1. Create the `.env` file at the root from the example:
 
 ```bash
 cp .env.example .env
 ```
 
-2. Abra o `.env` e preencha os valores marcados como `<your secret>`:
+2. Open `.env` and fill in the values marked as `<your secret>`:
 
 ```dotenv
 # Base URL
@@ -63,206 +63,202 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 DATABASE_URL=postgresql://postgres:password@localhost:5432/starter
 
 # BetterAuth
-BETTER_AUTH_SECRET=<gerar um segredo forte>
+BETTER_AUTH_SECRET=<generate a strong secret>
 BETTER_AUTH_URL=http://localhost:3000
 
 # Google
-GOOGLE_CLIENT_ID=<copiar do Google Cloud Console>
-GOOGLE_CLIENT_SECRET=<copiar do Google Cloud Console>
+GOOGLE_CLIENT_ID=<copy from Google Cloud Console>
+GOOGLE_CLIENT_SECRET=<copy from Google Cloud Console>
 
-# Email (opcional para ambiente local)
-RESEND_API_KEY=<se tiver>
+# Email (optional for local environment)
+RESEND_API_KEY=<if you have one>
 EMAIL_FROM=delivered@resend.dev
 EMAIL_TO=example@mail.com
-AUDIENCE_ID=<se tiver>
+AUDIENCE_ID=<if you have one>
 
 # Stripe
-STRIPE_SECRET_KEY=<copiar da conta Stripe (chave de teste)>
-STRIPE_WEBHOOK_SECRET=<copiar do Stripe CLI após configurar webhook>
+STRIPE_SECRET_KEY=<copy from Stripe account (test key)>
+STRIPE_WEBHOOK_SECRET=<copy from Stripe CLI after configuring webhook>
 ```
 
-> Como obter as variáveis de **Google** e **Stripe** está detalhado em:
-> - `docs/google-oauth-setup.md`
-> - `docs/stripe-setup.md`
+> How to get **Google** and **Stripe** variables is detailed in:
+> - `docs/google/google-oauth-setup.md`
+> - `docs/stripe/stripe-setup.md`
 
 ---
 
-## 4. Subir os containers Docker
+## 4. Start Docker containers
 
-O projeto já contém um `docker-compose.yml` com:
+The project already contains a `docker-compose.yml` with:
 
-- `postgres` – banco de dados PostgreSQL
-- `starter-studio` – Prisma Studio em container
-- `stripe` – Stripe CLI em modo "listen" para webhooks (pode ser ajustado para usar sua própria conta)
+- `postgres` – PostgreSQL database
+- `redis` – Redis cache
+- `redis-commander` – Redis web UI
+- `stripe` – Stripe CLI in "listen" mode for webhooks (can be adjusted to use your own account)
 
-Para subir os serviços de infraestrutura:
+To start the infrastructure services:
 
 ```bash
-# Na raiz do projeto
+# At the project root
 docker compose up -d
 
-# (Caso seu Docker use o comando antigo)
+# (If your Docker uses the old command)
 # docker-compose up -d
 ```
 
-Isso irá expor:
+This will expose:
 
-- PostgreSQL em `localhost:5432`
-- Prisma Studio (container) em `http://localhost:5555` (ver sessão de Prisma abaixo)
+- PostgreSQL at `localhost:5432`
+- Redis at `localhost:6379`
+- Redis Commander at `http://localhost:8081`
 
-Verifique se os containers estão rodando:
+Verify that containers are running:
 
 ```bash
 docker ps
 ```
 
-Você deve ver algo como:
+You should see something like:
 
-- `starter-postgres`
-- `starter-studio`
-- `stripe-cli` (opcional, dependendo da configuração do `docker-compose.yml`)
+- `postgres`
+- `redis`
+- `redis-commander`
+- `stripe-cli` (optional, depending on `docker-compose.yml` configuration)
 
 ---
 
-## 5. Configurar e rodar Prisma (migrations + ver tabelas)
+## 5. Configure and run Drizzle (migrations + view tables)
 
-O projeto usa Prisma com PostgreSQL. A URL do banco é lida de `DATABASE_URL` no `.env`.
+The project uses Drizzle with PostgreSQL. The database URL is read from `DATABASE_URL` in `.env`.
 
-### 5.1. Garantir que o banco está ativo
+### 5.1. Ensure database is active
 
-Confirme que o container `starter-postgres` está rodando:
+Confirm that the `postgres` container is running:
 
 ```bash
-docker ps | grep starter-postgres
+docker ps | grep postgres
 ```
 
-Se não estiver, rode novamente:
+If not, run again:
 
 ```bash
 docker compose up -d postgres
 ```
 
-### 5.2. Rodar migrations
+### 5.2. Run migrations
 
-Com o Docker e `.env` configurados, aplique as migrations no banco local:
-
-```bash
-# Usando Bunnunx prisma migrate dev --name init
-
-# (Alternativa com npx)
-# npx prisma migrate dev --name init
-```
-
-Isso irá:
-
-- Criar as tabelas definidas em `prisma/schema.prisma` no banco `starter`
-- Atualizar a pasta `prisma/migrations`
-
-### 5.3. Ver tabelas com Prisma Studio
-
-Existem **duas formas** de abrir o Prisma Studio:
-
-#### Opção A – Usando o container `starter-studio`
-
-1. Com o Docker rodando (`docker compose up -d`), acesse:
-
-   - `http://localhost:5555`
-
-2. Você verá o Prisma Studio conectado ao banco Postgres do Docker.
-
-#### Opção B – Usando Prisma Studio via CLI local
+With Docker and `.env` configured, apply migrations to the local database:
 
 ```bash
-# Usando Bun
-bunx prisma studio
+# Using Bun
+cd packages/database
+bun db:migrate
 
-# (ou com npx)
-# npx prisma studio
+# (Alternative with npx)
+# npx drizzle-kit migrate
 ```
 
-Por padrão, ele utilizará a URL de `DATABASE_URL` do seu `.env`.
+This will:
+
+- Create tables defined in `packages/database/src/schema/` in the `starter` database
+- Update the `packages/database/drizzle` folder
+
+### 5.3. View tables with Drizzle Studio
+
+Open Drizzle Studio to view and edit database tables:
+
+```bash
+# Using Bun (from packages/database/)
+bun db:studio
+
+# (or with npx)
+# npx drizzle-kit studio
+```
+
+By default, it will use the URL from `DATABASE_URL` in your `.env` and open at `http://localhost:4983`.
 
 ---
 
-## 6. Configurar Google OAuth
+## 6. Configure Google OAuth
 
-Para login com Google, você precisa das variáveis:
+For Google login, you need the variables:
 
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 
-O passo a passo completo está em `docs/google-oauth-setup.md`, incluindo:
+The complete step-by-step is in `docs/google/google-oauth-setup.md`, including:
 
-- Criação do projeto no **Google Cloud Console**
-- Configuração da tela de consentimento OAuth
-- Criação das credenciais OAuth 2.0 (Client ID / Secret)
-- Configuração de **URIs de redirecionamento** para ambiente local
+- Creating the project in **Google Cloud Console**
+- Configuring the OAuth consent screen
+- Creating OAuth 2.0 credentials (Client ID / Secret)
+- Configuring **redirect URIs** for local environment
 
-Depois de obter os valores, atualize o seu `.env`.
+After obtaining the values, update your `.env`.
 
 ---
 
-## 7. Configurar Stripe (test mode + webhook)
+## 7. Configure Stripe (test mode + webhook)
 
-Para integração com Stripe, você precisa no `.env`:
+For Stripe integration, you need in `.env`:
 
-- `STRIPE_SECRET_KEY` (chave secreta de **teste**)
-- `STRIPE_WEBHOOK_SECRET` (segredo do webhook gerado pelo Stripe CLI)
+- `STRIPE_SECRET_KEY` (secret **test** key)
+- `STRIPE_WEBHOOK_SECRET` (webhook secret generated by Stripe CLI)
 
-O passo a passo detalhado está em `docs/stripe-setup.md`, incluindo:
+The detailed step-by-step is in `docs/stripe/stripe-setup.md`, including:
 
-- Criar/usar uma conta Stripe em modo **Test**
-- Encontrar e copiar a `STRIPE_SECRET_KEY`
-- Rodar o Stripe CLI (local ou via Docker) com:
+- Create/use a Stripe account in **Test** mode
+- Find and copy the `STRIPE_SECRET_KEY`
+- Run Stripe CLI (local or via Docker) with:
 
   ```bash
-  stripe listen --forward-to http://host.docker.internal:3000/api/stripe/webhook
+  stripe listen --forward-to http://host.docker.internal:3333/stripe/webhook
   ```
 
-- Copiar o valor de `whsec_...` para `STRIPE_WEBHOOK_SECRET`
-- Gerar eventos de teste para verificar o webhook
+- Copy the `whsec_...` value to `STRIPE_WEBHOOK_SECRET`
+- Generate test events to verify the webhook
 
 ---
 
-## 8. Rodar o projeto localmente
+## 8. Run the project locally
 
-Com tudo configurado:
+With everything configured:
 
-1. Containers Docker rodando (`postgres`, `starter-studio`, opcionalmente `stripe-cli`)
-2. `.env` preenchido com Google/Stripe/DB/BetterAuth
-3. Migrations executadas com Prisma
+1. Docker containers running (`postgres`, `redis`, optionally `stripe-cli`)
+2. `.env` filled with Google/Stripe/DB/BetterAuth
+3. Migrations executed with Drizzle
 
-Rode o servidor de desenvolvimento:
+Run the development server:
 
 ```bash
-# Recomendado
+# Recommended
 bun dev
 
-# Alternativas
+# Alternatives
 # npm run dev
 # pnpm dev
 # yarn dev
 ```
 
-Abra em seguida:
+Then open:
 
-- `http://localhost:3000`
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:3333`
 
-Você deve conseguir:
+You should be able to:
 
-- Acessar o dashboard/login
-- Iniciar o fluxo de login com Google (se configurado)
-- Realizar ações que disparem chamadas para Stripe (se configurado)
+- Access the dashboard/login
+- Start Google login flow (if configured)
+- Perform actions that trigger Stripe calls (if configured)
 
 ---
 
-## 9. Referências
+## 9. References
 
 - **Next.js**: https://nextjs.org/docs
 - **Docker Desktop**: https://docs.docker.com/desktop/
 - **PostgreSQL**: https://www.postgresql.org/docs/
-- **Prisma ORM**: https://www.prisma.io/docs
-- **Prisma Studio (Docker image)**: https://hub.docker.com/r/timothyjmiller/prisma-studio
+- **Drizzle ORM**: https://orm.drizzle.team/docs/overview
+- **Drizzle Kit**: https://orm.drizzle.team/kit-docs/overview
 - **Stripe Docs**: https://stripe.com/docs
 - **Stripe CLI**: https://stripe.com/docs/stripe-cli
 - **Google Cloud Console**: https://console.cloud.google.com/

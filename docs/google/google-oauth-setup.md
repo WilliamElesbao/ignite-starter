@@ -1,136 +1,136 @@
-# Google OAuth – passo a passo
+# Google OAuth Setup Guide
 
-Este documento explica **como obter as chaves do Google** e configurar o OAuth para funcionar com o projeto local.
+This document explains **how to obtain Google credentials** and configure OAuth to work with the local project.
 
-Ao final você terá:
+At the end you will have:
 
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 
-preenchidos corretamente no seu `.env`.
+properly filled in your `.env` file.
 
 ---
 
-## 1. Acessar o Google Cloud Console
+## 1. Access Google Cloud Console
 
-1. Vá para: https://console.cloud.google.com/
-2. Faça login com a conta Google que será usada para desenvolvimento.
-3. Se for a primeira vez, aceite os termos de uso.
-
----
-
-## 2. Criar (ou selecionar) um projeto
-
-1. No topo da página, clique no seletor de projeto (próximo ao logo do Google Cloud).
-2. Clique em **"Novo projeto"** ou selecione um projeto existente específico para este app.
-3. Dê um nome ao projeto, por exemplo: `origin-starter-dev`.
-4. Clique em **Criar** e aguarde o provisionamento.
-
-Certifique-se de que o projeto correto está selecionado após a criação.
+1. Go to: https://console.cloud.google.com/
+2. Sign in with the Google account that will be used for development.
+3. If it's your first time, accept the terms of service.
 
 ---
 
-## 3. Ativar a API de Google Identity (se necessário)
+## 2. Create (or select) a project
 
-Em muitos casos, o fluxo de OAuth já funciona apenas com as credenciais, mas, se o console pedir:
+1. At the top of the page, click on the project selector (next to the Google Cloud logo).
+2. Click **"New project"** or select an existing project specific to this app.
+3. Give the project a name, for example: `origin-starter-dev`.
+4. Click **Create** and wait for provisioning.
 
-1. Vá em **APIs e serviços → Biblioteca**.
-2. Busque por **"Google Identity Services"** ou **"Google+ API"** (dependendo da interface atual).
-3. Clique em **Ativar**.
-
-Se não aparecer nenhum alerta ou erro, você pode pular esta etapa.
-
----
-
-## 4. Configurar a tela de consentimento OAuth
-
-1. No menu lateral, vá em **APIs e serviços → Tela de consentimento OAuth**.
-2. Escolha o tipo de usuário:
-   - Para ambiente de desenvolvimento, normalmente **"Externo"** é suficiente.
-3. Preencha os campos básicos:
-   - **Nome do app**: `Origin Starter (Dev)` ou semelhante.
-   - **E-mail de suporte do usuário**: seu e-mail.
-   - **Domínios autorizados**: para ambiente local, normalmente pode ficar vazio, mas, se for solicitado, você pode usar `localhost`.
-   - **E-mail de contato do desenvolvedor**: seu e-mail.
-4. Salve e continue até o fim, mantendo configurações simples.
-
-Para ambiente apenas de teste, normalmente você manterá o app em modo de **teste** e adicionará usuários de teste.
+Make sure the correct project is selected after creation.
 
 ---
 
-## 5. Criar credenciais OAuth 2.0 (Client ID / Secret)
+## 3. Enable Google Identity API (if necessary)
 
-1. No menu lateral, vá em **APIs e serviços → Credenciais**.
-2. Clique em **+ Criar credenciais → ID do cliente OAuth**.
-3. Em **Tipo de aplicativo**, escolha **Aplicativo da Web**.
-4. Defina um nome descritivo, por exemplo: `origin-starter-local`.
-5. Em **Origens JavaScript autorizadas**, adicione:
+In many cases, the OAuth flow works with just the credentials, but if the console asks:
+
+1. Go to **APIs & Services → Library**.
+2. Search for **"Google Identity Services"** or **"Google+ API"** (depending on the current interface).
+3. Click **Enable**.
+
+If no alert or error appears, you can skip this step.
+
+---
+
+## 4. Configure OAuth consent screen
+
+1. In the side menu, go to **APIs & Services → OAuth consent screen**.
+2. Choose the user type:
+   - For development environment, **"External"** is usually sufficient.
+3. Fill in the basic fields:
+   - **App name**: `Origin Starter (Dev)` or similar.
+   - **User support email**: your email.
+   - **Authorized domains**: for local environment, it can usually be left empty, but if requested, you can use `localhost`.
+   - **Developer contact email**: your email.
+4. Save and continue to the end, keeping simple settings.
+
+For test-only environment, you will typically keep the app in **test** mode and add test users.
+
+---
+
+## 5. Create OAuth 2.0 credentials (Client ID / Secret)
+
+1. In the side menu, go to **APIs & Services → Credentials**.
+2. Click **+ Create credentials → OAuth client ID**.
+3. Under **Application type**, choose **Web application**.
+4. Set a descriptive name, for example: `origin-starter-local`.
+5. Under **Authorized JavaScript origins**, add:
 
    - `http://localhost:3000`
 
-6. Em **URIs de redirecionamento autorizados**, adicione a URL usada pelo seu fluxo de autenticação.
+6. Under **Authorized redirect URIs**, add the URL used by your authentication flow.
 
-   Como estamos usando BetterAuth + Next.js, normalmente será algo como:
+   Since we're using BetterAuth + Next.js, it will typically be something like:
 
    - `http://localhost:3000/api/auth/callback/google`
 
-   > Se o projeto usar outro caminho específico, ajuste aqui de acordo com a rota de callback configurada.
+   > If the project uses another specific path, adjust here according to the configured callback route.
 
-7. Clique em **Criar**.
+7. Click **Create**.
 
-O Google exibirá uma janela com:
+Google will display a window with:
 
-- **ID do cliente** (Client ID)
-- **Segredo do cliente** (Client Secret)
+- **Client ID**
+- **Client Secret**
 
-Guarde essa tela aberta ou baixe o JSON das credenciais.
+Keep this screen open or download the credentials JSON.
 
 ---
 
-## 6. Mapear valores para o `.env`
+## 6. Map values to `.env`
 
-No seu projeto, edite o arquivo `.env` e preencha:
+In your project, edit the `.env` file and fill in:
 
 ```dotenv
-GOOGLE_CLIENT_ID=<colar aqui o Client ID>
-GOOGLE_CLIENT_SECRET=<colar aqui o Client Secret>
+GOOGLE_CLIENT_ID=<paste Client ID here>
+GOOGLE_CLIENT_SECRET=<paste Client Secret here>
 ```
 
-Por exemplo:
+For example:
 
 ```dotenv
 GOOGLE_CLIENT_ID=1234567890-abcdefghijklmnopqrstuv.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=GOCSPX-EXEMPLO_SECRETO
+GOOGLE_CLIENT_SECRET=GOCSPX-EXAMPLE_SECRET
 ```
 
-Salve o arquivo `.env`.
+Save the `.env` file.
 
-> Sempre que você alterar o `.env`, é uma boa prática **reiniciar o server de desenvolvimento** (`bun dev`) para garantir que as variáveis sejam recarregadas.
+> Whenever you change `.env`, it's good practice to **restart the development server** (`bun dev`) to ensure variables are reloaded.
 
 ---
 
-## 7. Testar login com Google localmente
+## 7. Test Google login locally
 
-1. Certifique-se de que:
-   - Docker está rodando (banco de dados ativo).
-   - Migrations do Prisma já foram aplicadas.
-   - `.env` contém `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET` válidos.
-2. Rode o servidor de desenvolvimento:
+1. Make sure that:
+   - Docker is running (database active).
+   - Drizzle migrations have been applied.
+   - `.env` contains valid `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
+2. Run the development server:
 
    ```bash
    bun dev
    ```
 
-3. Acesse `http://localhost:3000`.
-4. Inicie o fluxo de login com Google (botão "Login com Google" ou similar).
-5. Se o Google exibir a tela de consentimento, revise e aceite.
+3. Access `http://localhost:3000`.
+4. Start the Google login flow (button "Sign in with Google" or similar).
+5. If Google displays the consent screen, review and accept.
 
-Se tudo estiver correto, você deverá ser redirecionado de volta para o app logado com sua conta.
+If everything is correct, you should be redirected back to the app logged in with your account.
 
 ---
 
-## 8. Referências
+## 8. References
 
 - **Google OAuth 2.0 – Overview**: https://developers.google.com/identity/protocols/oauth2
-- **Configurar tela de consentimento OAuth**: https://developers.google.com/identity/protocols/oauth2/web-server#creatingcred
+- **Configure OAuth consent screen**: https://developers.google.com/identity/protocols/oauth2/web-server#creatingcred
 - **Google Cloud Console**: https://console.cloud.google.com/

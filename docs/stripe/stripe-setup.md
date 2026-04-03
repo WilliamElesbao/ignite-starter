@@ -1,55 +1,55 @@
-# Stripe – chave de teste, webhook e Docker
+# Stripe Setup Guide – Test Keys, Webhooks, and Docker
 
-Este documento explica como configurar **Stripe** para ambiente local usando:
+This document explains how to configure **Stripe** for local environment using:
 
-- Conta Stripe em modo **Test**
-- `STRIPE_SECRET_KEY` (chave de teste)
-- `STRIPE_WEBHOOK_SECRET` (segredo do webhook)
-- Docker com `stripe/stripe-cli` ou Stripe CLI instalada localmente
+- Stripe account in **Test** mode
+- `STRIPE_SECRET_KEY` (test key)
+- `STRIPE_WEBHOOK_SECRET` (webhook secret)
+- Docker with `stripe/stripe-cli` or locally installed Stripe CLI
 
-Ao final você será capaz de:
+At the end you will be able to:
 
-- Processar chamadas para a API Stripe com a chave de teste.
-- Receber eventos de webhook em `http://localhost:3000/api/stripe/webhook`.
-
----
-
-## 1. Criar (ou acessar) conta Stripe de teste
-
-1. Acesse: https://dashboard.stripe.com/
-2. Faça login ou crie uma nova conta.
-3. Certifique-se de estar no modo **Test data** (modo de teste) – no topo do dashboard há um toggle para "Viewing test data".
+- Process calls to the Stripe API with the test key.
+- Receive webhook events at `http://localhost:3000/api/stripe/webhook`.
 
 ---
 
-## 2. Obter a STRIPE_SECRET_KEY (chave secreta de teste)
+## 1. Create (or access) Stripe test account
 
-1. No dashboard Stripe, vá em **Developers → API keys**.
-2. Em **Standard keys**, localize a **Secret key** (geralmente começa com `sk_test_...`).
-3. Clique em **Reveal test key** para visualizar.
-4. Copie o valor da chave secreta de teste.
+1. Access: https://dashboard.stripe.com/
+2. Sign in or create a new account.
+3. Make sure you're in **Test data** mode (test mode) – at the top of the dashboard there's a toggle for "Viewing test data".
 
-No seu `.env`, preencha:
+---
+
+## 2. Get STRIPE_SECRET_KEY (test secret key)
+
+1. In the Stripe dashboard, go to **Developers → API keys**.
+2. Under **Standard keys**, locate the **Secret key** (usually starts with `sk_test_...`).
+3. Click **Reveal test key** to view.
+4. Copy the test secret key value.
+
+In your `.env`, fill in:
 
 ```dotenv
-STRIPE_SECRET_KEY=sk_test_exemplo1234567890
+STRIPE_SECRET_KEY=sk_test_example1234567890
 ```
 
-> Use **sempre** chaves de **teste** em ambiente local.
+> Always use **test** keys in local environment.
 
 ---
 
-## 3. Configurar o webhook para receber eventos
+## 3. Configure webhook to receive events
 
-O projeto espera receber webhooks em:
+The project expects to receive webhooks at:
 
 - `http://localhost:3000/api/stripe/webhook`
 
-Ao usar Docker, o container Stripe CLI se comunica com a máquina host via `host.docker.internal`.
+When using Docker, the Stripe CLI container communicates with the host machine via `host.docker.internal`.
 
-### 3.1. Usando Docker (imagem stripe/stripe-cli)
+### 3.1. Using Docker (stripe/stripe-cli image)
 
-O `docker-compose.yml` já traz um serviço `stripe` aproximado:
+The `docker-compose.yml` already includes a `stripe` service:
 
 ```yaml
 stripe:
@@ -62,136 +62,136 @@ stripe:
     - postgres
 ```
 
-Para usar **sua própria conta Stripe** e obter um `whsec_...` válido, a forma mais transparente é rodar o Stripe CLI autenticado **fora** do container primeiro, ou logar no container.
+To use **your own Stripe account** and get a valid `whsec_...`, the most transparent way is to run the authenticated Stripe CLI **outside** the container first, or log in to the container.
 
-#### Opção A – Stripe CLI instalado localmente (recomendado)
+#### Option A – Locally installed Stripe CLI (recommended)
 
-1. Certifique-se de ter o Stripe CLI instalado na sua máquina:
+1. Make sure you have Stripe CLI installed on your machine:
 
    ```bash
    stripe --version
    ```
 
-2. Faça login no Stripe CLI com sua conta:
+2. Log in to Stripe CLI with your account:
 
    ```bash
    stripe login
    ```
 
-   Isso abrirá o navegador para autorizar o CLI na sua conta.
+   This will open the browser to authorize the CLI with your account.
 
-3. Inicie o listener de webhook apontando para o endpoint da aplicação (via `host.docker.internal` para funcionar bem com containers):
+3. Start the webhook listener pointing to the application endpoint (via `host.docker.internal` to work well with containers):
 
    ```bash
    stripe listen --forward-to http://host.docker.internal:3000/api/stripe/webhook
    ```
 
-4. O comando irá exibir algo como:
+4. The command will display something like:
 
    ```text
    Ready! Your webhook signing secret is whsec_xxxxxxxxxxxxxxxxx
    ```
 
-5. Copie o valor de `whsec_...` e coloque no `.env`:
+5. Copy the `whsec_...` value and put it in `.env`:
 
    ```dotenv
    STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxx
    ```
 
-> Mantenha o comando `stripe listen ...` rodando em um terminal enquanto testa o app.
+> Keep the `stripe listen ...` command running in a terminal while testing the app.
 
-#### Opção B – Usando o serviço Docker `stripe-cli`
+#### Option B – Using Docker `stripe-cli` service
 
-Caso queira usar o container definido no `docker-compose.yml`:
+If you want to use the container defined in `docker-compose.yml`:
 
-1. Suba os containers (incluindo o serviço `stripe`):
+1. Start the containers (including the `stripe` service):
 
    ```bash
    docker compose up -d stripe
    ```
 
-2. A forma mais simples de garantir que o container está autenticado na sua conta Stripe é **executar o login** dentro dele (apenas uma vez):
+2. The simplest way to ensure the container is authenticated with your Stripe account is to **run login** inside it (only once):
 
    ```bash
    docker exec -it stripe-cli stripe login
    ```
 
-   Siga o fluxo no navegador para autorizar.
+   Follow the flow in the browser to authorize.
 
-3. Depois você pode ajustar o comando de `listen` no `docker-compose.yml` se quiser personalizar, por exemplo:
+3. Then you can adjust the `listen` command in `docker-compose.yml` if you want to customize, for example:
 
    ```yaml
    command: listen --forward-to http://host.docker.internal:3000/api/stripe/webhook
    ```
 
-4. O segredo `whsec_...` usado pelo container deverá ser copiado para o seu `.env`:
+4. The `whsec_...` secret used by the container should be copied to your `.env`:
 
    ```dotenv
    STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxx
    ```
 
-> Mesmo usando o container, é comum rodar `stripe listen` manualmente (fora ou dentro do container) para capturar o segredo mais recente.
+> Even using the container, it's common to run `stripe listen` manually (outside or inside the container) to capture the most recent secret.
 
 ---
 
-## 4. Atualizar `.env` com as chaves Stripe
+## 4. Update `.env` with Stripe keys
 
-No final, o seu `.env` deve ter algo como:
+In the end, your `.env` should have something like:
 
 ```dotenv
-STRIPE_SECRET_KEY=sk_test_exemplo1234567890
+STRIPE_SECRET_KEY=sk_test_example1234567890
 STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxx
 ```
 
-Salve o arquivo.
+Save the file.
 
-Reinicie o servidor de desenvolvimento se ele já estiver rodando (`Ctrl+C` e depois `bun dev`).
+Restart the development server if it's already running (`Ctrl+C` then `bun dev`).
 
 ---
 
-## 5. Testar webhooks com eventos de teste
+## 5. Test webhooks with test events
 
-Com o comando `stripe listen` ativo (localmente ou via Docker), você pode enviar eventos de teste:
+With the `stripe listen` command active (locally or via Docker), you can send test events:
 
 ```bash
-# Exemplo: enviar um evento checkout.session.completed
-time stripe trigger checkout.session.completed
+# Example: send a checkout.session.completed event
+stripe trigger checkout.session.completed
 ```
 
-O Stripe CLI deve mostrar que o evento foi enviado para `http://host.docker.internal:3000/api/stripe/webhook` e a aplicação deve processar o evento (confira logs do terminal do `bun dev`).
+The Stripe CLI should show that the event was sent to `http://host.docker.internal:3000/api/stripe/webhook` and the application should process the event (check logs in the `bun dev` terminal).
 
-Outros eventos de teste úteis:
+Other useful test events:
 
 ```bash
 stripe trigger payment_intent.succeeded
 stripe trigger invoice.payment_succeeded
 ```
 
-Consulte a documentação da Stripe para a lista completa de triggers disponíveis.
+Consult Stripe documentation for the complete list of available triggers.
 
 ---
 
-## 6. Integração com Docker no fluxo completo do projeto
+## 6. Integration with Docker in the complete project flow
 
-No fluxo padrão descrito em `docs/local-setup.md`:
+In the standard flow described in `docs/local-setup/local-setup.md`:
 
-1. Você sobe Docker (`postgres`, `starter-studio`, opcionalmente `stripe-cli`).
-2. Roda migrations Prisma.
-3. Inicia o app com `bun dev`.
-4. Roda o Stripe CLI (local ou no container) com:
+1. You start Docker (`postgres`, `starter-studio`, optionally `stripe-cli`).
+2. Run Drizzle migrations.
+3. Start the app with `bun dev`.
+4. Run Stripe CLI (local or in container) with:
 
    ```bash
    stripe listen --forward-to http://host.docker.internal:3000/api/stripe/webhook
    ```
 
-5. Copia o `whsec_...` para `STRIPE_WEBHOOK_SECRET`.
-6. Gera eventos de teste (`stripe trigger ...`) para validar o fluxo.
+5. Copy the `whsec_...` to `STRIPE_WEBHOOK_SECRET`.
+6. Generate test events (`stripe trigger ...`) to validate the flow.
 
 ---
 
-## 7. Referências
+## 7. References
 
-- **Stripe – Docs gerais**: https://stripe.com/docs
+- **Stripe – General docs**: https://stripe.com/docs
 - **Stripe API keys**: https://stripe.com/docs/keys
 - **Stripe CLI**: https://stripe.com/docs/stripe-cli
 - **Stripe Webhooks overview**: https://stripe.com/docs/webhooks

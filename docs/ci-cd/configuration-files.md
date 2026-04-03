@@ -13,14 +13,14 @@ This document provides a reference for all CI/CD configuration files, their purp
 ├── .github/
 │   ├── workflows/
 │   │   ├── sonar.yml                    # SonarCloud analysis workflow
-│   │   └── pr-review.yml                # PR review workflow
+│   │   └── pr-review.yml                # Biome linting workflow
 │   ├── PULL_REQUEST_TEMPLATE.md         # PR template
 │   └── copilot-instructions.md          # GitHub Copilot context
 ```
 
 ## .drone.yml
 
-**Purpose:** Main CI pipeline for type checking, linting, and testing
+**Purpose:** Main CI pipeline for type checking and linting
 
 **Location:** Repository root
 
@@ -29,14 +29,25 @@ kind: pipeline
 type: docker
 name: CI
 
+platform:
+  arch: arm64
+
 clone:
-  depth: 50
+  depth: 100
+
+trigger:
+  branch:
+    - main
+  event:
+    - push
+    - pull_request
+    - tag
 
 steps:
   - name: install
     image: oven/bun:1.3.3
     commands:
-      - bun install --frozen-lockfile
+      - bun install
 
   - name: typecheck
     image: oven/bun:1.3.3
@@ -56,21 +67,14 @@ steps:
     commands:
       - bun biome ci .
     depends_on:
-      - install
-
-  - name: test
-    image: oven/bun:1.3.3
-    commands:
-      - (cd apps/web && bun test)
-      - (cd packages/backend-base && bun test)
-    depends_on:
-      - install
+      - typecheck
 ```
 
 **Key Features:**
-- Parallel execution of typecheck, lint, and test after install
+- Sequential execution: install → typecheck → lint
 - Uses Bun 1.3.3 Docker image
-- Shallow clone (depth: 50) for faster checkout
+- Shallow clone (depth: 100) for faster checkout
+- ARM64 platform support
 
 ## sonar-project.properties
 
@@ -82,8 +86,16 @@ steps:
 sonar.projectKey=your-org_your-repo
 sonar.organization=your-org
 
-sonar.sources=apps/web/src,apps/backend/src,packages/backend-base/src,packages/database/src,packages/emails/src,packages/ui/src
+# Sources
+sonar.sources=\
+  apps/web/src,\
+  apps/backend/src,\
+  packages/backend-base/src,\
+  packages/database/src,\
+  packages/emails/src,\
+  packages/ui/src
 
+# Exclusions
 sonar.exclusions=\
   **/node_modules/**,\
   **/generated/**,\
@@ -96,14 +108,15 @@ sonar.exclusions=\
   **/*.spec.ts,\
   **/*.spec.tsx
 
-sonar.tests=apps/web/src,packages/backend-base/src
-sonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx
+# Temporary: ignore coverage metric until coverage pipeline is re-enabled
+sonar.coverage.exclusions=**/*
 ```
 
 **Configuration Notes:**
 - Replace `your-org_your-repo` with your SonarCloud project key
 - Replace `your-org` with your SonarCloud organization key
 - Adjust source paths if your monorepo structure differs
+- Coverage is currently excluded (can be re-enabled when tests are configured)
 
 ## .github/workflows/sonar.yml
 
@@ -112,18 +125,16 @@ sonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx
 **Location:** `.github/workflows/sonar.yml`
 
 ```yaml
-name: SonarCloud Analysis
+name: SonarCloud
 
 on:
   push:
-    branches: ["**"]
   pull_request:
-    types: [opened, synchronize, reopened]
 
 jobs:
-  sonarcloud:
-    name: SonarCloud
+  sonar:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -134,19 +145,20 @@ jobs:
           bun-version: 1.3.3
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 ```
 
 **Key Features:**
-- Triggers on all branches and pull requests
+- Triggers on all pushes and pull requests
 - Full git history for accurate analysis (fetch-depth: 0)
 - Uses official SonarCloud GitHub Action
+- Simplified configuration without validation step
 
 ## .github/workflows/pr-review.yml
 
@@ -155,20 +167,14 @@ jobs:
 **Location:** `.github/workflows/pr-review.yml`
 
 ```yaml
-name: PR Review
+name: Biome
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
 
 jobs:
-  biome-annotations:
-    name: Biome Lint
+  lint:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      checks: write
 
     steps:
       - uses: actions/checkout@v4
@@ -177,11 +183,9 @@ jobs:
         with:
           bun-version: 1.3.3
 
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - run: bun install
 
-      - name: Biome Check
-        run: bun biome check --reporter=github .
+      - run: bun biome check --reporter=github .
         continue-on-error: true
 ```
 
@@ -189,6 +193,7 @@ jobs:
 - Only runs on pull requests
 - Uses GitHub reporter for inline annotations
 - Continues on error to always provide feedback
+- Minimal configuration for fast execution
 
 ## .github/PULL_REQUEST_TEMPLATE.md
 
