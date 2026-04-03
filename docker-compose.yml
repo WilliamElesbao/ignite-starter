@@ -38,3 +38,11 @@ services:
     depends_on:
       - database
 
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "4318:4318" # OTLP HTTP receiver (traces)
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
