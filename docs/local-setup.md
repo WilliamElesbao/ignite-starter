@@ -1,4 +1,4 @@
-# Setup local do projeto Origin Starter
+# Setup local do projeto Ignite Starter
 
 Este guia descreve o passo a passo completo para rodar o projeto **localmente** usando Docker, Prisma e Bun/Node.
 
