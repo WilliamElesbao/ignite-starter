@@ -1,21 +1,31 @@
 kind: pipeline
 type: docker
 name: CI
-platform:
-  os: linux
-  arch: arm64
-trigger:
-  event:
-    - push
+
+# platform:
+#   os: linux
+#   arch: arm64
+
+# trigger:
+#   event:
+#     - push
 
 clone:
   depth: 50
+
+trigger:
+  branch:
+    - main
+  event:
+    - push
+    - pull_request
+    - tag
 
 steps:
   - name: install
     image: oven/bun:1.3.3
     commands:
-      - test -f bun.lock
+      # - test -f bun.lock
       - bun install
 
   - name: typecheck
