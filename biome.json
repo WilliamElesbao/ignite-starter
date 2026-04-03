@@ -14,8 +14,7 @@
       "!dist",
       "!build",
       "!generated",
-      "!**/generated",
-      "!signoz"
+      "!**/generated"
     ]
   },
   "formatter": {
