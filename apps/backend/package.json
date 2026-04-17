@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "worker:email": "bun run ../../packages/backend-base/src/workers/email.worker.ts"
   },
   "dependencies": {
     "@elysiajs/openapi": "^1.4.14",

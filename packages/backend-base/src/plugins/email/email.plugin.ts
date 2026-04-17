@@ -1,16 +1,17 @@
 import Elysia from "elysia";
 import { toErrorResponse } from "../../shared/errors/to-error-response";
-import shared from "../../shared/shared.plugin";
+import authPlugin from "../auth/auth.plugin";
+import { bullBoardPlugin, EMAIL_JOBS } from "../queue";
 import { EmailResponseDto } from "./dtos/email-response.dto";
 import {
   emailSend500ErrorDto,
   emailSend502ErrorDto,
 } from "./dtos/errors/email-error.dto";
 import { EMAIL_ERROR_MAP, EmailErrorCode } from "./email.errors";
-import { EmailService } from "./email.service";
 
 const emailPlugin = new Elysia({ tags: ["Email"] })
-  .use(shared)
+  .use(bullBoardPlugin) // Bull Board provides emailQueueService
+  .use(authPlugin)
   .onError(({ error, set }) => {
     const response = toErrorResponse(error, {
       code: EmailErrorCode.EMAIL_SEND_FAILED,
@@ -20,20 +21,29 @@ const emailPlugin = new Elysia({ tags: ["Email"] })
     set.status = response.status;
     return response.body;
   })
-  .state((state) => ({
-    ...state,
-    emailService: new EmailService(state.logger),
-  }))
   .group("/email", (app) =>
     app.post(
       "/send",
-      async ({ store: { emailService } }) => {
-        await emailService.sendWelcomeEmail();
+      async ({ store: { emailQueueService }, user }) => {
+        // Enqueue email job for asynchronous processing
+        const jobId = await emailQueueService.addJob(EMAIL_JOBS.SEND_WELCOME, {
+          userId: user.id,
+          email: user.email,
+        });
 
-        return { message: "Email sent successfully", success: true };
+        // Return immediately with job ID
+        return {
+          message: "Email queued successfully",
+          success: true,
+          jobId,
+        };
       },
       {
-        detail: { description: "Send a welcome email" },
+        auth: true,
+        detail: {
+          description:
+            "Queue a welcome email for asynchronous processing. Returns immediately with a job ID.",
+        },
         response: {
           200: EmailResponseDto,
           500: emailSend500ErrorDto,
