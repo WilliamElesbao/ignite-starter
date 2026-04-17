@@ -4,7 +4,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "prepare": "husky",
+    "prepare": "command -v git >/dev/null 2>&1 && husky || true",
     "commitlint": "commitlint --edit",
     "lint": "turbo run lint --",
     "lint:fix": "turbo run lint -- --fix",
