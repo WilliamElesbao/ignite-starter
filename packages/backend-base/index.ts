@@ -5,6 +5,11 @@ import authPlugin, { type AuthPlugin } from "./src/plugins/auth/auth.plugin";
 import emailPlugin, {
   type EmailPlugin,
 } from "./src/plugins/email/email.plugin";
+import {
+  type BullBoardPlugin,
+  bullBoardPlugin,
+  EmailQueueWorker,
+} from "./src/plugins/queue";
 import stripePlugin, {
   type StripePlugin,
 } from "./src/plugins/stripe/stripe.plugin";
@@ -22,4 +27,7 @@ export {
   type SessionResponse,
   stripePlugin,
   type StripePlugin,
+  bullBoardPlugin,
+  EmailQueueWorker,
+  type BullBoardPlugin,
 };

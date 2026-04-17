@@ -20,7 +20,7 @@ steps:
   - name: install
     image: oven/bun:1.3.3
     commands:
-      - bun install
+      - bun install --no-optional --ignore-scripts
 
   - name: typecheck
     image: oven/bun:1.3.3
