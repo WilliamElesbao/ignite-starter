@@ -20,7 +20,8 @@ steps:
   - name: install
     image: oven/bun:1.3.3
     commands:
-      - bun install --verbose
+      - apt-get update && apt-get install -y git
+      - bun install
 
   - name: typecheck
     image: oven/bun:1.3.3
