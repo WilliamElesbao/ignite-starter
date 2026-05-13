@@ -12,7 +12,10 @@
     "lint:fix": "biome check --fix --unsafe .",
     "ci": "biome ci .",
     "format": "biome format --write .",
-    "lint:watch": "bunx onchange . -- biome check --write --no-errors-on-unmatched {{changed}}"
+    "lint:watch": "bunx onchange . -- biome check --write --no-errors-on-unmatched {{changed}}",
+    "validate:i18n": "bun run src/scripts/validate-i18n.ts",
+    "locale-check": "bun run src/scripts/validate-i18n.ts",
+    "locale-unused": "bun run src/scripts/check-unused-i18n-keys.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
