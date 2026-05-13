@@ -511,7 +511,7 @@ async function main(): Promise<void> {
   try {
     // Define locale directory path relative to the script location
     const localeDir = path.join(process.cwd(), "src/lib/i18n/locales");
-    
+
     // Define source file name (English as the reference locale)
     const sourceFileName = "en.json";
 
@@ -537,8 +537,7 @@ async function main(): Promise<void> {
     process.exit(getExitCode(result));
   } catch (error) {
     // Top-level error handling for any unexpected errors
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`Error: ${errorMessage}`);
     process.exit(1);
   }
