@@ -22,6 +22,14 @@ steps:
     commands:
       - bun install --no-optional --ignore-scripts
 
+  - name: i18n-audit
+    image: oven/bun:1.3.3
+    commands:
+      - (cd apps/web && bun run locale-check)
+      - (cd apps/web && bun run locale-unused)
+    depends_on:
+      - install
+
   - name: typecheck
     image: oven/bun:1.3.3
     commands:
