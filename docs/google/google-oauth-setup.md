@@ -23,7 +23,7 @@ properly filled in your `.env` file.
 
 1. At the top of the page, click on the project selector (next to the Google Cloud logo).
 2. Click **"New project"** or select an existing project specific to this app.
-3. Give the project a name, for example: `origin-starter-dev`.
+3. Give the project a name, for example: `ignite-starter-dev`.
 4. Click **Create** and wait for provisioning.
 
 Make sure the correct project is selected after creation.
@@ -63,7 +63,7 @@ For test-only environment, you will typically keep the app in **test** mode and 
 1. In the side menu, go to **APIs & Services → Credentials**.
 2. Click **+ Create credentials → OAuth client ID**.
 3. Under **Application type**, choose **Web application**.
-4. Set a descriptive name, for example: `origin-starter-local`.
+4. Set a descriptive name, for example: `ignite-starter-local`.
 5. Under **Authorized JavaScript origins**, add:
 
    - `http://localhost:3000`

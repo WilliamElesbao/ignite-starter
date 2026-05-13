@@ -73,7 +73,7 @@ Each app/package has its own `.env` copied from `.env.example`. Key files to cre
 | `packages/backend-base/.env` | `DATABASE_URL`, `WEB_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` |
 | `packages/api/.env` | `API_URL` |
 
-Default local values (from `.env.example`): backend on `http://localhost:3333`, web on `http://localhost:3000`, PostgreSQL `postgresql://docker:docker@localhost:5432/origin-starter`, Redis `redis://:abcd1234@localhost:6379`.
+Default local values (from `.env.example`): backend on `http://localhost:3333`, web on `http://localhost:3000`, PostgreSQL `postgresql://docker:docker@localhost:5432/ignite-starter`, Redis `redis://:abcd1234@localhost:6379`.
 
 The `apps/backend/.env` is also read by `docker-compose.yml` for Redis configuration.
 
