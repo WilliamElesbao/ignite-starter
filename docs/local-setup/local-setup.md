@@ -1,8 +1,12 @@
+<!-- @format -->
+
 # Local Setup Guide for Origin Starter
 
-This guide describes the complete step-by-step process to run the project **locally** using Docker, Drizzle, and Bun/Node.
+This guide describes the complete step-by-step process to run the project
+**locally** using Docker, Drizzle, and Bun/Node.
 
-> Follow the steps in order. At the end, you should be able to run `bun dev` and test the app at `http://localhost:3000`.
+> Follow the steps in order. At the end, you should be able to run `bun dev` and
+> test the app at `http://localhost:3000`.
 
 ---
 
@@ -13,8 +17,10 @@ Before starting, make sure you have installed on your machine:
 - **Git**
 - **Node.js 22+** (recommended if using `npm`/`npx`)
 - **[Bun](https://bun.sh/)** (recommended for this project)
-- **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** (with Docker Compose)
-- **[Stripe CLI](https://stripe.com/docs/stripe-cli)** (for webhooks, if you want to run outside the container)
+- **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** (with
+  Docker Compose)
+- **[Stripe CLI](https://stripe.com/docs/stripe-cli)** (for webhooks, if you
+  want to run outside the container)
 
 Quick verification:
 
@@ -31,8 +37,8 @@ stripe --version
 
 ```bash
 # 1) Clone the project
-git clone git@github.com:WilliamElesbao/origin-starter.git
-cd origin-starter
+git clone git@github.com:WilliamElesbao/ignite-starter.git
+cd ignite-starter
 
 # 2) Install dependencies (recommended)
 bun install
@@ -82,6 +88,7 @@ STRIPE_WEBHOOK_SECRET=<copy from Stripe CLI after configuring webhook>
 ```
 
 > How to get **Google** and **Stripe** variables is detailed in:
+>
 > - `docs/google/google-oauth-setup.md`
 > - `docs/stripe/stripe-setup.md`
 
@@ -94,7 +101,8 @@ The project already contains a `docker-compose.yml` with:
 - `postgres` – PostgreSQL database
 - `redis` – Redis cache
 - `redis-commander` – Redis web UI
-- `stripe` – Stripe CLI in "listen" mode for webhooks (can be adjusted to use your own account)
+- `stripe` – Stripe CLI in "listen" mode for webhooks (can be adjusted to use
+  your own account)
 
 To start the infrastructure services:
 
@@ -129,7 +137,8 @@ You should see something like:
 
 ## 5. Configure and run Drizzle (migrations + view tables)
 
-The project uses Drizzle with PostgreSQL. The database URL is read from `DATABASE_URL` in `.env`.
+The project uses Drizzle with PostgreSQL. The database URL is read from
+`DATABASE_URL` in `.env`.
 
 ### 5.1. Ensure database is active
 
@@ -160,7 +169,8 @@ bun db:migrate
 
 This will:
 
-- Create tables defined in `packages/database/src/schema/` in the `starter` database
+- Create tables defined in `packages/database/src/schema/` in the `starter`
+  database
 - Update the `packages/database/drizzle` folder
 
 ### 5.3. View tables with Drizzle Studio
@@ -175,7 +185,8 @@ bun db:studio
 # npx drizzle-kit studio
 ```
 
-By default, it will use the URL from `DATABASE_URL` in your `.env` and open at `http://localhost:4983`.
+By default, it will use the URL from `DATABASE_URL` in your `.env` and open at
+`http://localhost:4983`.
 
 ---
 
