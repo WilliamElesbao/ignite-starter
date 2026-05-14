@@ -68,8 +68,9 @@ steps:
       - build-database
 
   - name: build-web
-    image: oven/bun:1.3.3
+    image: node:22-alpine
     commands:
-      - (cd apps/web && bun run build)
+      - npm ci
+      - cd apps/web && npm run build
     depends_on:
       - build-backend
