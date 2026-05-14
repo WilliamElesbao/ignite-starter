@@ -1,9 +1,17 @@
+import { createRequire } from "node:module";
 import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { ElysiaAdapter } from "@bull-board/elysia";
 import { Elysia } from "elysia";
 import shared from "../../shared/shared.plugin";
 import { EmailQueueService } from "./email-queue.service";
+
+const ensureRequire = () => {
+  const globalWithRequire = globalThis as { require?: NodeRequire };
+  if (!globalWithRequire.require) {
+    globalWithRequire.require = createRequire(import.meta.url);
+  }
+};
 
 /**
  * Bull Board Plugin
@@ -19,6 +27,8 @@ const bullBoardPlugin = new Elysia({ tags: ["Admin"] })
 
     // Configure Bull Board with email queue
     const serverAdapter = new ElysiaAdapter("/admin/queues");
+
+    ensureRequire();
 
     createBullBoard({
       queues: [new BullMQAdapter(emailQueueService.getQueue())],

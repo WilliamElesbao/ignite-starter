@@ -2,7 +2,8 @@ import pino from "pino";
 
 // pino-pretty is a devDependency used only for local development.
 // In production logs are emitted as structured JSON to stdout.
-const isDev = process.env.NODE_ENV !== "production";
+const nodeEnv = Bun.env.NODE_ENV ?? process.env.NODE_ENV;
+const isDev = nodeEnv !== "production";
 
 const options: pino.LoggerOptions = {
   level: process.env.LOG_LEVEL ?? "info",
