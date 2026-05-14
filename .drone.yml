@@ -50,3 +50,26 @@ steps:
 
     depends_on:
       - typecheck
+
+  - name: build-database
+    image: oven/bun:1.3.3
+    commands:
+      - (cd packages/database && bun run build)
+    depends_on:
+      - install
+      - typecheck
+      - lint
+
+  - name: build-backend
+    image: oven/bun:1.3.3
+    commands:
+      - (cd apps/backend && bun run build)
+    depends_on:
+      - build-database
+
+  - name: build-web
+    image: oven/bun:1.3.3
+    commands:
+      - (cd apps/web && bun run build)
+    depends_on:
+      - build-backend
