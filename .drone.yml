@@ -70,7 +70,7 @@ steps:
   - name: build-web
     image: node:22-alpine
     commands:
-      - npm ci
+      - npm install
       - cd apps/web && npm run build
     depends_on:
       - build-backend
