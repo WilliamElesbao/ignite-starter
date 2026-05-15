@@ -1,5 +1,5 @@
-import { vi } from "vitest";
 import type { Logger } from "pino";
+import { vi } from "vitest";
 
 // Mock environment variables for both process.env and Bun.env
 const envVars = {
