@@ -27,11 +27,6 @@ vi.mock("bullmq", () => ({
   Worker: vi.fn(),
 }));
 
-// Mock EmailService
-vi.mock("../../email/email.service", () => ({
-  EmailService: vi.fn(),
-}));
-
 // Mock the queue config
 vi.mock("../email-queue.config", () => ({
   EMAIL_QUEUE_NAME: "email",
@@ -75,9 +70,7 @@ describe("EmailQueueWorker", () => {
     _eventHandlers: Record<string, (...args: unknown[]) => void>;
     _processor: (...args: unknown[]) => void | Promise<void>;
   };
-  let mockEmailService: {
-    sendWelcomeEmail: ReturnType<typeof vi.fn>;
-  };
+  let sendWelcomeEmailMock: ReturnType<typeof vi.spyOn>;
   let emailQueueWorker: EmailQueueWorker;
   let processorFunction: (...args: unknown[]) => void | Promise<void>;
 
@@ -85,15 +78,9 @@ describe("EmailQueueWorker", () => {
     // Create mock logger
     mockLogger = createMockLogger();
 
-    // Create mock email service
-    mockEmailService = {
-      sendWelcomeEmail: vi.fn(),
-    };
-
-    // Mock EmailService constructor to return our mock
-    (EmailService as unknown as ReturnType<typeof vi.fn>).mockImplementation(
-      () => mockEmailService,
-    );
+    sendWelcomeEmailMock = vi
+      .spyOn(EmailService.prototype, "sendWelcomeEmail")
+      .mockResolvedValue({ id: "email-mock" });
 
     // Create mock worker with event handlers
     mockWorker = {
@@ -128,7 +115,7 @@ describe("EmailQueueWorker", () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("start", () => {
@@ -253,7 +240,7 @@ describe("EmailQueueWorker", () => {
         updateProgress: vi.fn().mockResolvedValue(undefined),
       };
 
-      mockEmailService.sendWelcomeEmail.mockResolvedValue({ id: "email-123" });
+      sendWelcomeEmailMock.mockResolvedValue({ id: "email-123" });
 
       await processorFunction(mockJob);
 
@@ -275,12 +262,11 @@ describe("EmailQueueWorker", () => {
         updateProgress: vi.fn().mockResolvedValue(undefined),
       };
 
-      mockEmailService.sendWelcomeEmail.mockResolvedValue({ id: "email-456" });
+      sendWelcomeEmailMock.mockResolvedValue({ id: "email-456" });
 
       await processorFunction(mockJob);
 
-      expect(EmailService).toHaveBeenCalledWith(mockLogger);
-      expect(mockEmailService.sendWelcomeEmail).toHaveBeenCalled();
+      expect(sendWelcomeEmailMock).toHaveBeenCalled();
     });
 
     it("should update job progress to 25%, 50%, 75%, 100%", async () => {
@@ -295,7 +281,7 @@ describe("EmailQueueWorker", () => {
         updateProgress: mockUpdateProgress,
       };
 
-      mockEmailService.sendWelcomeEmail.mockResolvedValue({
+      sendWelcomeEmailMock.mockResolvedValue({
         id: "email-progress",
       });
 
@@ -320,7 +306,7 @@ describe("EmailQueueWorker", () => {
       };
 
       const mockEmailResult = { id: "email-success-123" };
-      mockEmailService.sendWelcomeEmail.mockResolvedValue(mockEmailResult);
+      sendWelcomeEmailMock.mockResolvedValue(mockEmailResult);
 
       await processorFunction(mockJob);
 
@@ -351,7 +337,7 @@ describe("EmailQueueWorker", () => {
       };
 
       const mockError = new Error("Resend API error");
-      mockEmailService.sendWelcomeEmail.mockRejectedValue(mockError);
+      sendWelcomeEmailMock.mockRejectedValue(mockError);
 
       await expect(processorFunction(mockJob)).rejects.toThrow(
         "Resend API error",
@@ -395,7 +381,7 @@ describe("EmailQueueWorker", () => {
         updateProgress: vi.fn().mockResolvedValue(undefined),
       };
 
-      mockEmailService.sendWelcomeEmail.mockResolvedValue(null);
+      sendWelcomeEmailMock.mockResolvedValue(null);
 
       await processorFunction(mockJob);
 
@@ -425,7 +411,7 @@ describe("EmailQueueWorker", () => {
         updateProgress: mockUpdateProgress,
       };
 
-      mockEmailService.sendWelcomeEmail.mockResolvedValue({
+      sendWelcomeEmailMock.mockResolvedValue({
         id: "email-progress-fail",
       });
 
