@@ -15,11 +15,11 @@ const mockSessionStorage = {
 };
 
 // Define sessionStorage globally for all tests
-global.sessionStorage = mockSessionStorage as Storage;
+globalThis.sessionStorage = mockSessionStorage;
 
 // Also define it on window if available (jsdom environment)
-if (typeof window !== "undefined") {
-  Object.defineProperty(window, "sessionStorage", {
+if (typeof globalThis.window !== "undefined") {
+  Object.defineProperty(globalThis.window, "sessionStorage", {
     value: mockSessionStorage,
     writable: true,
   });
