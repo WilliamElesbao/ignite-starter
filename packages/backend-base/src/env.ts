@@ -10,4 +10,6 @@ const envSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().min(1),
 });
 
-export const env = envSchema.parse(Bun.env);
+// Use process.env for compatibility with both Bun and Node.js (vitest)
+const envSource = typeof Bun !== "undefined" ? Bun.env : process.env;
+export const env = envSchema.parse(envSource);
