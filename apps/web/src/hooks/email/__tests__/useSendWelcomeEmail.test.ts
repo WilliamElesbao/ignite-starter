@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { toast } from "sonner";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useSendEmail } from "../email.mutation";
+import * as emailMutation from "../email.mutation";
 import { useEmail } from "../useSendWelcomeEmail";
 
 // Mock dependencies
@@ -16,18 +16,16 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock("../email.mutation", () => ({
-  useSendEmail: vi.fn(),
-}));
-
 describe("useEmail", () => {
   const mockMutateAsync = vi.fn();
+  let useSendEmailSpy: ReturnType<typeof vi.spyOn>;
+  type UseSendEmailReturn = ReturnType<typeof emailMutation.useSendEmail>;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useSendEmail as ReturnType<typeof vi.fn>).mockReturnValue({
+    useSendEmailSpy = vi.spyOn(emailMutation, "useSendEmail").mockReturnValue({
       mutateAsync: mockMutateAsync,
-    });
+    } as unknown as UseSendEmailReturn);
   });
 
   afterEach(() => {
@@ -172,7 +170,7 @@ describe("useEmail", () => {
     renderHook(() => useEmail());
 
     // Assert
-    expect(useSendEmail).toHaveBeenCalled();
+    expect(useSendEmailSpy).toHaveBeenCalled();
   });
 
   it("should use translations from dashboard.toast.send-email namespace", async () => {
