@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import Elysia from "elysia";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockLogger } from "../../../test/setup";
 import { EmailErrorCode } from "../email.errors";
 

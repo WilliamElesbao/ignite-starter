@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Mock } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Set environment variables BEFORE any imports
 process.env.RESEND_API_KEY = "re_test_mock_api_key";

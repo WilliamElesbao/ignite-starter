@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock the env module
 vi.mock("../../../env", () => ({
@@ -59,13 +59,13 @@ vi.mock("../email-queue.config", () => ({
   },
 }));
 
-import { Worker } from "bullmq";
 import type { Job } from "bullmq";
-import { EmailQueueWorker } from "../email-queue.worker";
-import type { WelcomeEmailData } from "../email-queue.worker";
-import { EmailService } from "../../email/email.service";
-import { EMAIL_QUEUE_NAME, EMAIL_JOBS } from "../email-queue.config";
+import { Worker } from "bullmq";
 import { createMockLogger } from "../../../test/setup";
+import { EmailService } from "../../email/email.service";
+import { EMAIL_JOBS, EMAIL_QUEUE_NAME } from "../email-queue.config";
+import type { WelcomeEmailData } from "../email-queue.worker";
+import { EmailQueueWorker } from "../email-queue.worker";
 
 describe("EmailQueueWorker", () => {
   let mockLogger: ReturnType<typeof createMockLogger>;

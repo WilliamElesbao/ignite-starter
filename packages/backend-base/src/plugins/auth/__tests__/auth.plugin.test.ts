@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import Elysia from "elysia";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { EVENT_TYPE } from "../../../services/event.service";
 import { createMockLogger } from "../../../test/setup";
 import { AuthErrorCode } from "../auth.errors";
-import { EVENT_TYPE } from "../../../services/event.service";
 
 // Mock BetterAuth
 const mockGetSession = vi.fn();

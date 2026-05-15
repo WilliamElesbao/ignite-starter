@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Queue } from "bullmq";
-import { EmailQueueService } from "../email-queue.service";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createMockLogger } from "../../../test/setup";
 import {
-  EMAIL_QUEUE_NAME,
   EMAIL_JOB_OPTIONS,
+  EMAIL_QUEUE_NAME,
   getRedisConnection,
 } from "../email-queue.config";
-import { createMockLogger } from "../../../test/setup";
+import { EmailQueueService } from "../email-queue.service";
 
 // Mock BullMQ Queue
 vi.mock("bullmq", () => ({
