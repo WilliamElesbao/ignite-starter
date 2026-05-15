@@ -20,7 +20,7 @@ steps:
   - name: install
     image: oven/bun:1.3.3
     commands:
-      - bun install --frozen-lockfile --ignore-scripts
+      - bun install --ignore-scripts
 
   - name: i18n-audit
     image: oven/bun:1.3.3
