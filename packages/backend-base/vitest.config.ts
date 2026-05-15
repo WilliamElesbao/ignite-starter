@@ -15,6 +15,10 @@ export default defineConfig({
     alias: {
       // Mock Bun's randomUUIDv7 for Vitest
       bun: new URL("./src/test/mocks/bun.mock.ts", import.meta.url).pathname,
+      // Mock env files to avoid Zod validation in tests
+      "./env": new URL("./src/test/mocks/env.mock.ts", import.meta.url).pathname,
+      "../env": new URL("./src/test/mocks/env.mock.ts", import.meta.url).pathname,
+      "@repo/database/env": new URL("./src/test/mocks/database-env.mock.ts", import.meta.url).pathname,
     },
     env: {
       // Set required environment variables for tests
