@@ -19,7 +19,10 @@ const eventService = new EventService(Database, logger);
 const setup = new Elysia({ name: "shared" })
   .use(
     cors({
-      origin: [Bun.env.WEB_URL ?? "http://localhost:3000"],
+      origin: [
+        (typeof Bun !== "undefined" ? Bun.env : process.env).WEB_URL ??
+          "http://localhost:3000",
+      ],
       methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
       credentials: true,
       allowedHeaders: ["Content-Type", "Authorization"],

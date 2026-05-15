@@ -8,7 +8,7 @@ import { EmailQueueService } from "./email-queue.service";
 
 /**
  * Polyfill for require.resolve in ESM context
- * 
+ *
  * @bull-board/api internally uses require.resolve() to locate UI assets.
  * In Bun's ESM environment, we need to provide a compatible implementation
  * using import.meta.resolve() which returns file:// URLs that need conversion.

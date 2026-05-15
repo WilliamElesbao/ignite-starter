@@ -109,7 +109,8 @@ class RedisClient {
   }
 }
 
-const redisUrl = Bun.env.REDIS_URL ?? "redis://:abcd1234@localhost:6379";
+const envSource = typeof Bun !== "undefined" ? Bun.env : process.env;
+const redisUrl = envSource.REDIS_URL ?? "redis://:abcd1234@localhost:6379";
 const redisClient = new RedisClient(redisUrl);
 
 export default redisClient;

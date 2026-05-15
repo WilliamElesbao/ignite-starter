@@ -13,7 +13,7 @@ import {
  * Maintains a single instance of the email queue.
  */
 export class EmailQueueService {
-  private queue: Queue;
+  private readonly queue: Queue;
 
   constructor(private readonly logger: Logger) {
     // Create email queue with Redis configuration
