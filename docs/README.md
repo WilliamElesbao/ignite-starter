@@ -1,34 +1,61 @@
+<!-- @format -->
+
 # Documentation
 
-## Setup Guides
+Central documentation hub for Ignite Starter.
 
-- [Local Setup](./local-setup/local-setup.md) - Getting started with local development
-- [Google OAuth Setup](./google/google-oauth-setup.md) - Configure Google authentication
-- [Stripe Setup](./stripe/stripe-setup.md) - Configure payment processing
+## Start here
+
+- [Local setup](./local-setup/local-setup.md)
+- [Docker deployment](./docker/deployment.md)
+- [CI/CD overview](./ci-cd/README.md)
+
+## Setup and integrations
+
+- [Google OAuth setup](./google/google-oauth-setup.md)
+- [Stripe setup](./stripe/stripe-setup.md)
 
 ## CI/CD
 
-- [CI/CD Overview](./ci-cd/README.md) - Complete CI/CD pipeline documentation
-- [Pipeline Architecture](./ci-cd/pipeline-architecture.md) - Visual overview and execution flow
-- [Drone CI Setup](./ci-cd/drone-setup.md) - Self-hosted CI configuration
-- [SonarCloud Setup](./ci-cd/sonarcloud-setup.md) - Code quality analysis
-- [GitHub Configuration](./ci-cd/github-configuration.md) - Secrets and branch protection
-- [Configuration Files](./ci-cd/configuration-files.md) - Reference for all config files
+- [CI/CD README](./ci-cd/README.md)
+- [Pipeline architecture](./ci-cd/pipeline-architecture.md)
+- [Drone setup](./ci-cd/drone-setup.md)
+- [GitHub configuration](./ci-cd/github-configuration.md)
+- [SonarCloud setup](./ci-cd/sonarcloud-setup.md)
+- [Configuration files reference](./ci-cd/configuration-files.md)
 
-## External References
+## Testing and quality quick reference
 
-- [Better Auth + Google Credentials](https://better-auth.com/docs/authentication/google#get-your-google-credentials)
-- [Setup OAuth to the Google Cloud Console](https://console.cloud.google.com/auth/clients?organizationId=682596896072&project=origin-starter)
-- [Install the Stripe CLI](https://docs.stripe.com/stripe-cli/install?install-method=docker)
-- [Stripe dashboard](https://dashboard.stripe.com/acct_1TEFeGDj31fYLKFP/test/products?active=true)
-- [Storybook](https://storybook.js.org/docs/get-started/frameworks/nextjs-vite)
-- [Vitest](https://vitest.dev/api/test.html)
-- [Turborepo](https://turborepo.dev/docs)
-- [Biome](https://biomejs.dev/guides/getting-started/)
-- [Elysia](https://elysiajs.com/)
-- [Better Auth + Drizzle](https://better-auth.com/docs/adapters/drizzle)
-- [Drizzle](https://orm.drizzle.team/docs/get-started/postgresql-new)
-- [Stripe API](https://docs.stripe.com/api)
-- [Elysia Crons](https://elysiajs.com/plugins/cron)
-- [Redis](https://github.com/redis/node-redis)
-- [Internationalization for Next.js](https://next-intl.dev/)
+```bash
+# Web tests
+(cd apps/web && bun run test)
+(cd apps/web && bun test:coverage)
+
+# Backend-base tests
+(cd packages/backend-base && bun run test)
+(cd packages/backend-base && bun test:coverage)
+
+# i18n audit scripts
+(cd apps/web && bun run locale-check)
+(cd apps/web && bun run locale-unused)
+
+# Repository quality gates
+bun run check:all
+```
+
+## Package and app documentation
+
+- `README.md` (repository root)
+- `apps/backend/README.md`
+- `packages/api/README.md`
+- `packages/emails/readme.md`
+- `apps/backend/CLAUDE.md`
+- `apps/web/CLAUDE.md`
+- `packages/backend-base/CLAUDE.md`
+- `packages/database/CLAUDE.md`
+
+## Notes
+
+- This repository is intended to be a reusable starter foundation.
+- Keep docs aligned with real scripts/configs before merging architecture or
+  workflow changes.

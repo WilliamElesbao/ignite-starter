@@ -9,7 +9,7 @@ All backend business logic lives here as composable Elysia plugins. This package
 ## Package Role
 
 `packages/backend-base` exports:
-- Feature plugins: `authPlugin`, `userPlugin`, `emailPlugin`, `stripePlugin`
+- Feature plugins: `authPlugin`, `userPlugin`, `emailPlugin`, `stripePlugin`, `queuePlugin`
 - Infrastructure: `sharedPlugin`, `OpenAPI`, `subscriptionExpirationCron`
 - Lib singletons: configured Stripe, Resend, Pino logger, BetterAuth instance
 - Shared error utilities: `AppError`, `toErrorResponse`, `ErrorCatalog`
@@ -29,6 +29,7 @@ src/
 ├── plugins/        # Feature plugins — one folder per domain
 │   ├── auth/
 │   ├── email/
+│   ├── queue/      # BullMQ email queue plugin
 │   ├── stripe/
 │   └── user/
 ├── services/       # Cross-cutting services (EventService)
@@ -67,7 +68,7 @@ The root plugin injected into every feature plugin. Responsibilities:
 - Exposes an `auth: true` macro. Routes decorated with `{ auth: true }` automatically resolve the session and return 401 if no session exists.
 - On session resolution failure, fires a `LOGIN_SUSPICIOUS` event before returning 503.
 
-### Feature Plugins (user, email, stripe)
+### Feature Plugins (user, email, stripe, queue)
 
 Each plugin:
 1. Extends the shared plugin for access to `db`, `cache`, `stripe`, `logger`.
@@ -75,6 +76,19 @@ Each plugin:
 3. Defines typed routes with full response schemas (200, 401, 404, 500, etc.).
 4. Has its own `.onError()` that calls `toErrorResponse` and sets `set.status`.
 5. Uses the `auth: true` macro on protected routes.
+
+### Queue Plugin (`src/plugins/queue/`)
+
+The queue plugin provides BullMQ-based email processing:
+
+- **email-queue.service.ts** - Service to enqueue email jobs to Redis
+- **email-queue.worker.ts** - Worker that processes email jobs asynchronously
+- **bull-board.plugin.ts** - Web UI for monitoring queues at `/admin/queues`
+- **email-queue.config.ts** - Queue configuration (job options, Redis connection)
+
+The queue plugin integrates with the email plugin to send emails asynchronously, improving reliability and performance.
+
+See [Email Queue README](./src/plugins/queue/README.md) for complete documentation.
 
 ---
 

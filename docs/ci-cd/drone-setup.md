@@ -1,28 +1,59 @@
+<!-- @format -->
+
 # Drone CI Setup (Self-Hosted)
 
 ## Overview
 
-Drone CI is a self-hosted continuous integration platform that executes the main pipeline for type checking, linting, and testing.
+This guide explains how to provision and configure a self-hosted Drone CI
+instance for the repository pipeline defined in `.drone.yml`.
+
+The pipeline is responsible for:
+
+- Type checking
+- Linting
+- Running tests
+- Build validation for backend, database, and web applications
 
 ## Prerequisites
 
+Before starting, ensure you have:
+
 - Docker and Docker Compose installed
-- GitHub account with repository access
-- Server or local machine to host Drone (can use localhost for development)
+- A GitHub account with repository admin access
+- A server or local machine to host Drone
+- A public URL (or tunnel) reachable by GitHub webhooks
 
-## Step 1: Create GitHub OAuth App
+> Localhost can be used for development if exposed through a tunnel.
 
-1. Navigate to `GitHub → Settings → Developer settings → OAuth Apps`
-2. Click **"New OAuth App"**
-3. Fill in the details:
-   - **Application name:** `Drone CI - Self-Hosted`
-   - **Homepage URL:** `https://your-drone-url.com` (or `http://localhost:8080` for local)
-   - **Authorization callback URL:** `https://your-drone-url.com/login`
-4. Click **"Register application"**
-5. Copy the **Client ID**
-6. Click **"Generate a new client secret"** and copy the **Client Secret**
+---
 
-## Step 2: Create Drone Docker Compose Configuration
+# 1) Create GitHub OAuth App
+
+Navigate to:
+
+`GitHub → Settings → Developer settings → OAuth Apps`
+
+Click **"New OAuth App"** and configure:
+
+- **Application name:** `Drone CI - Self-Hosted`
+- **Homepage URL:** `https://your-drone-url.com`
+- **Authorization callback URL:** `https://your-drone-url.com/login`
+
+For local development, you can temporarily use:
+
+- `http://localhost:8080`
+- `http://localhost:8080/login`
+
+After creating the application:
+
+1. Copy the **Client ID**
+2. Generate and copy the **Client Secret**
+
+You will use both values in the Drone server configuration.
+
+---
+
+# 2) Create Drone Docker Compose Configuration
 
 Create a file named `drone-docker-compose.yml`:
 
@@ -38,12 +69,12 @@ services:
     volumes:
       - drone-data:/data
     environment:
-      - DRONE_GITHUB_CLIENT_ID=your_github_client_id
-      - DRONE_GITHUB_CLIENT_SECRET=your_github_client_secret
-      - DRONE_RPC_SECRET=your_random_secret_here
-      - DRONE_SERVER_HOST=your-drone-url.com
+      - DRONE_GITHUB_CLIENT_ID=<github-client-id>
+      - DRONE_GITHUB_CLIENT_SECRET=<github-client-secret>
+      - DRONE_RPC_SECRET=<random-secret>
+      - DRONE_SERVER_HOST=<drone-host>
       - DRONE_SERVER_PROTO=https
-      - DRONE_USER_CREATE=username:your_github_username,admin:true
+      - DRONE_USER_CREATE=username:<github-username>,admin:true
     restart: unless-stopped
 
   drone-runner:
@@ -56,7 +87,7 @@ services:
     environment:
       - DRONE_RPC_PROTO=http
       - DRONE_RPC_HOST=drone-server
-      - DRONE_RPC_SECRET=your_random_secret_here
+      - DRONE_RPC_SECRET=<random-secret>
       - DRONE_RUNNER_CAPACITY=2
       - DRONE_RUNNER_NAME=docker-runner
     restart: unless-stopped
@@ -65,108 +96,225 @@ volumes:
   drone-data:
 ```
 
-### Configuration Values
+## Configuration Values
 
-Replace the following placeholders:
+Replace the placeholders with real values:
 
-- `your_github_client_id` - OAuth App Client ID from Step 1
-- `your_github_client_secret` - OAuth App Client Secret from Step 1
-- `your_random_secret_here` - Generate with: `openssl rand -hex 16`
-- `your-drone-url.com` - Your public Drone URL
-- `your_github_username` - Your GitHub username (will be admin)
+| Placeholder              | Description                                       |
+| ------------------------ | ------------------------------------------------- |
+| `<github-client-id>`     | GitHub OAuth App Client ID                        |
+| `<github-client-secret>` | GitHub OAuth App Client Secret                    |
+| `<random-secret>`        | Shared RPC secret between Drone server and runner |
+| `<drone-host>`           | Public Drone hostname                             |
+| `<github-username>`      | GitHub username to grant Drone admin access       |
 
-## Step 3: Expose Drone Server (For Local Development)
-
-If running locally, you need to expose the server to a public URL for GitHub webhooks.
-
-### Using Cloudflare Tunnel
+Generate a secure RPC secret:
 
 ```bash
-# Install cloudflared
-brew install cloudflared
+openssl rand -hex 16
+```
 
-# Expose local Drone server
+---
+
+# 3) Expose Drone Server (Local Development)
+
+If Drone is running locally, GitHub webhooks cannot reach `localhost`.
+
+You must expose Drone using a public tunnel.
+
+## Option: Cloudflare Tunnel
+
+Install Cloudflare Tunnel:
+
+```bash
+brew install cloudflared
+```
+
+Start the tunnel:
+
+```bash
 cloudflared tunnel --url http://localhost:8080
 ```
 
-This will provide a public URL like `https://held-fax-councils-reid.trycloudflare.com`
+Example generated URL:
 
-Update your `drone-docker-compose.yml` with this URL:
+```txt
+https://example-name.trycloudflare.com
+```
+
+Update your Docker Compose configuration:
 
 ```yaml
-- DRONE_SERVER_HOST=held-fax-councils-reid.trycloudflare.com
+- DRONE_SERVER_HOST=example-name.trycloudflare.com
 - DRONE_SERVER_PROTO=https
 ```
 
-Also update the GitHub OAuth App callback URL to match.
+Also update the GitHub OAuth callback URL to match the new public URL.
 
-**Important:** Cloudflare tunnel URLs change each time you restart the tunnel. When the URL changes:
+### Important
 
-1. Update `DRONE_SERVER_HOST` in `drone-docker-compose.yml` with the new URL
-2. Restart Drone services: `docker compose -f drone-docker-compose.yml restart`
-3. Update the GitHub OAuth App callback URL
-4. Navigate to your repository settings in Drone (e.g., `https://your-new-url.trycloudflare.com/your-username/your-repo/settings`)
-5. Disable the repository
-6. Re-activate the repository
-7. This will recreate the webhook with the new URL
+Cloudflare temporary URLs change whenever the tunnel restarts.
 
-## Step 4: Start Drone Server
+Whenever the URL changes:
+
+1. Update `DRONE_SERVER_HOST`
+2. Restart Drone services
+3. Update GitHub OAuth callback URL
+4. Re-activate the repository in Drone to recreate webhooks
+
+Restart services:
+
+```bash
+docker compose -f drone-docker-compose.yml restart
+```
+
+---
+
+# 4) Start Drone Services
+
+Start the Drone server and runner:
 
 ```bash
 docker compose -f drone-docker-compose.yml up -d
 ```
 
-Verify the services are running:
+Verify containers are running:
 
 ```bash
 docker ps
 ```
 
-You should see `drone-server` and `drone-runner` containers running.
+Expected containers:
 
-## Step 5: Activate Repository
+- `drone-server`
+- `drone-runner`
 
-1. Navigate to your Drone URL (e.g., `https://your-drone-url.com`)
-2. Log in with GitHub
-3. Click **"SYNC"** to refresh repository list
-4. Find your repository and click **"ACTIVATE"**
-5. Drone will automatically create a webhook in your GitHub repository
+---
 
-## Step 6: Verify Webhook (Optional)
+# 5) Activate Repository in Drone
 
-If the webhook wasn't created automatically:
+1. Open the Drone UI
+2. Login with GitHub
+3. Click **"SYNC"** to refresh repositories
+4. Locate the repository
+5. Click **"ACTIVATE"**
 
-1. Go to `GitHub repo → Settings → Webhooks`
-2. Click **"Add webhook"**
-3. Configure:
-   - **Payload URL:** `https://your-drone-url.com/hook`
-   - **Content type:** `application/json`
-   - **Events:** Select "Push" and "Pull requests"
-4. Click **"Add webhook"**
+Drone should automatically create the GitHub webhook.
 
-## Step 7: Test the Pipeline
+---
 
-Push a commit to your repository and verify:
+# 6) Verify Webhook (Optional)
 
-1. Drone dashboard shows the build
-2. GitHub shows the "CI" status check
-3. Build completes successfully
+If Drone does not automatically create the webhook:
 
-## Troubleshooting
+Navigate to:
 
-### Build doesn't start
+`GitHub Repository → Settings → Webhooks`
 
-- Check webhook delivery in GitHub: `Settings → Webhooks → Recent Deliveries`
-- Verify repository is activated in Drone dashboard
-- Check Drone server logs: `docker logs drone-server`
+Create a new webhook with:
 
-### Build fails at install step
+| Setting      | Value                             |
+| ------------ | --------------------------------- |
+| Payload URL  | `https://your-drone-url.com/hook` |
+| Content type | `application/json`                |
+| Events       | Push + Pull Requests              |
 
-- Ensure `bun.lock` is committed and up to date
-- Check Drone runner logs: `docker logs drone-runner`
+Save the webhook.
 
-### Cannot access Drone UI
+---
 
-- Verify the server is running: `docker ps`
-- Check if the port is accessible: `curl http://localhost:8080`
-- For Cloudflare tunnel, ensure the tunnel is still running
+# 7) Validate Pipeline Execution
+
+Push a commit or open a pull request and verify the following stages execute
+successfully in Drone:
+
+- `install`
+- `i18n-audit`
+- `typecheck`
+- `lint`
+- `test-backend`
+- `test-web`
+- `build-database`
+- `build-backend`
+- `build-web`
+
+Also confirm:
+
+- The Drone dashboard shows build execution
+- GitHub displays CI status checks correctly
+
+---
+
+# Troubleshooting
+
+## No builds triggered
+
+Possible causes:
+
+- Webhook delivery failure
+- Repository not activated in Drone
+- Invalid webhook URL
+
+Verify webhook deliveries:
+
+`GitHub → Repository Settings → Webhooks → Recent Deliveries`
+
+---
+
+## Build fails immediately
+
+Inspect runner logs:
+
+```bash
+docker logs drone-runner
+```
+
+Common issues:
+
+- Docker socket permissions
+- Invalid RPC secret
+- Missing environment variables
+
+---
+
+## Build fails during install step
+
+Verify:
+
+- `bun.lock` is committed
+- Dependencies install locally
+- Build commands match repository structure
+
+---
+
+## OAuth login fails
+
+Verify:
+
+- OAuth callback URL
+- `DRONE_SERVER_HOST`
+- `DRONE_SERVER_PROTO`
+
+All values must match the public Drone URL exactly.
+
+---
+
+## Cannot access Drone UI
+
+Verify:
+
+- Containers are running
+- Port `8080` is exposed
+- Tunnel is active (if using local setup)
+
+Test locally:
+
+```bash
+curl http://localhost:8080
+```
+
+Inspect server logs:
+
+```bash
+docker logs drone-server
+```

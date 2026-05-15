@@ -62,19 +62,28 @@ steps:
     depends_on:
       - install
 
+  - name: test
+    image: oven/bun:1.3.3
+    commands:
+      - (cd apps/web && bun test:run)
+      - (cd packages/backend-base && bun test:run)
+    depends_on:
+      - typecheck
+
   - name: lint
     image: oven/bun:1.3.3
     commands:
       - bun biome ci .
     depends_on:
-      - typecheck
+      - test
 ```
 
 **Key Features:**
-- Sequential execution: install → typecheck → lint
+- Sequential execution: install → typecheck → test → lint
 - Uses Bun 1.3.3 Docker image
 - Shallow clone (depth: 100) for faster checkout
 - ARM64 platform support
+- Vitest unit tests for web and backend-base packages
 
 ## sonar-project.properties
 
@@ -108,15 +117,20 @@ sonar.exclusions=\
   **/*.spec.ts,\
   **/*.spec.tsx
 
-# Temporary: ignore coverage metric until coverage pipeline is re-enabled
-sonar.coverage.exclusions=**/*
+sonar.tests=apps/web/src,packages/backend-base/src
+sonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx
+
+# Test Coverage (optional - enable when coverage reporting is configured)
+# sonar.coverage.exclusions=**/*
+# sonar.javascript.lcov.reportPaths=apps/web/coverage/lcov.info,packages/backend-base/coverage/lcov.info
 ```
 
 **Configuration Notes:**
 - Replace `your-org_your-repo` with your SonarCloud project key
 - Replace `your-org` with your SonarCloud organization key
 - Adjust source paths if your monorepo structure differs
-- Coverage is currently excluded (can be re-enabled when tests are configured)
+- Test paths are configured for apps/web and packages/backend-base
+- Uncomment coverage lines when ready to enable coverage reporting
 
 ## .github/workflows/sonar.yml
 

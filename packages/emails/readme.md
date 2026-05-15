@@ -1,26 +1,66 @@
-# React Email Starter
+# Email Templates
 
-A live preview right in your browser so you don't need to keep sending real emails during development.
+React Email transactional email templates for the Ignite Starter project. This package contains reusable email components that can be previewed during development without sending real emails.
+
+## Overview
+
+This package provides:
+- React Email components for transactional emails
+- Live preview server for development
+- Integration with Resend for email delivery
+- Used by the backend email service and queue
 
 ## Getting Started
 
-First, install the dependencies:
+### Install Dependencies
 
-```sh
-npm install
-# or
-yarn
+```bash
+bun install
 ```
 
-Then, run the development server:
+### Development Server
 
-```sh
-npm run dev
-# or
-yarn dev
+Run the preview server to see email templates in your browser:
+
+```bash
+bun dev
 ```
 
-Open [localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3001](http://localhost:3001) to view the email templates.
+
+## Email Templates
+
+The package includes templates for:
+
+- Welcome emails
+- Password reset emails
+- Notification emails
+- Subscription-related emails
+
+## Usage
+
+Email templates are used by the backend email service:
+
+```typescript
+import { WelcomeEmail } from "@repo/emails";
+
+const emailHtml = await WelcomeEmail({ userName: "John" });
+```
+
+The backend email service (`packages/backend-base/src/plugins/email/`) uses these templates and sends them via Resend or queues them for asynchronous processing via BullMQ.
+
+## Integration
+
+This package is consumed by:
+- `packages/backend-base` - Email service uses templates to generate email HTML
+- BullMQ worker - Processes email jobs using these templates
+
+## Configuration
+
+Email delivery is configured via Resend API key in the backend environment:
+- `RESEND_API_KEY` - Resend API key for sending emails
+- `EMAIL_FROM` - Sender email address
+- `EMAIL_TO` - Default recipient (for testing)
 
 ## License
 
