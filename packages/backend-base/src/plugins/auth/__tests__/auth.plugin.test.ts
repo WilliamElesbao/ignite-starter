@@ -3,9 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EVENT_TYPE } from "../../../services/event.service";
 import { createMockLogger } from "../../../test/setup";
 import { AuthErrorCode } from "../auth.errors";
+import authPlugin from "../auth.plugin";
 
 // Mock BetterAuth
-const mockGetSession = vi.fn();
+const { mockGetSession } = vi.hoisted(() => ({
+  mockGetSession: vi.fn(),
+}));
 vi.mock("../../../lib/better-auth/auth", () => ({
   auth: {
     handler: vi.fn(),
@@ -60,17 +63,19 @@ describe("AuthPlugin", () => {
       mockGetSession.mockResolvedValue(mockSession);
 
       const app = new Elysia()
+        .use(authPlugin)
         .state("logger", mockLogger)
         .state("eventService", mockEventService)
-        .get("/protected", async ({ request }) => {
-          const session = await mockGetSession({ headers: request.headers });
-
-          if (!session) {
-            return { error: "Unauthorized" };
-          }
-
-          return { message: "Protected resource", user: session.user };
-        });
+        .get(
+          "/protected",
+          ({ user }) => ({
+            message: "Protected resource",
+            user,
+          }),
+          {
+            auth: true,
+          },
+        );
 
       const response = await app.handle(
         new Request("http://localhost/protected", {
@@ -111,16 +116,11 @@ describe("AuthPlugin", () => {
       mockGetSession.mockResolvedValue(mockSession);
 
       const app = new Elysia()
+        .use(authPlugin)
         .state("logger", mockLogger)
         .state("eventService", mockEventService)
-        .get("/protected", async ({ request }) => {
-          const session = await mockGetSession({ headers: request.headers });
-
-          if (!session) {
-            return { error: "Unauthorized" };
-          }
-
-          return { message: "Success" };
+        .get("/protected", () => ({ message: "Success" }), {
+          auth: true,
         });
 
       await app.handle(
@@ -142,26 +142,11 @@ describe("AuthPlugin", () => {
       mockGetSession.mockResolvedValue(null);
 
       const app = new Elysia()
+        .use(authPlugin)
         .state("logger", mockLogger)
         .state("eventService", mockEventService)
-        .get("/protected", async ({ request, set }) => {
-          const session = await mockGetSession({ headers: request.headers });
-
-          if (!session) {
-            mockLogger.warn({
-              msg: "Unauthorized request in auth macro",
-              path: request.url,
-              method: request.method,
-            });
-
-            set.status = 401;
-            return {
-              code: AuthErrorCode.AUTH_UNAUTHORIZED,
-              message: "Unauthorized",
-            };
-          }
-
-          return { message: "Protected resource" };
+        .get("/protected", () => ({ message: "Protected resource" }), {
+          auth: true,
         });
 
       const response = await app.handle(
@@ -183,26 +168,11 @@ describe("AuthPlugin", () => {
       mockGetSession.mockResolvedValue(null);
 
       const app = new Elysia()
+        .use(authPlugin)
         .state("logger", mockLogger)
         .state("eventService", mockEventService)
-        .get("/protected", async ({ request, set }) => {
-          const session = await mockGetSession({ headers: request.headers });
-
-          if (!session) {
-            mockLogger.warn({
-              msg: "Unauthorized request in auth macro",
-              path: request.url,
-              method: request.method,
-            });
-
-            set.status = 401;
-            return {
-              code: AuthErrorCode.AUTH_UNAUTHORIZED,
-              message: "Unauthorized",
-            };
-          }
-
-          return { message: "Protected resource" };
+        .get("/protected", () => ({ message: "Protected resource" }), {
+          auth: true,
         });
 
       await app.handle(
@@ -222,26 +192,11 @@ describe("AuthPlugin", () => {
       mockGetSession.mockResolvedValue(null);
 
       const app = new Elysia()
+        .use(authPlugin)
         .state("logger", mockLogger)
         .state("eventService", mockEventService)
-        .get("/protected", async ({ request, set }) => {
-          const session = await mockGetSession({ headers: request.headers });
-
-          if (!session) {
-            mockLogger.warn({
-              msg: "Unauthorized request in auth macro",
-              path: request.url,
-              method: request.method,
-            });
-
-            set.status = 401;
-            return {
-              code: AuthErrorCode.AUTH_UNAUTHORIZED,
-              message: "Unauthorized",
-            };
-          }
-
-          return { message: "Protected resource" };
+        .get("/protected", () => ({ message: "Protected resource" }), {
+          auth: true,
         });
 
       await app.handle(
@@ -261,44 +216,11 @@ describe("AuthPlugin", () => {
       mockGetSession.mockRejectedValue(mockError);
 
       const app = new Elysia()
+        .use(authPlugin)
         .state("logger", mockLogger)
         .state("eventService", mockEventService)
-        .get("/protected", async ({ request, set }) => {
-          try {
-            const session = await mockGetSession({ headers: request.headers });
-
-            if (!session) {
-              set.status = 401;
-              return {
-                code: AuthErrorCode.AUTH_UNAUTHORIZED,
-                message: "Unauthorized",
-              };
-            }
-
-            return { message: "Protected resource" };
-          } catch (error) {
-            mockLogger.error({
-              msg: "Failed to resolve auth session",
-              path: request.url,
-              method: request.method,
-              error,
-            });
-
-            await mockEventService.createEvent({
-              type: EVENT_TYPE.LOGIN_SUSPICIOUS,
-              payload: {
-                path: request.url,
-                method: request.method,
-                reason: "AUTH_SESSION_RESOLVE_FAILED",
-              },
-            });
-
-            set.status = 503;
-            return {
-              code: AuthErrorCode.AUTH_SESSION_RESOLVE_FAILED,
-              message: "Failed to validate session",
-            };
-          }
+        .get("/protected", () => ({ message: "Protected resource" }), {
+          auth: true,
         });
 
       const response = await app.handle(
@@ -321,44 +243,11 @@ describe("AuthPlugin", () => {
       mockGetSession.mockRejectedValue(mockError);
 
       const app = new Elysia()
+        .use(authPlugin)
         .state("logger", mockLogger)
         .state("eventService", mockEventService)
-        .get("/protected", async ({ request, set }) => {
-          try {
-            const session = await mockGetSession({ headers: request.headers });
-
-            if (!session) {
-              set.status = 401;
-              return {
-                code: AuthErrorCode.AUTH_UNAUTHORIZED,
-                message: "Unauthorized",
-              };
-            }
-
-            return { message: "Protected resource" };
-          } catch (error) {
-            mockLogger.error({
-              msg: "Failed to resolve auth session",
-              path: request.url,
-              method: request.method,
-              error,
-            });
-
-            await mockEventService.createEvent({
-              type: EVENT_TYPE.LOGIN_SUSPICIOUS,
-              payload: {
-                path: request.url,
-                method: request.method,
-                reason: "AUTH_SESSION_RESOLVE_FAILED",
-              },
-            });
-
-            set.status = 503;
-            return {
-              code: AuthErrorCode.AUTH_SESSION_RESOLVE_FAILED,
-              message: "Failed to validate session",
-            };
-          }
+        .get("/protected", () => ({ message: "Protected resource" }), {
+          auth: true,
         });
 
       await app.handle(
@@ -380,44 +269,11 @@ describe("AuthPlugin", () => {
       mockGetSession.mockRejectedValue(mockError);
 
       const app = new Elysia()
+        .use(authPlugin)
         .state("logger", mockLogger)
         .state("eventService", mockEventService)
-        .get("/protected", async ({ request, set }) => {
-          try {
-            const session = await mockGetSession({ headers: request.headers });
-
-            if (!session) {
-              set.status = 401;
-              return {
-                code: AuthErrorCode.AUTH_UNAUTHORIZED,
-                message: "Unauthorized",
-              };
-            }
-
-            return { message: "Protected resource" };
-          } catch (error) {
-            mockLogger.error({
-              msg: "Failed to resolve auth session",
-              path: request.url,
-              method: request.method,
-              error,
-            });
-
-            await mockEventService.createEvent({
-              type: EVENT_TYPE.LOGIN_SUSPICIOUS,
-              payload: {
-                path: request.url,
-                method: request.method,
-                reason: "AUTH_SESSION_RESOLVE_FAILED",
-              },
-            });
-
-            set.status = 503;
-            return {
-              code: AuthErrorCode.AUTH_SESSION_RESOLVE_FAILED,
-              message: "Failed to validate session",
-            };
-          }
+        .get("/protected", () => ({ message: "Protected resource" }), {
+          auth: true,
         });
 
       await app.handle(
@@ -448,46 +304,11 @@ describe("AuthPlugin", () => {
         mockGetSession.mockRejectedValue(error);
 
         const app = new Elysia()
+          .use(authPlugin)
           .state("logger", mockLogger)
           .state("eventService", mockEventService)
-          .get("/protected", async ({ request, set }) => {
-            try {
-              const session = await mockGetSession({
-                headers: request.headers,
-              });
-
-              if (!session) {
-                set.status = 401;
-                return {
-                  code: AuthErrorCode.AUTH_UNAUTHORIZED,
-                  message: "Unauthorized",
-                };
-              }
-
-              return { message: "Protected resource" };
-            } catch (error) {
-              mockLogger.error({
-                msg: "Failed to resolve auth session",
-                path: request.url,
-                method: request.method,
-                error,
-              });
-
-              await mockEventService.createEvent({
-                type: EVENT_TYPE.LOGIN_SUSPICIOUS,
-                payload: {
-                  path: request.url,
-                  method: request.method,
-                  reason: "AUTH_SESSION_RESOLVE_FAILED",
-                },
-              });
-
-              set.status = 503;
-              return {
-                code: AuthErrorCode.AUTH_SESSION_RESOLVE_FAILED,
-                message: "Failed to validate session",
-              };
-            }
+          .get("/protected", () => ({ message: "Protected resource" }), {
+            auth: true,
           });
 
         const response = await app.handle(
@@ -522,26 +343,11 @@ describe("AuthPlugin", () => {
         mockGetSession.mockResolvedValue(null);
 
         const app = new Elysia()
+          .use(authPlugin)
           .state("logger", mockLogger)
           .state("eventService", mockEventService)
-          .all("/protected", async ({ request, set }) => {
-            const session = await mockGetSession({ headers: request.headers });
-
-            if (!session) {
-              mockLogger.warn({
-                msg: "Unauthorized request in auth macro",
-                path: request.url,
-                method: request.method,
-              });
-
-              set.status = 401;
-              return {
-                code: AuthErrorCode.AUTH_UNAUTHORIZED,
-                message: "Unauthorized",
-              };
-            }
-
-            return { message: "Protected resource" };
+          .all("/protected", () => ({ message: "Protected resource" }), {
+            auth: true,
           });
 
         await app.handle(
@@ -566,26 +372,11 @@ describe("AuthPlugin", () => {
         mockGetSession.mockResolvedValue(null);
 
         const app = new Elysia()
+          .use(authPlugin)
           .state("logger", mockLogger)
           .state("eventService", mockEventService)
-          .get(path, async ({ request, set }) => {
-            const session = await mockGetSession({ headers: request.headers });
-
-            if (!session) {
-              mockLogger.warn({
-                msg: "Unauthorized request in auth macro",
-                path: request.url,
-                method: request.method,
-              });
-
-              set.status = 401;
-              return {
-                code: AuthErrorCode.AUTH_UNAUTHORIZED,
-                message: "Unauthorized",
-              };
-            }
-
-            return { message: "Protected resource" };
+          .get(path, () => ({ message: "Protected resource" }), {
+            auth: true,
           });
 
         await app.handle(
@@ -614,17 +405,22 @@ describe("AuthPlugin", () => {
       mockGetSession.mockResolvedValue(incompleteSession);
 
       const app = new Elysia()
+        .use(authPlugin)
         .state("logger", mockLogger)
         .state("eventService", mockEventService)
-        .get("/protected", async ({ request }) => {
-          const session = await mockGetSession({ headers: request.headers });
+        .get(
+          "/protected",
+          ({ user }) => {
+            if (!user) {
+              return { error: "Invalid session" };
+            }
 
-          if (!session || !session.user) {
-            return { error: "Invalid session" };
-          }
-
-          return { message: "Protected resource", user: session.user };
-        });
+            return { message: "Protected resource", user };
+          },
+          {
+            auth: true,
+          },
+        );
 
       const response = await app.handle(
         new Request("http://localhost/protected", {
