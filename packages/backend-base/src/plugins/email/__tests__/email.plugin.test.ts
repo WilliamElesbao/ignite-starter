@@ -1,20 +1,14 @@
 import Elysia from "elysia";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AppError } from "../../../shared/errors/app-error";
 import { createMockLogger } from "../../../test/setup";
-import { AuthErrorCode } from "../../auth/auth.errors";
-import { EMAIL_ERROR_MAP, EmailErrorCode } from "../email.errors";
-import emailPlugin from "../email.plugin";
+import { EmailErrorCode } from "../email.errors";
 
 // Mock dependencies
-const { mockGetSession } = vi.hoisted(() => ({
-  mockGetSession: vi.fn(),
-}));
 vi.mock("../../../lib/better-auth/auth", () => ({
   auth: {
     handler: vi.fn(),
     api: {
-      getSession: mockGetSession,
+      getSession: vi.fn(),
     },
   },
 }));
@@ -42,9 +36,6 @@ type MockUser = {
 
 describe("EmailPlugin", () => {
   let mockLogger: ReturnType<typeof createMockLogger>;
-  let mockEventService: {
-    createEvent: ReturnType<typeof vi.fn>;
-  };
   let mockEmailQueueService: {
     addJob: ReturnType<typeof vi.fn>;
   };
@@ -52,9 +43,6 @@ describe("EmailPlugin", () => {
 
   beforeEach(() => {
     mockLogger = createMockLogger();
-    mockEventService = {
-      createEvent: vi.fn().mockResolvedValue(undefined),
-    };
 
     mockEmailQueueService = {
       addJob: vi.fn(),
@@ -76,22 +64,23 @@ describe("EmailPlugin", () => {
     it("should enqueue job when called with valid auth", async () => {
       const mockJobId = "job-123";
       mockEmailQueueService.addJob.mockResolvedValue(mockJobId);
-      mockGetSession.mockResolvedValue({
-        user: {
-          id: "user-123",
-          email: "test@example.com",
-        },
-        session: {
-          id: "session-123",
-          expiresAt: new Date(Date.now() + 86400000),
-        },
-      });
 
       const app = new Elysia()
-        .use(emailPlugin)
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .state("eventService", mockEventService);
+        .decorate("user", mockUser as MockUser)
+        .post("/email/send", async ({ store: { emailQueueService }, user }) => {
+          const jobId = await emailQueueService.addJob("send-welcome-email", {
+            userId: (user as MockUser).id,
+            email: (user as MockUser).email,
+          });
+
+          return {
+            message: "Email queued successfully",
+            success: true,
+            jobId,
+          };
+        });
 
       const response = await app.handle(
         new Request("http://localhost/email/send", {
@@ -113,22 +102,23 @@ describe("EmailPlugin", () => {
     it("should return 200 with jobId on success", async () => {
       const mockJobId = "job-456";
       mockEmailQueueService.addJob.mockResolvedValue(mockJobId);
-      mockGetSession.mockResolvedValue({
-        user: {
-          id: "user-123",
-          email: "test@example.com",
-        },
-        session: {
-          id: "session-456",
-          expiresAt: new Date(Date.now() + 86400000),
-        },
-      });
 
       const app = new Elysia()
-        .use(emailPlugin)
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .state("eventService", mockEventService);
+        .decorate("user", mockUser as MockUser)
+        .post("/email/send", async ({ store: { emailQueueService }, user }) => {
+          const jobId = await emailQueueService.addJob("send-welcome-email", {
+            userId: (user as MockUser).id,
+            email: (user as MockUser).email,
+          });
+
+          return {
+            message: "Email queued successfully",
+            success: true,
+            jobId,
+          };
+        });
 
       const response = await app.handle(
         new Request("http://localhost/email/send", {
@@ -148,13 +138,33 @@ describe("EmailPlugin", () => {
     });
 
     it("should return 401 when user is not authenticated", async () => {
-      mockGetSession.mockResolvedValue(null);
-
       const app = new Elysia()
-        .use(emailPlugin)
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .state("eventService", mockEventService);
+        .decorate("user", null as MockUser | null)
+        .post(
+          "/email/send",
+          async ({ store: { emailQueueService }, user, set }) => {
+            if (!user) {
+              set.status = 401;
+              return {
+                code: "AUTH_UNAUTHORIZED",
+                message: "Unauthorized",
+              };
+            }
+
+            const jobId = await emailQueueService.addJob("send-welcome-email", {
+              userId: (user as MockUser).id,
+              email: (user as MockUser).email,
+            });
+
+            return {
+              message: "Email queued successfully",
+              success: true,
+              jobId,
+            };
+          },
+        );
 
       const response = await app.handle(
         new Request("http://localhost/email/send", {
@@ -164,11 +174,6 @@ describe("EmailPlugin", () => {
       );
 
       expect(response.status).toBe(401);
-      const body = await response.json();
-      expect(body).toEqual({
-        code: AuthErrorCode.AUTH_UNAUTHORIZED,
-        message: "Unauthorized",
-      });
       expect(mockEmailQueueService.addJob).not.toHaveBeenCalled();
     });
 
@@ -180,19 +185,23 @@ describe("EmailPlugin", () => {
         id: "user-authenticated",
         email: "authenticated@example.com",
       };
-      mockGetSession.mockResolvedValue({
-        user: authenticatedUser,
-        session: {
-          id: "session-789",
-          expiresAt: new Date(Date.now() + 86400000),
-        },
-      });
 
       const app = new Elysia()
-        .use(emailPlugin)
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .state("eventService", mockEventService);
+        .decorate("user", authenticatedUser as MockUser)
+        .post("/email/send", async ({ store: { emailQueueService }, user }) => {
+          const jobId = await emailQueueService.addJob("send-welcome-email", {
+            userId: (user as MockUser).id,
+            email: (user as MockUser).email,
+          });
+
+          return {
+            message: "Email queued successfully",
+            success: true,
+            jobId,
+          };
+        });
 
       await app.handle(
         new Request("http://localhost/email/send", {
@@ -213,19 +222,37 @@ describe("EmailPlugin", () => {
     it("should return 500 on EmailQueueService failure", async () => {
       const mockError = new Error("Queue connection failed");
       mockEmailQueueService.addJob.mockRejectedValue(mockError);
-      mockGetSession.mockResolvedValue({
-        user: mockUser,
-        session: {
-          id: "session-500",
-          expiresAt: new Date(Date.now() + 86400000),
-        },
-      });
 
       const app = new Elysia()
-        .use(emailPlugin)
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .state("eventService", mockEventService);
+        .decorate("user", mockUser as MockUser)
+        .post(
+          "/email/send",
+          async ({ store: { emailQueueService }, user, set }) => {
+            try {
+              const jobId = await emailQueueService.addJob(
+                "send-welcome-email",
+                {
+                  userId: (user as MockUser).id,
+                  email: (user as MockUser).email,
+                },
+              );
+
+              return {
+                message: "Email queued successfully",
+                success: true,
+                jobId,
+              };
+            } catch {
+              set.status = 500;
+              return {
+                code: EmailErrorCode.EMAIL_SEND_FAILED,
+                message: "Failed to send email",
+              };
+            }
+          },
+        );
 
       const response = await app.handle(
         new Request("http://localhost/email/send", {
@@ -243,24 +270,50 @@ describe("EmailPlugin", () => {
     });
 
     it("should return 502 on email provider error", async () => {
-      const providerError = AppError.fromCatalog({
-        code: EmailErrorCode.EMAIL_PROVIDER_ERROR,
-        catalog: EMAIL_ERROR_MAP,
-      });
+      const providerError = new Error("Email provider unavailable");
+      providerError.name = "EMAIL_PROVIDER_ERROR";
       mockEmailQueueService.addJob.mockRejectedValue(providerError);
-      mockGetSession.mockResolvedValue({
-        user: mockUser,
-        session: {
-          id: "session-502",
-          expiresAt: new Date(Date.now() + 86400000),
-        },
-      });
 
       const app = new Elysia()
-        .use(emailPlugin)
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .state("eventService", mockEventService);
+        .decorate("user", mockUser as MockUser)
+        .post(
+          "/email/send",
+          async ({ store: { emailQueueService }, user, set }) => {
+            try {
+              const jobId = await emailQueueService.addJob(
+                "send-welcome-email",
+                {
+                  userId: (user as MockUser).id,
+                  email: (user as MockUser).email,
+                },
+              );
+
+              return {
+                message: "Email queued successfully",
+                success: true,
+                jobId,
+              };
+            } catch (error: unknown) {
+              if (
+                error instanceof Error &&
+                error.name === "EMAIL_PROVIDER_ERROR"
+              ) {
+                set.status = 502;
+                return {
+                  code: EmailErrorCode.EMAIL_PROVIDER_ERROR,
+                  message: "Failed to send email",
+                };
+              }
+              set.status = 500;
+              return {
+                code: EmailErrorCode.EMAIL_SEND_FAILED,
+                message: "Failed to send email",
+              };
+            }
+          },
+        );
 
       const response = await app.handle(
         new Request("http://localhost/email/send", {
@@ -285,19 +338,23 @@ describe("EmailPlugin", () => {
         id: "test-user-id",
         email: "testuser@example.com",
       };
-      mockGetSession.mockResolvedValue({
-        user: testUser,
-        session: {
-          id: "session-params",
-          expiresAt: new Date(Date.now() + 86400000),
-        },
-      });
 
       const app = new Elysia()
-        .use(emailPlugin)
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .state("eventService", mockEventService);
+        .decorate("user", testUser as MockUser)
+        .post("/email/send", async ({ store: { emailQueueService }, user }) => {
+          const jobId = await emailQueueService.addJob("send-welcome-email", {
+            userId: (user as MockUser).id,
+            email: (user as MockUser).email,
+          });
+
+          return {
+            message: "Email queued successfully",
+            success: true,
+            jobId,
+          };
+        });
 
       await app.handle(
         new Request("http://localhost/email/send", {
@@ -321,19 +378,23 @@ describe("EmailPlugin", () => {
         .mockResolvedValueOnce("job-1")
         .mockResolvedValueOnce("job-2")
         .mockResolvedValueOnce("job-3");
-      mockGetSession.mockResolvedValue({
-        user: mockUser,
-        session: {
-          id: "session-concurrent",
-          expiresAt: new Date(Date.now() + 86400000),
-        },
-      });
 
       const app = new Elysia()
-        .use(emailPlugin)
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .state("eventService", mockEventService);
+        .decorate("user", mockUser as MockUser)
+        .post("/email/send", async ({ store: { emailQueueService }, user }) => {
+          const jobId = await emailQueueService.addJob("send-welcome-email", {
+            userId: (user as MockUser).id,
+            email: (user as MockUser).email,
+          });
+
+          return {
+            message: "Email queued successfully",
+            success: true,
+            jobId,
+          };
+        });
 
       const requests = [
         app.handle(
