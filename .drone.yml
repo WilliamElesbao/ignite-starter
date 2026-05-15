@@ -57,6 +57,7 @@ steps:
     depends_on:
       - install
       - typecheck
+      
       - lint
 
   - name: test-web
