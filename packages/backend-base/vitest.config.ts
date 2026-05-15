@@ -9,7 +9,7 @@ export default defineConfig({
     server: {
       deps: {
         external: ["bun"], // Externalize Bun to avoid import errors
-        inline: ["@repo/database"], // Inline database package to apply mocks
+        inline: ["@repo/db"], // Inline database package to apply mocks
       },
     },
     alias: {
