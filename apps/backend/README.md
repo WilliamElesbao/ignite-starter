@@ -104,15 +104,15 @@ Build and run as a Docker container:
 
 ```bash
 # Build image
-docker build -t ignite-api -f apps/backend/Dockerfile .
+docker build -t ignite-backend -f apps/backend/Dockerfile .
 
 # Run container
-docker run --name ignite-api \
+docker run --name ignite-backend \
   --env-file apps/backend/.env \
   -e DATABASE_URL=postgresql://docker:docker@host.docker.internal:5432/ignite-starter \
   -e REDIS_URL=redis://:abcd1234@host.docker.internal:6379 \
   -p 3333:3333 \
-  ignite-api
+  ignite-backend
 ```
 
 See [Docker Deployment Guide](../../docs/docker/deployment.md) for complete

@@ -1,5 +1,5 @@
 # Docker deployment
-This guide documents the containerized build and run flow for frontend (`ignite-web`) and backend (`ignite-api`).
+This guide documents the containerized build and run flow for frontend (`ignite-web`) and backend (`ignite-backend`).
 
 ## Prerequisites
 - Docker running locally
