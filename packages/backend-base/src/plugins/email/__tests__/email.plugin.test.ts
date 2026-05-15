@@ -7,14 +7,12 @@ import { EMAIL_ERROR_MAP, EmailErrorCode } from "../email.errors";
 import emailPlugin from "../email.plugin";
 
 // Mock dependencies
-const { mockGetSession } = vi.hoisted(() => ({
-  mockGetSession: vi.fn(),
-}));
+let mockGetSession: ReturnType<typeof vi.fn>;
 vi.mock("../../../lib/better-auth/auth", () => ({
   auth: {
     handler: vi.fn(),
     api: {
-      getSession: mockGetSession,
+      getSession: vi.fn(),
     },
   },
 }));
@@ -50,7 +48,9 @@ describe("EmailPlugin", () => {
   };
   let mockUser: MockUser;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    const authModule = await import("../../../lib/better-auth/auth");
+    mockGetSession = vi.mocked(authModule.auth.api.getSession);
     mockLogger = createMockLogger();
     mockEventService = {
       createEvent: vi.fn().mockResolvedValue(undefined),
@@ -69,7 +69,7 @@ describe("EmailPlugin", () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("POST /email/send", () => {
