@@ -47,9 +47,26 @@ steps:
     image: oven/bun:1.3.3
     commands:
       - bun biome ci .
-
     depends_on:
       - typecheck
+
+  - name: test-backend
+    image: oven/bun:1.3.3
+    commands:
+      - (cd packages/backend-base && bun run test)
+    depends_on:
+      - install
+      - typecheck
+      - lint
+
+  - name: test-web
+    image: oven/bun:1.3.3
+    commands:
+      - (cd apps/web && bun run test)
+    depends_on:
+      - install
+      - typecheck
+      - lint
 
   - name: build-database
     image: oven/bun:1.3.3
