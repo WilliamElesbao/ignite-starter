@@ -103,6 +103,7 @@ The project already contains a `docker-compose.yml` with:
 - `redis-commander` – Redis web UI
 - `stripe` – Stripe CLI in "listen" mode for webhooks (can be adjusted to use
   your own account)
+- `jaeger` – Distributed tracing for observability
 
 To start the infrastructure services:
 
@@ -119,6 +120,7 @@ This will expose:
 - PostgreSQL at `localhost:5432`
 - Redis at `localhost:6379`
 - Redis Commander at `http://localhost:8081`
+- Jaeger UI at `http://localhost:16686`
 
 Verify that containers are running:
 
@@ -131,9 +133,29 @@ You should see something like:
 - `postgres`
 - `redis`
 - `redis-commander`
-- `stripe-cli` (optional, depending on `docker-compose.yml` configuration)
+- `stripe-webhook`
+- `jaeger`
 
----
+### 4.1. Docker Volumes
+
+Data persistence is handled via Docker volumes in `./.docker/`:
+
+- `./.docker/postgres` - PostgreSQL data directory
+- `./.docker/redis` - Redis data directory
+
+These volumes ensure your data persists across container restarts. To reset data:
+
+```bash
+# Stop containers
+docker compose down
+
+# Remove volumes
+rm -rf ./.docker/postgres
+rm -rf ./.docker/redis
+
+# Restart containers
+docker compose up -d
+```
 
 ## 5. Configure and run Drizzle (migrations + view tables)
 
@@ -226,15 +248,43 @@ The detailed step-by-step is in `docs/stripe/stripe-setup.md`, including:
   ```
 
 - Copy the `whsec_...` value to `STRIPE_WEBHOOK_SECRET`
-- Generate test events to verify the webhook
+- Generate test events (`stripe trigger ...`) to validate the flow
 
 ---
 
-## 8. Run the project locally
+## 8. Run Tests
+
+The project uses Vitest for unit testing with coverage reporting.
+
+### 8.1. Run Tests Locally
+
+```bash
+# Run tests for web frontend
+cd apps/web
+bun run test
+
+# Run tests with coverage
+bun test:coverage
+
+# Run tests for backend
+cd packages/backend-base
+bun run test
+
+# Run tests with coverage
+bun test:coverage
+```
+
+### 8.2. Test Files
+
+Test files are located in `__tests__/` directories next to the code they test:
+
+---
+
+## 9. Run the project locally
 
 With everything configured:
 
-1. Docker containers running (`postgres`, `redis`, optionally `stripe-cli`)
+1. Docker containers running (`postgres`, `redis`, `jaeger`, `stripe-webhook`)
 2. `.env` filled with Google/Stripe/DB/BetterAuth
 3. Migrations executed with Drizzle
 
@@ -260,10 +310,11 @@ You should be able to:
 - Access the dashboard/login
 - Start Google login flow (if configured)
 - Perform actions that trigger Stripe calls (if configured)
+- View distributed traces in Jaeger UI at `http://localhost:16686`
 
 ---
 
-## 9. References
+## 10. References
 
 - **Next.js**: https://nextjs.org/docs
 - **Docker Desktop**: https://docs.docker.com/desktop/
@@ -273,3 +324,5 @@ You should be able to:
 - **Stripe Docs**: https://stripe.com/docs
 - **Stripe CLI**: https://stripe.com/docs/stripe-cli
 - **Google Cloud Console**: https://console.cloud.google.com/
+- **Jaeger**: https://www.jaegertracing.io/docs/
+- **Vitest**: https://vitest.dev/

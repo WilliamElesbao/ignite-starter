@@ -1,156 +1,153 @@
-# Turborepo starter
+# Ignite Starter
+Ignite Starter is a scalable fullstack monorepo starter for teams that want to bootstrap new products with a production-oriented baseline.
+It provides a ready-to-extend foundation for web, API, database, email, testing, and CI workflows.
 
-This Turborepo starter is maintained by the Turborepo core team.
+## Project overview
+Use this repository as a boilerplate to launch new applications quickly while keeping architecture and quality standards consistent from day one.
+The project is structured so business features can be added without rewriting core platform concerns.
 
-## Using this example
+## Architecture overview
+- `apps/web`: Next.js frontend (App Router) with i18n and shared UI consumption
+- `apps/backend`: thin API runtime entry point
+- `packages/backend-base`: backend business logic (plugins, services, DTOs, queue)
+- `packages/database`: Drizzle schema, migrations, and shared DB client
+- `packages/api`: generated API client from backend OpenAPI
+- `packages/emails`: React Email templates
+- `packages/ui`: shared UI package
 
-Run the following command:
+## Tech stack
+- Frontend: Next.js 16, React 19, Tailwind CSS v4, next-intl
+- Backend: Elysia + Bun
+- Data: PostgreSQL + Drizzle ORM
+- Auth: BetterAuth (email/password + Google OAuth)
+- Queue: BullMQ + Redis (email jobs)
+- Email: Resend + React Email templates
+- Testing: Vitest + coverage (v8)
+- Quality: Biome + TypeScript
+- CI: Drone CI + GitHub Actions + SonarCloud
+- Infra: Docker Compose (database, redis, stripe webhook forwarder, jaeger)
 
-```sh
-npx create-turbo@latest
+## Monorepo structure
+```text
+apps/
+  backend/
+  web/
+packages/
+  api/
+  backend-base/
+  database/
+  emails/
+  typescript-config/
+  ui/
+docs/
 ```
 
-## What's inside?
+## Development workflow
+1. Install dependencies.
+2. Configure environment files.
+3. Start infrastructure with Docker.
+4. Run database migrations.
+5. Start the apps in dev mode.
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `web`: a [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by the applications
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [Biome](https://biomejs.dev/) for linting and code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```bash
+bun install
+cp apps/backend/.env.example apps/backend/.env
+cp apps/web/.env.example apps/web/.env
+cp packages/database/.env.example packages/database/.env
+cp packages/backend-base/.env.example packages/backend-base/.env
+cp packages/api/.env.example packages/api/.env
+docker compose up -d
+(cd packages/database && bun db:migrate)
+bun dev
 ```
 
-Without global `turbo`, use your package manager:
+## Core commands
+```bash
+# Monorepo
+bun dev
+bun build
+bun check-types
+bun lint
+bun format
+bun check:all
 
-```sh
-cd my-turborepo
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+# API client generation (backend must be running)
+(cd packages/api && bun run generate)
+
+# i18n audit (web)
+(cd apps/web && bun run locale-check)
+(cd apps/web && bun run locale-unused)
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+## Testing strategy
+Unit tests run with Vitest in:
+- `apps/web` (including sign-in and email hook tests)
+- `packages/backend-base` (including auth, email service, and BullMQ worker tests)
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
+```bash
+(cd apps/web && bun run test)
+(cd apps/web && bun test:coverage)
+(cd packages/backend-base && bun run test)
+(cd packages/backend-base && bun test:coverage)
 ```
 
-Without global `turbo`:
+## Docker support
+The repository includes Dockerfiles for web and backend, with:
+- Next.js standalone runtime image for web
+- Non-root container execution
+- Backend image dependency on `packages/database` build artifacts
 
-```sh
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+See `docs/docker/deployment.md` for the complete build and run flow.
 
-### Develop
+## CI/CD overview
+- Drone CI (`.drone.yml`): install, i18n audit, typecheck, lint, tests, and build pipeline
+- GitHub Actions:
+  - `.github/workflows/sonar.yml` (SonarCloud scan)
+  - `.github/workflows/pr-review.yml` (Biome annotations)
+- SonarCloud project config in `sonar-project.properties`
 
-To develop all apps and packages, run the following command:
+## Environment setup
+Environment files are per app/package, not global:
+- `apps/backend/.env`
+- `apps/web/.env`
+- `packages/database/.env`
+- `packages/backend-base/.env`
+- `packages/api/.env`
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+Use `*.env.example` in each location as the base template.
 
-```sh
-cd my-turborepo
-turbo dev
-```
+## Features
+### Ready
+- [x] Next.js web app
+- [x] Backend API
+- [x] Database package with Drizzle
+- [x] Shared API client package
+- [x] Shared UI package
+- [x] Email templates package
+- [x] BetterAuth authentication (email/password) + Google OAuth
+- [x] Stripe integration
+- [x] BullMQ email queue with Redis
+- [x] Unit tests with Vitest
+- [x] Test coverage setup
+- [x] Sign-in unit tests
+- [x] Email service and queue unit tests
+- [x] i18n audit scripts
+- [x] Docker infrastructure
+- [x] Backend and frontend Docker images
+- [x] Standalone Next.js build strategy
+- [x] Non-root container execution
+- [x] CI pipeline (Drone + GitHub Actions + SonarCloud)
+- [x] Database build dependency flow in container pipeline
+- [x] Documentation for setting up observability tools such as Jaeger and SigNoz
 
-Without global `turbo`, use your package manager:
+### Planned / In progress
+- [ ] E2E tests with Playwright
+- [ ] Continuous Deployment (CD)
 
-```sh
-cd my-turborepo
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+## Documentation
+- `docs/README.md`
+- `docs/local-setup/local-setup.md`
+- `docs/docker/deployment.md`
+- `docs/ci-cd/README.md`
+- `docs/google/google-oauth-setup.md`
+- `docs/stripe/stripe-setup.md`

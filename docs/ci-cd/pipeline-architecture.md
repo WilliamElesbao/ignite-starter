@@ -31,25 +31,30 @@ The CI/CD pipeline is designed with separation of concerns, ensuring each workfl
     ┌────┴────┐               │                  │
     ▼         ▼               ▼                  ▼
 ┌────────┐ ┌────┐    ┌────────────┐  ┌──────────────┐
-│Typecheck│ │Lint│    │ SonarCloud │  │    Biome     │
+│Typecheck│ │Test│    │ SonarCloud │  │    Biome     │
 │ (7 pkg) │ │    │    │  Analysis  │  │ Annotations  │
 └────┬────┘ └─┬──┘    └─────┬──────┘  └──────┬───────┘
      │        │             │                 │
-     └────────┴─────────────┴─────────────────┘
-                     │
-                     ▼
-          ┌──────────────────────┐
-          │  GitHub Commit Status │
-          │  ✓ CI                 │
-          │  ✓ SonarCloud         │
-          │  ✓ Biome              │
-          └──────────────────────┘
-                     │
-                     ▼
-          ┌──────────────────────┐
-          │ Branch Protection    │
-          │ Allows/Blocks Merge  │
-          └──────────────────────┘
+     └───┬────┴─────────────┴─────────────────┘
+         ▼
+    ┌────────┐
+    │  Lint  │
+    │        │
+    └───┬────┘
+        │
+        ▼
+┌──────────────────────┐
+│  GitHub Commit Status │
+│  ✓ CI                 │
+│  ✓ SonarCloud         │
+│  ✓ Biome              │
+└──────────────────────┘
+        │
+        ▼
+┌──────────────────────┐
+│ Branch Protection    │
+│ Allows/Blocks Merge  │
+└──────────────────────┘
 ```
 
 ## Component Responsibilities
@@ -61,11 +66,12 @@ The CI/CD pipeline is designed with separation of concerns, ensuring each workfl
 **Responsibilities:**
 - Install dependencies
 - Run TypeScript type checking across all packages
+- Execute Vitest unit tests for web and backend-base packages
 - Execute Biome linting
 
 **Triggers:** Push events and pull requests to main branch
 
-**Execution Flow:** Sequential (install → typecheck → lint)
+**Execution Flow:** Sequential (install → typecheck → test → lint)
 
 **Platform:** ARM64 architecture support
 
@@ -101,6 +107,7 @@ The CI/CD pipeline is designed with separation of concerns, ensuring each workfl
 | Check | Drone CI | SonarCloud | Biome Lint |
 |-------|----------|------------|------------|
 | Type Checking | ✅ | ❌ | ❌ |
+| Unit Tests | ✅ | ❌ | ❌ |
 | Linting (CI mode) | ✅ | ❌ | ❌ |
 | Linting (Annotations) | ❌ | ❌ | ✅ |
 | Code Quality Analysis | ❌ | ✅ | ❌ |
@@ -119,7 +126,7 @@ The CI/CD pipeline is designed with separation of concerns, ensuring each workfl
 
 | Workflow | Typical Duration | Blocking |
 |----------|-----------------|----------|
-| Drone CI | 2-4 minutes | Yes |
+| Drone CI | 3-5 minutes | Yes |
 | SonarCloud | 1-3 minutes | Yes |
 | Biome Lint | 30-60 seconds | No (continue-on-error) |
 
@@ -143,52 +150,22 @@ This separation allows:
 - Helpful inline feedback without blocking PRs
 - Different reporting formats for different purposes
 
-### Why No Test Step?
+### Why Test Step in Drone CI?
 
-Tests are currently commented out in the configuration. When re-enabled:
-- Add test step to Drone CI after lint
-- Configure coverage reporting to SonarCloud
-- Update `sonar-project.properties` to include coverage paths
-
-## Simplified vs Previous Architecture
-
-### Previous Setup Issues
-
-- Validation steps that could fail silently
-- Environment-specific configurations
-- Overlapping responsibilities between workflows
-- Complex conditional logic
-- Verbose YAML configurations
-
-### Current Simplified Setup
-
-- Minimal, focused workflows
-- Clear separation of concerns
-- No redundant validation
-- Streamlined configuration
-- Easy to understand and maintain
+Tests are now included in the Drone CI pipeline:
+- Vitest unit tests run for `apps/web` and `packages/backend-base`
+- Test step runs after typecheck and before lint
+- Coverage reporting can be enabled in SonarCloud when ready
+- Test files use `__tests__/` directories alongside source code
 
 ## Future Enhancements
 
 When the project grows, consider:
 
-1. **Add Test Coverage**
-   - Enable test step in Drone CI
+1. **Enable Test Coverage Reporting**
    - Configure coverage reporting to SonarCloud
    - Set coverage thresholds
-
-2. **Add Build Verification**
-   - Add build step to verify production builds
-   - Cache build artifacts for deployment
-
-3. **Add Performance Testing**
-   - Lighthouse CI for frontend performance
-   - Load testing for backend APIs
-
-4. **Add Security Scanning**
-   - Dependency vulnerability scanning
-   - SAST (Static Application Security Testing)
-   - Container image scanning
+   - Add coverage badges to README
 
 ## Monitoring and Debugging
 
@@ -216,6 +193,10 @@ bun biome ci .
 # Test type checking locally
 cd apps/web && bun tsc --noEmit
 cd apps/backend && bun tsc --noEmit
+
+# Test unit tests locally
+cd apps/web && bun run test
+cd packages/backend-base && bun run test
 
 # Test full CI pipeline locally (requires Docker)
 docker run -v $(pwd):/workspace -w /workspace oven/bun:1.3.3 bun install

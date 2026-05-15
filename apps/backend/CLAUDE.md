@@ -20,7 +20,8 @@ const app = new Elysia()
   .use(subscriptionExpirationCron)
   .use(userPlugin)
   .use(emailPlugin)
-  .use(stripePlugin);
+  .use(stripePlugin)
+  .use(queuePlugin); // BullMQ email queue
 
 app.listen(process.env.PORT ?? 3333);
 ```
@@ -63,7 +64,7 @@ Copy `.env.example` to `.env` before running. Required variables:
 | `PORT` | HTTP port (default `3333`) |
 | `WEB_URL` | CORS allowed origin |
 | `DATABASE_URL` | PostgreSQL connection |
-| `REDIS_URL` | Redis connection |
+| `REDIS_URL` | Redis connection (required for BullMQ email queue and BetterAuth session caching) |
 | `BETTER_AUTH_SECRET` / `BETTER_AUTH_URL` | BetterAuth config |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth |
 | `RESEND_API_KEY` / `EMAIL_FROM` / `EMAIL_TO` / `AUDIENCE_ID` | Resend email |
@@ -81,6 +82,20 @@ docker compose up -d          # Required: starts PostgreSQL, Redis, Stripe CLI f
 ```
 
 For local Stripe webhook testing, the `stripe` service in `docker-compose.yml` forwards Stripe events to `http://host.docker.internal:3333/stripe/webhook` automatically.
+
+---
+
+## Email Queue Worker
+
+The backend includes a BullMQ-based email queue worker that processes email jobs asynchronously:
+
+- **Queue Service** - Enqueues email jobs to Redis
+- **Worker** - Processes email jobs using the EmailService
+- **Bull Board** - Web UI for monitoring at `http://localhost:3333/admin/queues`
+
+The worker starts automatically with the API in development mode. For production, consider running the worker as a separate process for better scaling.
+
+See [Email Queue Documentation](../../packages/backend-base/src/plugins/queue/README.md) for complete details.
 
 ---
 
