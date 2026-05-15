@@ -6,12 +6,14 @@ import { AuthErrorCode } from "../auth.errors";
 import authPlugin from "../auth.plugin";
 
 // Mock BetterAuth
-let mockGetSession: ReturnType<typeof vi.fn>;
+const { mockGetSession } = vi.hoisted(() => ({
+  mockGetSession: vi.fn(),
+}));
 vi.mock("../../../lib/better-auth/auth", () => ({
   auth: {
     handler: vi.fn(),
     api: {
-      getSession: vi.fn(),
+      getSession: mockGetSession,
     },
   },
 }));
@@ -32,9 +34,7 @@ describe("AuthPlugin", () => {
     createEvent: ReturnType<typeof vi.fn>;
   };
 
-  beforeEach(async () => {
-    const authModule = await import("../../../lib/better-auth/auth");
-    mockGetSession = vi.mocked(authModule.auth.api.getSession);
+  beforeEach(() => {
     mockLogger = createMockLogger();
     mockEventService = {
       createEvent: vi.fn().mockResolvedValue(undefined),
