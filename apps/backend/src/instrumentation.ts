@@ -4,7 +4,7 @@ import { PgInstrumentation } from "@opentelemetry/instrumentation-pg";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-node";
 
 export const instrumentation = opentelemetry({
-  serviceName: Bun.env.OTEL_SERVICE_NAME ?? "origin-backend",
+  serviceName: Bun.env.OTEL_SERVICE_NAME ?? "ignite-backend",
   spanProcessors: [
     new BatchSpanProcessor(
       new OTLPTraceExporter({

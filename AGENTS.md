@@ -164,7 +164,7 @@ The backend's `apps/backend/.env` already has the correct values:
 
 ```
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
-OTEL_SERVICE_NAME=origin-backend
+OTEL_SERVICE_NAME=ignite-backend
 ```
 
-After starting both SigNoz and the backend, make any HTTP request and traces will appear in the SigNoz UI under the `origin-backend` service. The OpenTelemetry plugin is configured in `apps/backend/src/instrumentation.ts` and preloaded via `apps/backend/bunfig.toml`.
+After starting both SigNoz and the backend, make any HTTP request and traces will appear in the SigNoz UI under the `ignite-backend` service. The OpenTelemetry plugin is configured in `apps/backend/src/instrumentation.ts` and preloaded via `apps/backend/bunfig.toml`.
