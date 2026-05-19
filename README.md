@@ -6,6 +6,57 @@ It provides a ready-to-extend foundation for web, API, database, email, testing,
 Use this repository as a boilerplate to launch new applications quickly while keeping architecture and quality standards consistent from day one.
 The project is structured so business features can be added without rewriting core platform concerns.
 
+# Screenshots
+
+## Authentication Flow
+
+| Sign In | Sign Up | Welcome Toast |
+| --- | --- | --- |
+| ![sign-in](docs/1.png) | ![sign-up](docs/2.png) | ![welcome-toast](docs/3.png) |
+
+---
+
+## Email & Theme
+
+| Light Theme | Send Email Action | Email Template |
+| --- | --- | --- |
+| ![light-theme](docs/4.png) | ![send-email-action](docs/5.png) | ![email-template](docs/6.png) |
+
+---
+
+## Billing & Stripe
+
+| Plans | Redirecting to Stripe | Stripe Checkout |
+| --- | --- | --- |
+| ![plans](docs/7.png) | ![redirecting-to-stripe](docs/8.png) | ![stripe-checkout](docs/9.png) |
+
+| Cancel Subscription Dialog | Subscription Canceled Toast |
+| --- | --- |
+| ![cancel-subscription-dialog](docs/10.png) | ![subscription-canceled-toast](docs/11.png) |
+
+---
+
+## Infrastructure & Observability
+
+<table>
+  <tr>
+    <th>Backend API (ElysiaJS)</th>
+    <th>Database (Drizzle ORM)</th>
+    <th>Queue (Bull Board / BullMQ)</th>
+    <th colspan="2">Telemetry & Monitoring (SigNoz)</th>
+  </tr>
+
+  <tr>
+    <td><img src="docs/12.png" /></td>
+    <td><img src="docs/13.png" /></td>
+    <td><img src="docs/14.png" /></td>
+    <td><img src="docs/15.png" /></td>
+    <td><img src="docs/16.png" /></td>
+  </tr>
+</table>
+
+
+
 ## Architecture overview
 - `apps/web`: Next.js frontend (App Router) with i18n and shared UI consumption
 - `apps/backend`: thin API runtime entry point
