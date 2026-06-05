@@ -1,0 +1,195 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["*"]
+  pull_request:
+
+jobs:
+  install:
+    name: Install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.3
+
+      - name: Install dependencies
+        run: bun install --ignore-scripts
+
+  i18n-audit:
+    name: i18n Audit
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.3
+
+      - name: Install dependencies
+        run: bun install --ignore-scripts
+
+      - name: Validate i18n keys
+        run: |
+          cd apps/web
+          bun run locale-check
+          bun run locale-unused
+
+  typecheck:
+    name: Typecheck
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.3
+
+      - name: Install dependencies
+        run: bun install --ignore-scripts
+
+      - name: Typecheck
+        run: |
+          (cd apps/web && bun tsc --noEmit)
+          (cd apps/backend && bun tsc --noEmit)
+          (cd packages/backend-base && bun tsc --noEmit)
+          (cd packages/database && bun tsc --noEmit)
+          (cd packages/emails && bun tsc --noEmit)
+          (cd packages/api && bun tsc --noEmit)
+          (cd packages/ui && bun tsc --noEmit)
+
+  lint:
+    name: Lint
+    needs: typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.3
+
+      - name: Install dependencies
+        run: bun install --ignore-scripts
+
+      - name: Lint
+        run: bun biome ci .
+
+  test-backend:
+    name: Test Backend
+    needs: [install, typecheck, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.3
+
+      - name: Install dependencies
+        run: bun install --ignore-scripts
+
+      - name: Run backend tests
+        run: |
+          cd packages/backend-base
+          bun run test
+
+  test-web:
+    name: Test Web
+    needs: [install, typecheck, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.3
+
+      - name: Install dependencies
+        run: bun install --ignore-scripts
+
+      - name: Run web tests
+        run: |
+          cd apps/web
+          bun run test
+
+  build-database:
+    name: Build Database
+    needs: [install, typecheck, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.3
+
+      - name: Install dependencies
+        run: bun install --ignore-scripts
+
+      - name: Build database package
+        run: |
+          cd packages/database
+          bun run build
+
+  build-backend:
+    name: Build Backend
+    needs: build-database
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.3
+
+      - name: Install dependencies
+        run: bun install --ignore-scripts
+
+      - name: Build backend
+        run: |
+          cd apps/backend
+          bun run build
+
+  build-web:
+    name: Build Web
+    needs: build-backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: bun install --ignore-scripts
+
+      - name: Build web
+        run: |
+          cd apps/web
+          node --run build
