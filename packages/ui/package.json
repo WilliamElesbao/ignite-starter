@@ -4,20 +4,22 @@
   "private": true,
   "scripts": {
     "generate:component": "turbo gen react-component",
-    "storybook": "concurrently 'storybook dev -p 6006' 'tcm -w src'",
-    "build-storybook": "storybook build"
+    "dev": "concurrently 'storybook dev -p 6006' 'tcm -w src'",
+    "build-storybook": "storybook build",
+    "lint": "biome check .",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "^5.1.0",
+    "@chromatic-com/storybook": "^5.2.1",
     "@repo/typescript-config": "workspace:*",
-    "@storybook/addon-a11y": "^10.3.3",
-    "@storybook/addon-docs": "^10.3.3",
-    "@storybook/addon-vitest": "^10.3.3",
-    "@storybook/react-vite": "^10.3.3",
+    "@storybook/addon-a11y": "^10.4.2",
+    "@storybook/addon-docs": "^10.4.2",
+    "@storybook/addon-vitest": "^10.4.2",
+    "@storybook/react-vite": "^10.4.2",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^22.15.3",
     "@types/react": "19.2.2",
@@ -27,7 +29,7 @@
     "autoprefixer": "^10.4.27",
     "playwright": "^1.58.2",
     "postcss": "^8.5.8",
-    "storybook": "^10.3.3",
+    "storybook": "^10.4.2",
     "tailwindcss": "^4.2.2",
     "typescript": "5.9.2",
     "vitest": "^4.1.1"

@@ -7,15 +7,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "lint": "biome check .",
+    "lint:watch": "bunx onchange . -- biome check --write --no-errors-on-unmatched {{changed}}",
+    "lint:fix": "biome check --fix --unsafe .",
+    "format": "biome format --write .",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
-    "lint": "biome check .",
-    "lint:fix": "biome check --fix --unsafe .",
-    "ci": "biome ci .",
-    "format": "biome format --write .",
-    "lint:watch": "bunx onchange . -- biome check --write --no-errors-on-unmatched {{changed}}",
     "locale-check": "bun run src/scripts/validate-i18n.ts",
-    "locale-unused": "bun run src/scripts/check-unused-i18n-keys.ts"
+    "locale-unused": "bun run src/scripts/check-unused-i18n-keys.ts",
+    "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

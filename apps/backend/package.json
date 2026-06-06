@@ -5,7 +5,9 @@
     "build": "bun build ./src/index.ts --target bun --sourcemap --outdir ./dist",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
-    "worker:email": "bun run ../../packages/backend-base/src/workers/email.worker.ts"
+    "worker:email": "bun run ../../packages/backend-base/src/workers/email.worker.ts",
+    "lint": "biome check .",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@elysiajs/openapi": "^1.4.14",

@@ -2,7 +2,9 @@
   "name": "@repo/api",
   "private": true,
   "scripts": {
-    "generate": "bun --env-file .env openapi-ts"
+    "generate": "bun --env-file .env openapi-ts",
+    "lint": "biome check .",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.95.2"

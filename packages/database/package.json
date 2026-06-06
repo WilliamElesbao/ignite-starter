@@ -10,7 +10,9 @@
     "db:generate": "bun --env-file .env --bun drizzle-kit generate",
     "db:migrate": "bun --env-file .env --bun drizzle-kit migrate",
     "db:seed": "",
-    "db:studio": "bunx --bun  drizzle-kit studio"
+    "db:studio": "bunx --bun  drizzle-kit studio",
+    "lint": "biome check .",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "zod": "^4.3.6",
