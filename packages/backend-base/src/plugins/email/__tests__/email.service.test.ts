@@ -1,4 +1,3 @@
-import type { Mock } from "vitest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Set environment variables BEFORE any imports
@@ -9,14 +8,18 @@ process.env.WEB_URL = "http://localhost:3000";
 
 // Mock the Resend class before any imports using a factory function
 vi.mock("resend", () => {
-  const mockSendFn = vi.fn();
+  class MockResend {
+    emails = {
+      send: vi.fn(),
+    };
+    constructor(apiKey: string) {
+      // Store for testing if needed
+      this.apiKey = apiKey;
+    }
+    apiKey: string;
+  }
   return {
-    Resend: vi.fn().mockImplementation(() => ({
-      emails: {
-        send: mockSendFn,
-      },
-    })),
-    __mockSend: mockSendFn, // Export for test access
+    Resend: MockResend,
   };
 });
 
@@ -25,23 +28,15 @@ vi.mock("@repo/emails/templates", () => ({
   WelcomeEmail: vi.fn(() => "MockedWelcomeEmail"),
 }));
 
-// Now import the modules
-import { Resend } from "resend";
+import { resend } from "../../../lib/resend";
 import { AppError } from "../../../shared/errors/app-error";
 import { createMockLogger } from "../../../test/setup";
 import { EmailErrorCode } from "../email.errors";
 import { EmailService } from "../email.service";
 
-// Get the mock send function
-const getMockSend = () => {
-  const resendInstance = new Resend("test");
-  return resendInstance.emails.send as Mock;
-};
-
 describe("EmailService", () => {
   let emailService: EmailService;
   let mockLogger: ReturnType<typeof createMockLogger>;
-  let mockResendSend: Mock;
 
   beforeEach(() => {
     // Reset all mocks before each test
@@ -49,9 +44,6 @@ describe("EmailService", () => {
 
     // Create a fresh mock logger for each test
     mockLogger = createMockLogger();
-
-    // Get reference to the mocked send function
-    mockResendSend = getMockSend();
 
     // Create a new EmailService instance with the mock logger
     emailService = new EmailService(mockLogger);
@@ -61,16 +53,17 @@ describe("EmailService", () => {
     it("should call resend.emails.send with correct parameters", async () => {
       // Arrange
       const mockEmailData = { id: "email-123" };
-      mockResendSend.mockResolvedValue({
+      vi.mocked(resend.emails.send).mockResolvedValue({
         data: mockEmailData,
         error: null,
+        headers: null,
       });
 
       // Act
       await emailService.sendWelcomeEmail();
 
       // Assert
-      expect(mockResendSend).toHaveBeenCalledWith({
+      expect(resend.emails.send).toHaveBeenCalledWith({
         from: "test@example.com",
         to: "recipient@example.com",
         subject: "Welcome to Ignite Starter!",
@@ -81,9 +74,10 @@ describe("EmailService", () => {
     it("should log success message on successful send", async () => {
       // Arrange
       const mockEmailData = { id: "email-123" };
-      mockResendSend.mockResolvedValue({
+      vi.mocked(resend.emails.send).mockResolvedValue({
         data: mockEmailData,
         error: null,
+        headers: null,
       });
 
       // Act
@@ -100,9 +94,10 @@ describe("EmailService", () => {
     it("should return email data on successful send", async () => {
       // Arrange
       const mockEmailData = { id: "email-123" };
-      mockResendSend.mockResolvedValue({
+      vi.mocked(resend.emails.send).mockResolvedValue({
         data: mockEmailData,
         error: null,
+        headers: null,
       });
 
       // Act
@@ -114,10 +109,15 @@ describe("EmailService", () => {
 
     it("should throw AppError with EMAIL_PROVIDER_ERROR when Resend returns error", async () => {
       // Arrange
-      const mockError = { message: "Invalid API key" };
-      mockResendSend.mockResolvedValue({
+      const mockError = {
+        message: "Invalid API key",
+        name: "invalid_api_key" as const,
+        statusCode: 422,
+      };
+      vi.mocked(resend.emails.send).mockResolvedValue({
         data: null,
         error: mockError,
+        headers: null,
       });
 
       // Act & Assert
@@ -138,10 +138,15 @@ describe("EmailService", () => {
 
     it("should log error details when Resend returns error", async () => {
       // Arrange
-      const mockError = { message: "Invalid API key" };
-      mockResendSend.mockResolvedValue({
+      const mockError = {
+        message: "Invalid API key",
+        name: "invalid_api_key" as const,
+        statusCode: 422,
+      };
+      vi.mocked(resend.emails.send).mockResolvedValue({
         data: null,
         error: mockError,
+        headers: null,
       });
 
       // Act
@@ -163,7 +168,7 @@ describe("EmailService", () => {
     it("should throw AppError with EMAIL_SEND_FAILED when exception occurs during send", async () => {
       // Arrange
       const mockException = new Error("Network error");
-      mockResendSend.mockRejectedValue(mockException);
+      vi.mocked(resend.emails.send).mockRejectedValue(mockException);
 
       // Act & Assert
       await expect(emailService.sendWelcomeEmail()).rejects.toThrow(AppError);
@@ -181,7 +186,7 @@ describe("EmailService", () => {
     it("should log error when exception occurs during send", async () => {
       // Arrange
       const mockException = new Error("Network error");
-      mockResendSend.mockRejectedValue(mockException);
+      vi.mocked(resend.emails.send).mockRejectedValue(mockException);
 
       // Act
       try {
@@ -202,16 +207,17 @@ describe("EmailService", () => {
     it("should use correct EMAIL_FROM environment variable", async () => {
       // Arrange
       const mockEmailData = { id: "email-123" };
-      mockResendSend.mockResolvedValue({
+      vi.mocked(resend.emails.send).mockResolvedValue({
         data: mockEmailData,
         error: null,
+        headers: null,
       });
 
       // Act
       await emailService.sendWelcomeEmail();
 
       // Assert
-      expect(mockResendSend).toHaveBeenCalledWith(
+      expect(resend.emails.send).toHaveBeenCalledWith(
         expect.objectContaining({
           from: "test@example.com",
         }),
@@ -221,16 +227,17 @@ describe("EmailService", () => {
     it("should use correct EMAIL_TO environment variable", async () => {
       // Arrange
       const mockEmailData = { id: "email-123" };
-      mockResendSend.mockResolvedValue({
+      vi.mocked(resend.emails.send).mockResolvedValue({
         data: mockEmailData,
         error: null,
+        headers: null,
       });
 
       // Act
       await emailService.sendWelcomeEmail();
 
       // Assert
-      expect(mockResendSend).toHaveBeenCalledWith(
+      expect(resend.emails.send).toHaveBeenCalledWith(
         expect.objectContaining({
           to: "recipient@example.com",
         }),
@@ -240,16 +247,17 @@ describe("EmailService", () => {
     it("should include correct subject in email", async () => {
       // Arrange
       const mockEmailData = { id: "email-123" };
-      mockResendSend.mockResolvedValue({
+      vi.mocked(resend.emails.send).mockResolvedValue({
         data: mockEmailData,
         error: null,
+        headers: null,
       });
 
       // Act
       await emailService.sendWelcomeEmail();
 
       // Assert
-      expect(mockResendSend).toHaveBeenCalledWith(
+      expect(resend.emails.send).toHaveBeenCalledWith(
         expect.objectContaining({
           subject: "Welcome to Ignite Starter!",
         }),
@@ -268,7 +276,7 @@ describe("EmailService", () => {
         },
       });
 
-      mockResendSend.mockRejectedValue(originalAppError);
+      vi.mocked(resend.emails.send).mockRejectedValue(originalAppError);
 
       // Act & Assert
       await expect(emailService.sendWelcomeEmail()).rejects.toThrow(AppError);
@@ -286,10 +294,15 @@ describe("EmailService", () => {
 
     it("should log both error scenarios separately", async () => {
       // Arrange - Test provider error logging
-      const mockProviderError = { message: "Invalid API key" };
-      mockResendSend.mockResolvedValue({
+      const mockProviderError = {
+        message: "Invalid API key",
+        name: "invalid_api_key" as const,
+        statusCode: 422,
+      };
+      vi.mocked(resend.emails.send).mockResolvedValue({
         data: null,
         error: mockProviderError,
+        headers: null,
       });
 
       // Act
@@ -312,7 +325,7 @@ describe("EmailService", () => {
 
       // Arrange - Test exception error logging
       const mockException = new Error("Network error");
-      mockResendSend.mockRejectedValue(mockException);
+      vi.mocked(resend.emails.send).mockRejectedValue(mockException);
 
       // Act
       try {

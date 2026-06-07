@@ -23,9 +23,54 @@ vi.mock("../../../lib/resend", () => ({
 }));
 
 // Mock BullMQ Worker
-vi.mock("bullmq", () => ({
-  Worker: vi.fn(),
-}));
+vi.mock("bullmq", () => {
+  class MockWorker {
+    private eventHandlers: Record<string, ((...args: unknown[]) => void)[]> =
+      {};
+    public readonly queueName: string;
+    public readonly processor: (job: unknown) => Promise<void> | void;
+    public readonly options?: Record<string, unknown>;
+
+    constructor(
+      queueName: string,
+      processor: (job: unknown) => Promise<void> | void,
+      options?: Record<string, unknown>,
+    ) {
+      this.queueName = queueName;
+      this.processor = processor;
+      this.options = options;
+    }
+
+    on(event: string, handler: (...args: unknown[]) => void): this {
+      if (!this.eventHandlers[event]) {
+        this.eventHandlers[event] = [];
+      }
+      this.eventHandlers[event].push(handler);
+      return this;
+    }
+
+    async close(): Promise<void> {
+      // Mock implementation
+    }
+
+    // Helper method for tests to trigger events
+    triggerEvent(event: string, ...args: unknown[]): void {
+      const handlers = this.eventHandlers[event] || [];
+      for (const handler of handlers) {
+        handler(...args);
+      }
+    }
+
+    // Expose for testing
+    getProcessor(): (job: unknown) => Promise<void> | void {
+      return this.processor;
+    }
+  }
+
+  return {
+    Worker: MockWorker,
+  };
+});
 
 // Mock the queue config
 vi.mock("../email-queue.config", () => ({
@@ -62,17 +107,21 @@ import { EMAIL_JOBS, EMAIL_QUEUE_NAME } from "../email-queue.config";
 import type { WelcomeEmailData } from "../email-queue.worker";
 import { EmailQueueWorker } from "../email-queue.worker";
 
+// Type for the mock worker with extended properties
+interface MockWorkerExtensions {
+  queueName: string;
+  processor: (job: unknown) => Promise<void> | void;
+  options?: Record<string, unknown>;
+  triggerEvent: (event: string, ...args: unknown[]) => void;
+  getProcessor: () => (job: unknown) => Promise<void> | void;
+}
+
+type MockWorker = Worker & MockWorkerExtensions;
+
 describe("EmailQueueWorker", () => {
   let mockLogger: ReturnType<typeof createMockLogger>;
-  let mockWorker: {
-    on: ReturnType<typeof vi.fn>;
-    close: ReturnType<typeof vi.fn>;
-    _eventHandlers: Record<string, (...args: unknown[]) => void>;
-    _processor: (...args: unknown[]) => void | Promise<void>;
-  };
   let sendWelcomeEmailMock: ReturnType<typeof vi.spyOn>;
   let emailQueueWorker: EmailQueueWorker;
-  let processorFunction: (...args: unknown[]) => void | Promise<void>;
 
   beforeEach(() => {
     // Create mock logger
@@ -81,34 +130,6 @@ describe("EmailQueueWorker", () => {
     sendWelcomeEmailMock = vi
       .spyOn(EmailService.prototype, "sendWelcomeEmail")
       .mockResolvedValue({ id: "email-mock" });
-
-    // Create mock worker with event handlers
-    mockWorker = {
-      on: vi.fn(),
-      close: vi.fn().mockResolvedValue(undefined),
-      _eventHandlers: {},
-      _processor: vi.fn(),
-    };
-
-    // Capture event handlers and processor
-    mockWorker.on.mockImplementation(
-      (event: string, handler: (...args: unknown[]) => void) => {
-        mockWorker._eventHandlers[event] = handler;
-        return mockWorker;
-      },
-    );
-
-    // Mock Worker constructor
-    (Worker as unknown as ReturnType<typeof vi.fn>).mockImplementation(
-      (
-        _queueName: string,
-        processor: (...args: unknown[]) => void | Promise<void>,
-      ) => {
-        processorFunction = processor;
-        mockWorker._processor = processor;
-        return mockWorker;
-      },
-    );
 
     // Create worker instance
     emailQueueWorker = new EmailQueueWorker(mockLogger);
@@ -122,33 +143,56 @@ describe("EmailQueueWorker", () => {
     it("should create worker with correct configuration", async () => {
       await emailQueueWorker.start();
 
-      expect(Worker).toHaveBeenCalledWith(
-        EMAIL_QUEUE_NAME,
-        expect.any(Function),
-        expect.objectContaining({
-          connection: expect.objectContaining({
-            maxRetriesPerRequest: null,
-          }),
-          concurrency: 5,
+      // Worker should be created (checking via instance)
+      const worker = (emailQueueWorker as unknown as { worker: MockWorker })
+        .worker;
+      expect(worker).toBeInstanceOf(Worker);
+      expect(worker.queueName).toBe(EMAIL_QUEUE_NAME);
+      expect(worker.options).toMatchObject({
+        connection: expect.objectContaining({
+          maxRetriesPerRequest: null,
         }),
-      );
+        concurrency: 5,
+      });
     });
 
     it("should register completed event handler", async () => {
       await emailQueueWorker.start();
 
-      expect(mockWorker.on).toHaveBeenCalledWith(
-        "completed",
-        expect.any(Function),
+      const worker = (emailQueueWorker as unknown as { worker: MockWorker })
+        .worker;
+      const onSpy = vi.spyOn(worker, "on");
+
+      // The on() calls happen in the constructor, so we need to check if handlers exist
+      // by triggering an event
+      worker.triggerEvent("completed", { id: "test-job", name: "test" });
+
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        expect.objectContaining({
+          msg: "Email job completed",
+        }),
       );
+
+      onSpy.mockRestore();
     });
 
     it("should register failed event handler", async () => {
       await emailQueueWorker.start();
 
-      expect(mockWorker.on).toHaveBeenCalledWith(
+      const worker = (emailQueueWorker as unknown as { worker: MockWorker })
+        .worker;
+
+      // Trigger failed event
+      worker.triggerEvent(
         "failed",
-        expect.any(Function),
+        { id: "test-job", name: "test" },
+        new Error("Test"),
+      );
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.objectContaining({
+          msg: "Email job failed",
+        }),
       );
     });
 
@@ -169,8 +213,9 @@ describe("EmailQueueWorker", () => {
         name: EMAIL_JOBS.SEND_WELCOME,
       };
 
-      // Trigger completed event
-      mockWorker._eventHandlers.completed(mockJob);
+      const worker = (emailQueueWorker as unknown as { worker: MockWorker })
+        .worker;
+      worker.triggerEvent("completed", mockJob);
 
       expect(mockLogger.info).toHaveBeenCalledWith({
         msg: "Email job completed",
@@ -188,8 +233,9 @@ describe("EmailQueueWorker", () => {
       };
       const mockError = new Error("Email send failed");
 
-      // Trigger failed event
-      mockWorker._eventHandlers.failed(mockJob, mockError);
+      const worker = (emailQueueWorker as unknown as { worker: MockWorker })
+        .worker;
+      worker.triggerEvent("failed", mockJob, mockError);
 
       expect(mockLogger.error).toHaveBeenCalledWith({
         msg: "Email job failed",
@@ -203,9 +249,15 @@ describe("EmailQueueWorker", () => {
   describe("stop", () => {
     it("should close worker gracefully", async () => {
       await emailQueueWorker.start();
+
+      const worker = (emailQueueWorker as unknown as { worker: MockWorker })
+        .worker;
+      const closeSpy = vi.spyOn(worker, "close");
+
       await emailQueueWorker.stop();
 
-      expect(mockWorker.close).toHaveBeenCalled();
+      expect(closeSpy).toHaveBeenCalled();
+      closeSpy.mockRestore();
     });
 
     it("should log worker stopped message", async () => {
@@ -220,13 +272,21 @@ describe("EmailQueueWorker", () => {
     it("should handle stop when worker is not started", async () => {
       await emailQueueWorker.stop();
 
-      expect(mockWorker.close).not.toHaveBeenCalled();
+      // Should not throw and should not log stopped message
+      expect(mockLogger.info).not.toHaveBeenCalledWith({
+        msg: "Email worker stopped",
+      });
     });
   });
 
   describe("processJob", () => {
+    let processorFunction: (job: unknown) => Promise<void> | void;
+
     beforeEach(async () => {
       await emailQueueWorker.start();
+      const worker = (emailQueueWorker as unknown as { worker: MockWorker })
+        .worker;
+      processorFunction = worker.getProcessor();
     });
 
     it("should process send-welcome-email job type correctly", async () => {
@@ -426,7 +486,9 @@ describe("EmailQueueWorker", () => {
     it("should start and stop gracefully", async () => {
       await emailQueueWorker.start();
 
-      expect(Worker).toHaveBeenCalled();
+      const worker = (emailQueueWorker as unknown as { worker: MockWorker })
+        .worker;
+      expect(worker).toBeInstanceOf(Worker);
       expect(mockLogger.info).toHaveBeenCalledWith({
         msg: "Email worker started",
         queueName: EMAIL_QUEUE_NAME,
@@ -434,7 +496,6 @@ describe("EmailQueueWorker", () => {
 
       await emailQueueWorker.stop();
 
-      expect(mockWorker.close).toHaveBeenCalled();
       expect(mockLogger.info).toHaveBeenCalledWith({
         msg: "Email worker stopped",
       });
@@ -444,14 +505,17 @@ describe("EmailQueueWorker", () => {
       await emailQueueWorker.start();
       await emailQueueWorker.start();
 
-      // Worker constructor should be called twice
-      expect(Worker).toHaveBeenCalledTimes(2);
+      // Logger should be called twice for started message
+      expect(mockLogger.info).toHaveBeenCalledWith({
+        msg: "Email worker started",
+        queueName: EMAIL_QUEUE_NAME,
+      });
+      expect(mockLogger.info).toHaveBeenCalledTimes(2);
     });
 
     it("should handle stop without start", async () => {
       await emailQueueWorker.stop();
 
-      expect(mockWorker.close).not.toHaveBeenCalled();
       expect(mockLogger.info).not.toHaveBeenCalledWith({
         msg: "Email worker stopped",
       });
@@ -469,7 +533,9 @@ describe("EmailQueueWorker", () => {
         name: EMAIL_JOBS.SEND_WELCOME,
       };
 
-      mockWorker._eventHandlers.completed(mockJob);
+      const worker = (emailQueueWorker as unknown as { worker: MockWorker })
+        .worker;
+      worker.triggerEvent("completed", mockJob);
 
       expect(mockLogger.info).toHaveBeenCalledWith({
         msg: "Email job completed",
@@ -485,7 +551,9 @@ describe("EmailQueueWorker", () => {
       };
       const mockError = new Error("Network timeout");
 
-      mockWorker._eventHandlers.failed(mockJob, mockError);
+      const worker = (emailQueueWorker as unknown as { worker: MockWorker })
+        .worker;
+      worker.triggerEvent("failed", mockJob, mockError);
 
       expect(mockLogger.error).toHaveBeenCalledWith({
         msg: "Email job failed",
@@ -498,7 +566,9 @@ describe("EmailQueueWorker", () => {
     it("should handle failed event with undefined job", async () => {
       const mockError = new Error("Unknown error");
 
-      mockWorker._eventHandlers.failed(undefined, mockError);
+      const worker = (emailQueueWorker as unknown as { worker: MockWorker })
+        .worker;
+      worker.triggerEvent("failed", undefined, mockError);
 
       expect(mockLogger.error).toHaveBeenCalledWith({
         msg: "Email job failed",

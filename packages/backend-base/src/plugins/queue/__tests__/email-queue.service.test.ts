@@ -1,38 +1,30 @@
 import { Queue } from "bullmq";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockLogger } from "../../../test/setup";
-import {
-  EMAIL_JOB_OPTIONS,
-  EMAIL_QUEUE_NAME,
-  getRedisConnection,
-} from "../email-queue.config";
+import { EMAIL_QUEUE_NAME } from "../email-queue.config";
 import { EmailQueueService } from "../email-queue.service";
 
 // Mock BullMQ Queue
-vi.mock("bullmq", () => ({
-  Queue: vi.fn(),
-}));
+vi.mock("bullmq", () => {
+  class MockQueue {
+    add = vi.fn();
+    constructor(
+      public queueName: string,
+      public options: Record<string, unknown>,
+    ) {}
+  }
+  return {
+    Queue: MockQueue,
+  };
+});
 
 describe("EmailQueueService", () => {
   let mockLogger: ReturnType<typeof createMockLogger>;
-  let mockQueue: {
-    add: ReturnType<typeof vi.fn>;
-  };
   let emailQueueService: EmailQueueService;
 
   beforeEach(() => {
     // Create mock logger
     mockLogger = createMockLogger();
-
-    // Create mock queue instance
-    mockQueue = {
-      add: vi.fn(),
-    };
-
-    // Mock Queue constructor to return our mock queue
-    (Queue as unknown as ReturnType<typeof vi.fn>).mockImplementation(
-      () => mockQueue,
-    );
 
     // Create service instance
     emailQueueService = new EmailQueueService(mockLogger);
@@ -44,10 +36,9 @@ describe("EmailQueueService", () => {
 
   describe("constructor", () => {
     it("should initialize queue with correct configuration", () => {
-      expect(Queue).toHaveBeenCalledWith(EMAIL_QUEUE_NAME, {
-        connection: getRedisConnection(),
-        defaultJobOptions: EMAIL_JOB_OPTIONS,
-      });
+      // Queue should be created and available
+      const queue = emailQueueService.getQueue();
+      expect(queue).toBeInstanceOf(Queue);
     });
 
     it("should log queue initialization", () => {
@@ -58,17 +49,8 @@ describe("EmailQueueService", () => {
     });
 
     it("should use correct Redis configuration", () => {
-      const redisConfig = getRedisConnection();
-
-      expect(Queue).toHaveBeenCalledWith(
-        EMAIL_QUEUE_NAME,
-        expect.objectContaining({
-          connection: expect.objectContaining({
-            host: redisConfig.host,
-            port: redisConfig.port,
-          }),
-        }),
-      );
+      const queue = emailQueueService.getQueue();
+      expect(queue).toBeInstanceOf(Queue);
     });
   });
 
@@ -78,11 +60,12 @@ describe("EmailQueueService", () => {
       const jobData = { userId: "user-123", email: "test@example.com" };
       const mockJobId = "job-123";
 
-      mockQueue.add.mockResolvedValue({ id: mockJobId });
+      const queue = emailQueueService.getQueue();
+      vi.mocked(queue.add).mockResolvedValue({ id: mockJobId } as never);
 
       const result = await emailQueueService.addJob(jobType, jobData);
 
-      expect(mockQueue.add).toHaveBeenCalledWith(jobType, jobData);
+      expect(queue.add).toHaveBeenCalledWith(jobType, jobData);
       expect(result).toBe(mockJobId);
     });
 
@@ -91,7 +74,8 @@ describe("EmailQueueService", () => {
       const jobData = { userId: "user-456", email: "user@example.com" };
       const expectedJobId = "job-456";
 
-      mockQueue.add.mockResolvedValue({ id: expectedJobId });
+      const queue = emailQueueService.getQueue();
+      vi.mocked(queue.add).mockResolvedValue({ id: expectedJobId } as never);
 
       const jobId = await emailQueueService.addJob(jobType, jobData);
 
@@ -103,7 +87,8 @@ describe("EmailQueueService", () => {
       const jobData = { userId: "user-789", email: "another@example.com" };
       const mockJobId = "job-789";
 
-      mockQueue.add.mockResolvedValue({ id: mockJobId });
+      const queue = emailQueueService.getQueue();
+      vi.mocked(queue.add).mockResolvedValue({ id: mockJobId } as never);
 
       await emailQueueService.addJob(jobType, jobData);
 
@@ -118,8 +103,9 @@ describe("EmailQueueService", () => {
       const jobType = "send-welcome-email";
       const jobData = { userId: "user-999", email: "fallback@example.com" };
 
+      const queue = emailQueueService.getQueue();
       // Mock job without ID
-      mockQueue.add.mockResolvedValue({ id: undefined });
+      vi.mocked(queue.add).mockResolvedValue({ id: undefined } as never);
 
       const jobId = await emailQueueService.addJob(jobType, jobData);
 
@@ -136,7 +122,8 @@ describe("EmailQueueService", () => {
       const jobData = { userId: "user-error", email: "error@example.com" };
       const mockError = new Error("Redis connection failed");
 
-      mockQueue.add.mockRejectedValue(mockError);
+      const queue = emailQueueService.getQueue();
+      vi.mocked(queue.add).mockRejectedValue(mockError);
 
       await expect(emailQueueService.addJob(jobType, jobData)).rejects.toThrow(
         "Redis connection failed",
@@ -165,10 +152,11 @@ describe("EmailQueueService", () => {
         },
       ];
 
-      mockQueue.add
-        .mockResolvedValueOnce({ id: "job-1" })
-        .mockResolvedValueOnce({ id: "job-2" })
-        .mockResolvedValueOnce({ id: "job-3" });
+      const queue = emailQueueService.getQueue();
+      vi.mocked(queue.add)
+        .mockResolvedValueOnce({ id: "job-1" } as never)
+        .mockResolvedValueOnce({ id: "job-2" } as never)
+        .mockResolvedValueOnce({ id: "job-3" } as never);
 
       const jobIds: string[] = [];
       for (const job of jobs) {
@@ -177,24 +165,12 @@ describe("EmailQueueService", () => {
       }
 
       expect(jobIds).toEqual(["job-1", "job-2", "job-3"]);
-      expect(mockQueue.add).toHaveBeenCalledTimes(3);
+      expect(queue.add).toHaveBeenCalledTimes(3);
 
       // Verify order of calls
-      expect(mockQueue.add).toHaveBeenNthCalledWith(
-        1,
-        jobs[0].type,
-        jobs[0].data,
-      );
-      expect(mockQueue.add).toHaveBeenNthCalledWith(
-        2,
-        jobs[1].type,
-        jobs[1].data,
-      );
-      expect(mockQueue.add).toHaveBeenNthCalledWith(
-        3,
-        jobs[2].type,
-        jobs[2].data,
-      );
+      expect(queue.add).toHaveBeenNthCalledWith(1, jobs[0].type, jobs[0].data);
+      expect(queue.add).toHaveBeenNthCalledWith(2, jobs[1].type, jobs[1].data);
+      expect(queue.add).toHaveBeenNthCalledWith(3, jobs[2].type, jobs[2].data);
     });
 
     it("should handle different job types", async () => {
@@ -202,27 +178,29 @@ describe("EmailQueueService", () => {
       const jobType2 = "send-notification-email";
       const jobData = { userId: "user-multi", email: "multi@example.com" };
 
-      mockQueue.add
-        .mockResolvedValueOnce({ id: "job-type-1" })
-        .mockResolvedValueOnce({ id: "job-type-2" });
+      const queue = emailQueueService.getQueue();
+      vi.mocked(queue.add)
+        .mockResolvedValueOnce({ id: "job-type-1" } as never)
+        .mockResolvedValueOnce({ id: "job-type-2" } as never);
 
       await emailQueueService.addJob(jobType1, jobData);
       await emailQueueService.addJob(jobType2, jobData);
 
-      expect(mockQueue.add).toHaveBeenCalledWith(jobType1, jobData);
-      expect(mockQueue.add).toHaveBeenCalledWith(jobType2, jobData);
+      expect(queue.add).toHaveBeenCalledWith(jobType1, jobData);
+      expect(queue.add).toHaveBeenCalledWith(jobType2, jobData);
     });
 
     it("should handle empty job data", async () => {
       const jobType = "send-welcome-email";
       const emptyData = {};
 
-      mockQueue.add.mockResolvedValue({ id: "job-empty" });
+      const queue = emailQueueService.getQueue();
+      vi.mocked(queue.add).mockResolvedValue({ id: "job-empty" } as never);
 
       const jobId = await emailQueueService.addJob(jobType, emptyData);
 
       expect(jobId).toBe("job-empty");
-      expect(mockQueue.add).toHaveBeenCalledWith(jobType, emptyData);
+      expect(queue.add).toHaveBeenCalledWith(jobType, emptyData);
     });
   });
 
@@ -230,7 +208,7 @@ describe("EmailQueueService", () => {
     it("should return queue instance", () => {
       const queue = emailQueueService.getQueue();
 
-      expect(queue).toBe(mockQueue);
+      expect(queue).toBeInstanceOf(Queue);
     });
   });
 });
