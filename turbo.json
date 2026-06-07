@@ -16,6 +16,12 @@
     "format": {
       "dependsOn": ["^format"]
     },
+    "test": {
+      "dependsOn": ["^test"]
+    },
+    "test:coverage": {
+      "dependsOn": ["^test:coverage"]
+    },
     "check-types": {
       "dependsOn": ["^check-types"]
     },
