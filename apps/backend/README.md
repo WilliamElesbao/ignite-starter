@@ -63,7 +63,7 @@ Required variables:
 - `BETTER_AUTH_SECRET` / `BETTER_AUTH_URL` - BetterAuth configuration
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` - Google OAuth
 - `RESEND_API_KEY` / `EMAIL_FROM` / `EMAIL_TO` - Email configuration
-- `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` - Stripe payments
+- `STRIPE_API_KEY` / `STRIPE_WEBHOOK_SECRET` - Stripe payments
 
 See [CLAUDE.md](./CLAUDE.md) for detailed environment setup.
 

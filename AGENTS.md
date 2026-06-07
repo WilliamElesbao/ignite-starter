@@ -67,10 +67,10 @@ Each app/package has its own `.env` copied from `.env.example`. Key files to cre
 
 | File | Key variables |
 |---|---|
-| `apps/backend/.env` | `PORT`, `DATABASE_URL`, `REDIS_URL`, `WEB_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_TO`, `AUDIENCE_ID`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` |
+| `apps/backend/.env` | `PORT`, `DATABASE_URL`, `REDIS_URL`, `WEB_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_TO`, `AUDIENCE_ID`, `STRIPE_API_KEY`, `STRIPE_WEBHOOK_SECRET` |
 | `apps/web/.env` | `API_URL`, `NEXT_PUBLIC_BASE_URL` |
 | `packages/database/.env` | `DATABASE_URL` |
-| `packages/backend-base/.env` | `DATABASE_URL`, `WEB_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` |
+| `packages/backend-base/.env` | `DATABASE_URL`, `WEB_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `STRIPE_API_KEY`, `STRIPE_WEBHOOK_SECRET` |
 | `packages/api/.env` | `API_URL` |
 
 Default local values (from `.env.example`): backend on `http://localhost:3333`, web on `http://localhost:3000`, PostgreSQL `postgresql://docker:docker@localhost:5432/ignite-starter`, Redis `redis://:abcd1234@localhost:6379`.

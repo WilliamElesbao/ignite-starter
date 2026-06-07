@@ -28,7 +28,7 @@ export default defineConfig({
       WEB_URL: "http://localhost:3000",
       GOOGLE_CLIENT_ID: "test-google-client-id",
       GOOGLE_CLIENT_SECRET: "test-google-client-secret",
-      STRIPE_SECRET_KEY: "sk_test_mock",
+      STRIPE_API_KEY: "sk_test_mock",
       STRIPE_WEBHOOK_SECRET: "whsec_test_mock",
     },
     coverage: {
@@ -50,7 +50,7 @@ if (typeof Bun !== "undefined" && Bun.env) {
     WEB_URL: "http://localhost:3000",
     GOOGLE_CLIENT_ID: "test-google-client-id",
     GOOGLE_CLIENT_SECRET: "test-google-client-secret",
-    STRIPE_SECRET_KEY: "sk_test_mock",
+    STRIPE_API_KEY: "sk_test_mock",
     STRIPE_WEBHOOK_SECRET: "whsec_test_mock",
   });
 }
