@@ -7,6 +7,8 @@
     "dev": "concurrently 'storybook dev -p 6006' 'tcm -w src'",
     "build-storybook": "storybook build",
     "lint": "biome check .",
+    "lint-fix": "biome check --fix --unsafe .",
+    "format": "biome format --write .",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {

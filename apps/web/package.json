@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "biome check .",
     "lint:watch": "bunx onchange . -- biome check --write --no-errors-on-unmatched {{changed}}",
-    "lint:fix": "biome check --fix --unsafe .",
+    "lint-fix": "biome check --fix --unsafe .",
     "format": "biome format --write .",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
