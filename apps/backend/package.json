@@ -15,11 +15,11 @@
     "@opentelemetry/exporter-trace-otlp-proto": "latest",
     "@opentelemetry/instrumentation-pg": "latest",
     "@opentelemetry/sdk-trace-node": "latest",
-    "@repo/backend-base": "workspace:*",
+    "@repo/backend-base": "*",
     "elysia": "latest"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
+    "@repo/typescript-config": "*",
     "bun-types": "latest"
   },
   "module": "src/index.js"

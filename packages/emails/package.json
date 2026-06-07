@@ -16,7 +16,7 @@
     "react": "^19.0.0"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
+    "@repo/typescript-config": "*",
     "@react-email/preview-server": "5.2.10",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",

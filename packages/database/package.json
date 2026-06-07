@@ -1,5 +1,6 @@
 {
   "name": "@repo/db",
+  "version": "0.0.0",
   "private": true,
   "exports": {
     ".": "./index.ts"
@@ -20,11 +21,11 @@
     "pg": "^8.20.0"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
+    "@repo/typescript-config": "*",
     "@types/pg": "^8.20.0",
     "bun-types": "latest",
     "drizzle-kit": "^0.31.10",
     "@types/node": "^20",
-    "typescript": "^5"
+    "typescript": "6.0.3"
   }
 }
