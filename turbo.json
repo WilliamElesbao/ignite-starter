@@ -1,21 +1,37 @@
 {
-  "$schema": "https://turborepo.dev/schema.json",
+  "$schema": "https://v2-9-16.turborepo.dev/schema.json",
   "ui": "tui",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**", "dist/**", "storybook-static/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      "inputs": ["$TURBO_DEFAULT$", "biome.json", ".biomeignore"]
+    },
+    "lint-fix": {
+      "dependsOn": ["^lint-fix"],
+      "inputs": ["$TURBO_DEFAULT$", "biome.json", ".biomeignore"]
     },
     "format": {
       "dependsOn": ["^format"],
-      "cache": false
+      "inputs": ["$TURBO_DEFAULT$", "biome.json", ".biomeignore"]
+    },
+    "test": {
+      "dependsOn": ["^test"],
+      "inputs": ["$TURBO_DEFAULT$", "vitest.config.ts", "**/*.test.ts", "**/*.test.tsx", "src/**"],
+      "outputs": []
+    },
+    "test:coverage": {
+      "dependsOn": ["^test:coverage"],
+      "inputs": ["$TURBO_DEFAULT$", "vitest.config.ts", "**/*.test.ts", "**/*.test.tsx", "src/**"],
+      "outputs": ["coverage/**"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^check-types"],
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig.json", "**/*.d.ts"]
     },
     "dev": {
       "cache": false,

@@ -1,26 +1,32 @@
 {
   "name": "@repo/backend-base",
+  "version": "0.0.0",
   "type": "module",
   "private": true,
   "scripts": {
-    "test": "vitest",
-    "test:coverage": "vitest run --coverage",
     "db:generate": "bun --env-file .env --bun drizzle-kit generate",
     "db:migrate": "bun --env-file .env --bun drizzle-kit migrate",
-    "db:studio": "bunx --bun  drizzle-kit studio"
+    "db:studio": "bunx --bun  drizzle-kit studio",
+    "lint": "biome check .",
+    "lint-fix": "biome check --fix --unsafe .",
+    "format": "biome format --write .",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@better-auth/api-key": "^1.5.6",
-    "@better-auth/stripe": "^1.5.6",
+    "@better-auth/api-key": "^1.6.11",
+    "@better-auth/stripe": "^1.6.11",
     "@bull-board/api": "^6.20.6",
     "@bull-board/elysia": "^6.20.6",
     "@elysiajs/cors": "^1.4.1",
     "@elysiajs/cron": "^1.4.1",
-    "@repo/db": "workspace:*",
-    "@repo/emails": "workspace:*",
+    "@repo/db": "*",
+    "@repo/emails": "*",
     "@types/ms": "^2.1.0",
     "axios": "^1.13.6",
-    "better-auth": "^1.5.6",
+    "better-auth": "1.6.11",
     "bullmq": "^5.38.2",
     "dayjs": "^1.11.20",
     "dotenv": "^17.3.1",
@@ -36,12 +42,12 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
+    "@repo/typescript-config": "*",
     "@types/pg": "^8.20.0",
     "bun-types": "latest",
     "drizzle-kit": "^0.31.10",
     "tsx": "^4.21.0",
-    "vitest": "^2.1.8",
-    "@vitest/coverage-v8": "^2.1.8"
+    "vitest": "^4.1.8",
+    "@vitest/coverage-v8": "^4.1.8"
   }
 }

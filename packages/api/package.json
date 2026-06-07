@@ -1,14 +1,19 @@
 {
   "name": "@repo/api",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
-    "generate": "bun --env-file .env openapi-ts"
+    "generate": "bun --env-file .env openapi-ts",
+    "lint": "biome check .",
+    "lint-fix": "biome check --fix --unsafe .",
+    "format": "biome format --write .",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.95.2"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
-    "@hey-api/openapi-ts": "0.94.4"
+    "@repo/typescript-config": "*",
+    "@hey-api/openapi-ts": "0.98.1"
   }
 }

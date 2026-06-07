@@ -68,7 +68,7 @@ Copy `.env.example` to `.env` before running. Required variables:
 | `BETTER_AUTH_SECRET` / `BETTER_AUTH_URL` | BetterAuth config |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth |
 | `RESEND_API_KEY` / `EMAIL_FROM` / `EMAIL_TO` / `AUDIENCE_ID` | Resend email |
-| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Stripe payments |
+| `STRIPE_API_KEY` / `STRIPE_WEBHOOK_SECRET` | Stripe payments |
 
 All validation of these variables happens at startup inside `packages/backend-base/src/env.ts` — the app will throw on launch if any required variable is missing.
 

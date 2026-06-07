@@ -1,7 +1,8 @@
 import Elysia from "elysia";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createMockLogger } from "../../../test/setup";
-import { EmailErrorCode } from "../email.errors";
+import { createMockLogger } from "../../test/setup";
+import type { EmailQueueService } from "../queue";
+import { EmailErrorCode } from "./email.errors";
 
 // Mock dependencies
 vi.mock("../../../lib/better-auth/auth", () => ({
@@ -36,8 +37,8 @@ type MockUser = {
 
 describe("EmailPlugin", () => {
   let mockLogger: ReturnType<typeof createMockLogger>;
-  let mockEmailQueueService: {
-    addJob: ReturnType<typeof vi.fn>;
+  let mockEmailQueueService = {
+    addJob: vi.fn<EmailQueueService["addJob"]>(),
   };
   let mockUser: MockUser;
 
@@ -68,11 +69,11 @@ describe("EmailPlugin", () => {
       const app = new Elysia()
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .decorate("user", mockUser as MockUser)
+        .decorate("user", mockUser)
         .post("/email/send", async ({ store: { emailQueueService }, user }) => {
           const jobId = await emailQueueService.addJob("send-welcome-email", {
-            userId: (user as MockUser).id,
-            email: (user as MockUser).email,
+            userId: user.id,
+            email: user.email,
           });
 
           return {
@@ -106,11 +107,11 @@ describe("EmailPlugin", () => {
       const app = new Elysia()
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .decorate("user", mockUser as MockUser)
+        .decorate("user", mockUser)
         .post("/email/send", async ({ store: { emailQueueService }, user }) => {
           const jobId = await emailQueueService.addJob("send-welcome-email", {
-            userId: (user as MockUser).id,
-            email: (user as MockUser).email,
+            userId: user.id,
+            email: user.email,
           });
 
           return {
@@ -154,8 +155,8 @@ describe("EmailPlugin", () => {
             }
 
             const jobId = await emailQueueService.addJob("send-welcome-email", {
-              userId: (user as MockUser).id,
-              email: (user as MockUser).email,
+              userId: user.id,
+              email: user.email,
             });
 
             return {
@@ -189,11 +190,11 @@ describe("EmailPlugin", () => {
       const app = new Elysia()
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .decorate("user", authenticatedUser as MockUser)
+        .decorate("user", authenticatedUser)
         .post("/email/send", async ({ store: { emailQueueService }, user }) => {
           const jobId = await emailQueueService.addJob("send-welcome-email", {
-            userId: (user as MockUser).id,
-            email: (user as MockUser).email,
+            userId: user.id,
+            email: user.email,
           });
 
           return {
@@ -226,7 +227,7 @@ describe("EmailPlugin", () => {
       const app = new Elysia()
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .decorate("user", mockUser as MockUser)
+        .decorate("user", mockUser)
         .post(
           "/email/send",
           async ({ store: { emailQueueService }, user, set }) => {
@@ -234,8 +235,8 @@ describe("EmailPlugin", () => {
               const jobId = await emailQueueService.addJob(
                 "send-welcome-email",
                 {
-                  userId: (user as MockUser).id,
-                  email: (user as MockUser).email,
+                  userId: user.id,
+                  email: user.email,
                 },
               );
 
@@ -277,7 +278,7 @@ describe("EmailPlugin", () => {
       const app = new Elysia()
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .decorate("user", mockUser as MockUser)
+        .decorate("user", mockUser)
         .post(
           "/email/send",
           async ({ store: { emailQueueService }, user, set }) => {
@@ -285,8 +286,8 @@ describe("EmailPlugin", () => {
               const jobId = await emailQueueService.addJob(
                 "send-welcome-email",
                 {
-                  userId: (user as MockUser).id,
-                  email: (user as MockUser).email,
+                  userId: user.id,
+                  email: user.email,
                 },
               );
 
@@ -342,11 +343,11 @@ describe("EmailPlugin", () => {
       const app = new Elysia()
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .decorate("user", testUser as MockUser)
+        .decorate("user", testUser)
         .post("/email/send", async ({ store: { emailQueueService }, user }) => {
           const jobId = await emailQueueService.addJob("send-welcome-email", {
-            userId: (user as MockUser).id,
-            email: (user as MockUser).email,
+            userId: user.id,
+            email: user.email,
           });
 
           return {
@@ -382,11 +383,11 @@ describe("EmailPlugin", () => {
       const app = new Elysia()
         .state("emailQueueService", mockEmailQueueService)
         .state("logger", mockLogger)
-        .decorate("user", mockUser as MockUser)
+        .decorate("user", mockUser)
         .post("/email/send", async ({ store: { emailQueueService }, user }) => {
           const jobId = await emailQueueService.addJob("send-welcome-email", {
-            userId: (user as MockUser).id,
-            email: (user as MockUser).email,
+            userId: user.id,
+            email: user.email,
           });
 
           return {

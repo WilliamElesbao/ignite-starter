@@ -1,4 +1,7 @@
 {
   "extends": "@repo/typescript-config/react-library.json",
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["**/*.ts", "**/*.tsx"],
+  "compilerOptions": {
+    "types": ["bun-types"]
+  }
 }

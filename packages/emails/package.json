@@ -6,7 +6,11 @@
     "./templates": "./src/index.ts"
   },
   "scripts": {
-    "dev": "email dev --dir ./src/templates --port 3001"
+    "dev": "email dev --dir ./src/templates --port 3001",
+    "lint": "biome check .",
+    "lint-fix": "biome check --fix --unsafe .",
+    "format": "biome format --write .",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@react-email/components": "1.0.10",
@@ -14,7 +18,7 @@
     "react": "^19.0.0"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
+    "@repo/typescript-config": "*",
     "@react-email/preview-server": "5.2.10",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",

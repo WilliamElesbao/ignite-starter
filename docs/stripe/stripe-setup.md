@@ -3,7 +3,7 @@
 This document explains how to configure **Stripe** for local environment using:
 
 - Stripe account in **Test** mode
-- `STRIPE_SECRET_KEY` (test key)
+- `STRIPE_API_KEY` (test key)
 - `STRIPE_WEBHOOK_SECRET` (webhook secret)
 - Docker with `stripe/stripe-cli` or locally installed Stripe CLI
 
@@ -22,7 +22,7 @@ At the end you will be able to:
 
 ---
 
-## 2. Get STRIPE_SECRET_KEY (test secret key)
+## 2. Get STRIPE_API_KEY (test secret key)
 
 1. In the Stripe dashboard, go to **Developers → API keys**.
 2. Under **Standard keys**, locate the **Secret key** (usually starts with `sk_test_...`).
@@ -32,7 +32,7 @@ At the end you will be able to:
 In your `.env`, fill in:
 
 ```dotenv
-STRIPE_SECRET_KEY=sk_test_example1234567890
+STRIPE_API_KEY=sk_test_example1234567890
 ```
 
 > Always use **test** keys in local environment.
@@ -139,7 +139,7 @@ If you want to use the container defined in `docker-compose.yml`:
 In the end, your `.env` should have something like:
 
 ```dotenv
-STRIPE_SECRET_KEY=sk_test_example1234567890
+STRIPE_API_KEY=sk_test_example1234567890
 STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxx
 ```
 

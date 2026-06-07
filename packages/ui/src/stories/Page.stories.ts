@@ -31,3 +31,34 @@ export const LoggedIn: Story = {
     await expect(logoutButton).toBeInTheDocument();
   },
 };
+
+export const LogoutFlow: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Login first
+    const loginButton = canvas.getByRole("button", { name: /Log in/i });
+    await userEvent.click(loginButton);
+
+    // Then logout
+    const logoutButton = canvas.getByRole("button", { name: /Log out/i });
+    await userEvent.click(logoutButton);
+
+    // Should see login button again
+    await expect(
+      canvas.getByRole("button", { name: /Log in/i }),
+    ).toBeInTheDocument();
+  },
+};
+
+export const SignUpFlow: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const signUpButton = canvas.getByRole("button", { name: /Sign up/i });
+    await expect(signUpButton).toBeInTheDocument();
+    await userEvent.click(signUpButton);
+
+    const logoutButton = canvas.getByRole("button", { name: /Log out/i });
+    await expect(logoutButton).toBeInTheDocument();
+  },
+};

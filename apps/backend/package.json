@@ -3,9 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "build": "bun build ./src/index.ts --target bun --sourcemap --outdir ./dist",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
-    "worker:email": "bun run ../../packages/backend-base/src/workers/email.worker.ts"
+    "worker:email": "bun run ../../packages/backend-base/src/workers/email.worker.ts",
+    "lint": "biome check .",
+    "lint-fix": "biome check --fix --unsafe .",
+    "format": "biome format --write .",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@elysiajs/openapi": "^1.4.14",
@@ -13,11 +16,11 @@
     "@opentelemetry/exporter-trace-otlp-proto": "latest",
     "@opentelemetry/instrumentation-pg": "latest",
     "@opentelemetry/sdk-trace-node": "latest",
-    "@repo/backend-base": "workspace:*",
+    "@repo/backend-base": "*",
     "elysia": "latest"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
+    "@repo/typescript-config": "*",
     "bun-types": "latest"
   },
   "module": "src/index.js"
