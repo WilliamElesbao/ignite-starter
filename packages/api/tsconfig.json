@@ -1,4 +1,7 @@
 {
   "extends": "@repo/typescript-config/base.json",
-  "include": ["src/**/*", "openapi-ts.config.ts", "generated/**/*.ts"]
+  "include": ["src/**/*", "openapi-ts.config.ts", "generated/**/*.ts"],
+  "compilerOptions": {
+    "types": ["bun-types"]
+  }
 }
