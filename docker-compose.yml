@@ -8,8 +8,8 @@ services:
     env_file:
       - ./apps/backend/.env
     command: redis-server --requirepass abcd1234
-    volumes:
-      - ./.docker/redis:/data
+    # volumes:
+    #   - ./.docker/redis:/data
 
   redis-commander:
     image: rediscommander/redis-commander:latest
@@ -31,8 +31,8 @@ services:
       POSTGRES_PASSWORD: docker
     ports:
       - "5432:5432"
-    volumes:
-      - ./.docker/postgres:/var/lib/postgresql/data
+    # volumes:
+    #   - ./.docker/postgres:/var/lib/postgresql/data
 
   stripe:
     image: stripe/stripe-cli:latest
