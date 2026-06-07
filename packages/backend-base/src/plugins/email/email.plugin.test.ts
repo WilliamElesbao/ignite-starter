@@ -1,8 +1,8 @@
 import Elysia from "elysia";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createMockLogger } from "../../../test/setup";
-import type { EmailQueueService } from "../../queue";
-import { EmailErrorCode } from "../email.errors";
+import { createMockLogger } from "../../test/setup";
+import type { EmailQueueService } from "../queue";
+import { EmailErrorCode } from "./email.errors";
 
 // Mock dependencies
 vi.mock("../../../lib/better-auth/auth", () => ({

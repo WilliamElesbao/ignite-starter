@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { WELCOME_TOAST } from "@/constants";
 import { authClient } from "@/lib/better-auth/auth-client";
 import { mockSessionStorage } from "@/test/setup";
-import { signInWithGoogle } from "../sign-in";
+import { signInWithGoogle } from "./sign-in";
 
 // Mock authClient
 vi.mock("@/lib/better-auth/auth-client", () => ({

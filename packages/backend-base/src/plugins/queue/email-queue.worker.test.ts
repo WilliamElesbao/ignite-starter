@@ -101,11 +101,11 @@ vi.mock("../email-queue.config", () => ({
 
 import type { Job } from "bullmq";
 import { Worker } from "bullmq";
-import { createMockLogger } from "../../../test/setup";
-import { EmailService } from "../../email/email.service";
-import { EMAIL_JOBS, EMAIL_QUEUE_NAME } from "../email-queue.config";
-import type { WelcomeEmailData } from "../email-queue.worker";
-import { EmailQueueWorker } from "../email-queue.worker";
+import { createMockLogger } from "../../test/setup";
+import { EmailService } from "../email/email.service";
+import { EMAIL_JOBS, EMAIL_QUEUE_NAME } from "./email-queue.config";
+import type { WelcomeEmailData } from "./email-queue.worker";
+import { EmailQueueWorker } from "./email-queue.worker";
 
 // Type for the mock worker with extended properties
 interface MockWorkerExtensions {

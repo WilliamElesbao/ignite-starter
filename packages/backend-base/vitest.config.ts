@@ -32,8 +32,19 @@ export default defineConfig({
       STRIPE_WEBHOOK_SECRET: "whsec_test_mock",
     },
     coverage: {
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 80,
+        statements: 80,
+      },
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
+      include: [
+        "src/plugins/email/email.service.ts",
+        "src/plugins/queue/email-queue.service.ts",
+        "src/plugins/queue/email-queue.worker.ts",
+      ],
       exclude: ["node_modules/", "src/test/", "**/*.test.ts"],
     },
   },

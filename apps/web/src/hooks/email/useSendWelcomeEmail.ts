@@ -20,9 +20,7 @@ export const useEmail = () => {
       return;
     }
 
-    if (response.success) {
-      toast.success(t("email-sent-successfully"));
-    }
+    toast.success(t("email-sent-successfully"));
   };
 
   return { sendWelcomeEmail };

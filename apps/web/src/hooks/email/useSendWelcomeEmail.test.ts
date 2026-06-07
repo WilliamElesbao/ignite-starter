@@ -1,8 +1,8 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { toast } from "sonner";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import * as emailMutation from "../email.mutation";
-import { useEmail } from "../useSendWelcomeEmail";
+import * as emailMutation from "./email.mutation";
+import { useEmail } from "./useSendWelcomeEmail";
 
 // Mock dependencies
 vi.mock("sonner", () => ({
@@ -150,6 +150,21 @@ describe("useEmail", () => {
     expect(toast.success).not.toHaveBeenCalled();
   });
 
+  it("should handle error when response.success is false and error is present", async () => {
+    // Arrange
+    mockMutateAsync.mockRejectedValue(new Error("API Error"));
+
+    // Act
+    const { result } = renderHook(() => useEmail());
+    await result.current.sendWelcomeEmail();
+
+    // Assert
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith("failed-to-send-email");
+    });
+    expect(toast.success).not.toHaveBeenCalled();
+  });
+
   it("should handle response with success property correctly", async () => {
     // Arrange - Test with explicit success: true
     mockMutateAsync.mockResolvedValue({ success: true, jobId: "job-123" });
@@ -163,6 +178,21 @@ describe("useEmail", () => {
       expect(toast.success).toHaveBeenCalledWith("email-sent-successfully");
     });
     expect(toast.error).not.toHaveBeenCalled();
+  });
+
+  it("should not call success toast when response.success is explicitly false", async () => {
+    // Arrange - response exists but success is false
+    mockMutateAsync.mockResolvedValue({ success: false });
+
+    // Act
+    const { result } = renderHook(() => useEmail());
+    await result.current.sendWelcomeEmail();
+
+    // Assert - should show error, not success
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith("failed-to-send-email");
+    });
+    expect(toast.success).not.toHaveBeenCalled();
   });
 
   it("should call useSendEmail hook", () => {
