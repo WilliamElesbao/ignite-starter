@@ -11,7 +11,7 @@ export default defineConfig({
     pool: "forks", // Required for Bun compatibility with jsdom
     coverage: {
       provider: "v8",
-      reporter: ["text", "json", "html"],
+      reporter: ["text", "json", "html", "lcov"],
       exclude: [
         "node_modules/",
         "src/test/",

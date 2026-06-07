@@ -27,5 +27,16 @@ export default defineConfig({
         },
       },
     ],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json", "html", "lcov"],
+      exclude: [
+        "node_modules/",
+        "src/test/",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        ".next/**",
+      ],
+    },
   },
 });
