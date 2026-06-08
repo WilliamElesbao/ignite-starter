@@ -1,10 +1,10 @@
+import { FieldGroup } from "@repo/ui/components/ui/field";
+import { Form } from "@repo/ui/components/ui/form";
 import type {
   FieldValues,
   SubmitHandler,
   UseFormReturn,
 } from "react-hook-form";
-import { FieldGroup } from "@/components/ui/field";
-import { Form } from "@/components/ui/form";
 
 interface AuthFormContainerProps<T extends FieldValues> {
   form: UseFormReturn<T>;

@@ -1,12 +1,6 @@
 "use client";
 
-import { AppSidebar } from "@/components/app-sidebar";
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
-import { DataTable } from "@/components/data-table";
-import { ChoosePlanDialog } from "@/components/origin-ui/choose-plan-dialog";
-import { SectionCards } from "@/components/section-cards";
-import { SiteHeader } from "@/components/site-header";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@repo/ui/components/ui/sidebar";
 import { DialogProvider } from "@/context/dialog.context";
 import {
   useGetStripeProducts,
@@ -14,6 +8,12 @@ import {
 } from "@/hooks/stripe/stripe.queries";
 import type { User } from "@/lib/better-auth/auth.types";
 import { useWelcomeToast } from "../auth/hooks/useWelcomeToast";
+import { AppSidebar } from "./components/app-sidebar";
+import { ChartAreaInteractive } from "./components/chart-area-interactive";
+import { ChoosePlanDialog } from "./components/choose-plan-dialog";
+import { DataTable } from "./components/data-table";
+import { SectionCards } from "./components/section-cards";
+import { SiteHeader } from "./components/site-header";
 import data from "./data.json";
 
 interface DashboardWrapperProps {
