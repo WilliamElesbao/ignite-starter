@@ -12,16 +12,16 @@
   },
   "dependencies": {
     "@elysiajs/openapi": "^1.4.14",
-    "@elysiajs/opentelemetry": "latest",
-    "@opentelemetry/exporter-trace-otlp-proto": "latest",
-    "@opentelemetry/instrumentation-pg": "latest",
-    "@opentelemetry/sdk-trace-node": "latest",
-    "@repo/backend-base": "*",
-    "elysia": "latest"
+    "@elysiajs/opentelemetry": "1.4.11",
+    "@opentelemetry/exporter-trace-otlp-proto": "0.218.0",
+    "@opentelemetry/instrumentation-pg": "0.70.0",
+    "@opentelemetry/sdk-trace-node": "2.7.1",
+    "@repo/backend-base": "workspace:*",
+    "elysia": "1.4.28"
   },
   "devDependencies": {
-    "@repo/typescript-config": "*",
-    "bun-types": "latest"
+    "@repo/typescript-config": "workspace:*",
+    "bun-types": "1.3.14"
   },
   "module": "src/index.js"
 }
