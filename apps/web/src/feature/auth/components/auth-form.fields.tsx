@@ -1,11 +1,11 @@
+import { Field, FieldError, FieldLabel } from "@repo/ui/components/ui/field";
+import { Input } from "@repo/ui/components/ui/input";
 import {
   Controller,
   type FieldValues,
   type Path,
   type UseFormReturn,
 } from "react-hook-form";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 
 interface AuthFormFieldProps<T extends FieldValues> {
   form: UseFormReturn<T>;

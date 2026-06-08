@@ -1,8 +1,8 @@
+import { FieldDescription } from "@repo/ui/components/ui/field";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { GiFox } from "rocketicons/gi";
 import { RcRocketIcon } from "rocketicons/rc";
-import { FieldDescription } from "@/components/ui/field";
 
 interface AuthFormHeaderProps {
   mode: "sign-in" | "sign-up";

@@ -1,5 +1,5 @@
+import { FieldDescription } from "@repo/ui/components/ui/field";
 import { useTranslations } from "next-intl";
-import { FieldDescription } from "@/components/ui/field";
 
 interface AuthFormDescriptionProps {
   children?: React.ReactNode;

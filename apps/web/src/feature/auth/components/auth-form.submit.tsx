@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { Field } from "@/components/ui/field";
+import { Button } from "@repo/ui/components/ui/button";
+import { Field } from "@repo/ui/components/ui/field";
 
 interface AuthFormSubmitProps {
   children: React.ReactNode;

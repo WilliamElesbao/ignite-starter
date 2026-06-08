@@ -1,6 +1,6 @@
+import { Button } from "@repo/ui/components/ui/button";
+import { Field } from "@repo/ui/components/ui/field";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
-import { Field } from "@/components/ui/field";
 
 interface AuthFormSocialsProps {
   signInWithGoogle: () => void;

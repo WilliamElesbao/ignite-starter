@@ -22,7 +22,7 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@repo/ui": ["../../packages/ui/src/index.ts"]
+      "@repo/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "include": [
@@ -31,8 +31,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts",
-    "../../packages/ui/**/*.ts"
+    "**/*.mts"
   ],
   "exclude": ["node_modules"]
 }
