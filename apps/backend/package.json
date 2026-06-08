@@ -16,11 +16,11 @@
     "@opentelemetry/exporter-trace-otlp-proto": "0.218.0",
     "@opentelemetry/instrumentation-pg": "0.70.0",
     "@opentelemetry/sdk-trace-node": "2.7.1",
-    "@repo/backend-base": "*",
+    "@repo/backend-base": "workspace:*",
     "elysia": "1.4.28"
   },
   "devDependencies": {
-    "@repo/typescript-config": "*",
+    "@repo/typescript-config": "workspace:*",
     "bun-types": "1.3.14"
   },
   "module": "src/index.js"
