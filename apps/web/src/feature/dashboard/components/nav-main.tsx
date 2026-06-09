@@ -9,7 +9,7 @@ import {
   SidebarMenuItem,
 } from "@repo/ui/components/ui/sidebar";
 import { type Icon, IconCirclePlusFilled, IconMail } from "@tabler/icons-react";
-import { useEmail } from "@/hooks/email/useSendWelcomeEmail";
+import { useEmail } from "@/hooks/email/use-send-welcome-email";
 
 export function NavMain({
   items,

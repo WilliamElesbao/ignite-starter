@@ -1,9 +1,9 @@
 import { cleanup, render } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Button } from "./Button";
-import { ButtonCssModule } from "./ButtonCssModule";
-import { ButtonTailwind } from "./ButtonTailwind";
+import { Button } from "./button";
+import { ButtonCssModule } from "./button-css-module";
+import { ButtonTailwind } from "./button-tailwind";
 
 describe("Button", () => {
   beforeEach(() => {

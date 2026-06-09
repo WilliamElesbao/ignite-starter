@@ -1,13 +1,13 @@
 "use client";
 
 import { SidebarInset, SidebarProvider } from "@repo/ui/components/ui/sidebar";
-import { DialogProvider } from "@/context/dialog.context";
+import { DialogProvider } from "@/context/dialog-context";
 import {
   useGetStripeProducts,
   useGetStripeSubscriptionDetails,
 } from "@/hooks/stripe/stripe.queries";
 import type { User } from "@/lib/better-auth/auth.types";
-import { useWelcomeToast } from "../auth/hooks/useWelcomeToast";
+import { useWelcomeToast } from "../auth/hooks/use-welcome-toast";
 import { AppSidebar } from "./components/app-sidebar";
 import { ChartAreaInteractive } from "./components/chart-area-interactive";
 import { ChoosePlanDialog } from "./components/choose-plan-dialog";

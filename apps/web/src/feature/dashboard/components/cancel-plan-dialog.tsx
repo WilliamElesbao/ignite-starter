@@ -15,7 +15,7 @@ import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { CircleAlertIcon } from "lucide-react";
 import { useEffect, useId, useState } from "react";
-import { useCancelSubscription } from "@/hooks/stripe/useSubscription";
+import { useCancelSubscription } from "@/hooks/stripe/use-subscription";
 
 const PHRASE = "Yes, I'd like to cancel my subscription";
 

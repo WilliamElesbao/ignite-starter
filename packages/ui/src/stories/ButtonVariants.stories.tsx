@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { ButtonCssModule } from "../Button/ButtonCssModule";
-import { ButtonTailwind } from "../Button/ButtonTailwind";
+import { ButtonCssModule, ButtonTailwind } from "../button";
 
 const meta = {
   title: "Components/ButtonVariants",

@@ -12,7 +12,7 @@ import {
 import { Languages } from "lucide-react";
 import { usePathname as useNextPathname } from "next/navigation";
 import { hasLocale, useLocale, useTranslations } from "next-intl";
-import { useLocaleLabel } from "@/hooks/locale/useLocale";
+import { useLocaleLabel } from "@/hooks/locale/use-locale";
 import { useRouter } from "@/lib/i18n/navigation";
 import { routing } from "@/lib/i18n/routing";
 

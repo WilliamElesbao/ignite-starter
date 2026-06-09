@@ -1,3 +1,3 @@
-export * from "./Button";
-export * from "./ButtonCssModule";
-export * from "./ButtonTailwind";
+export * from "./button";
+export * from "./button-css-module";
+export * from "./button-tailwind";

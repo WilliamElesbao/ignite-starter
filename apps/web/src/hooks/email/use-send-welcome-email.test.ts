@@ -1,8 +1,8 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { toast } from "sonner";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import * as emailMutation from "./email.mutation";
-import { useEmail } from "./useSendWelcomeEmail";
+import * as emailMutation from "./email.mutations";
+import { useEmail } from "./use-send-welcome-email";
 
 // Mock dependencies
 vi.mock("sonner", () => ({

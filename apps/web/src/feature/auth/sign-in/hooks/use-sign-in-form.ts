@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { WELCOME_TOAST } from "@/constants";
 import { authClient } from "@/lib/better-auth/auth-client";
-import { type SignInFormValues, signInFormSchema } from "./form.schema";
+import { type SignInFormValues, signInFormSchema } from "./form-schema";
 
 /**
  * Manages sign-in form state and submission with email/password authentication.

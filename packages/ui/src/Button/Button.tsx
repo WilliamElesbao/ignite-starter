@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { ButtonTailwind } from "./ButtonTailwind";
+import { ButtonTailwind } from "./button-tailwind";
 
 export interface ButtonProps {
   children: ReactNode;
