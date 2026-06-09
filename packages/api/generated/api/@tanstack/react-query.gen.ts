@@ -231,7 +231,7 @@ export const getUserByIdOptions = (options: Options<GetUserByIdData>) =>
   });
 
 /**
- * Send a welcome email
+ * Queue a welcome email for asynchronous processing. Returns immediately with a job ID.
  */
 export const postEmailSendMutation = (
   options?: Partial<Options<PostEmailSendData>>,

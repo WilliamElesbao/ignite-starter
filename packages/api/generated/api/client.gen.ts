@@ -23,7 +23,5 @@ export type CreateClientConfig<T extends ClientOptions = ClientOptions2> = (
 ) => Config<Required<ClientOptions> & T>;
 
 export const client = createClient(
-  createClientConfig(
-    createConfig<ClientOptions2>({ baseUrl: "http://localhost:3333" }),
-  ),
+  createClientConfig(createConfig<ClientOptions2>()),
 );
