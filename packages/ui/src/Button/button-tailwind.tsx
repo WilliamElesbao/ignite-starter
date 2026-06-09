@@ -1,6 +1,6 @@
 "use client";
 
-import type { ButtonProps } from "./button";
+import type { ButtonProps } from "./custom-button";
 
 export const ButtonTailwind = ({
   children,

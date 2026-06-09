@@ -1,7 +1,7 @@
 "use client";
 
-import type { ButtonProps } from "./button";
 import styles from "./button-css-module.module.css";
+import type { ButtonProps } from "./custom-button";
 
 export const ButtonCssModule = ({
   children,
