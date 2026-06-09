@@ -37,11 +37,6 @@ jobs:
           bun run locale-check
           bun run locale-unused
 
-      - name: Generate API client
-        run: |
-          cd packages/api
-          bun run generate
-
       - name: Typecheck
         run: bun run tsc
 
