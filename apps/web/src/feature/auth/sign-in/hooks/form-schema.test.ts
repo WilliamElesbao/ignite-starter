@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { signInFormSchema } from "./form.schema";
+import { signInFormSchema } from "./form-schema";
 
 // Mock next-intl
 vi.mock("next-intl", () => ({

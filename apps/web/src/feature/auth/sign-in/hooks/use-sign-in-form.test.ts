@@ -7,9 +7,9 @@ import { toast } from "sonner";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { WELCOME_TOAST } from "@/constants";
 import { authClient } from "@/lib/better-auth/auth-client";
-import { createMockSignInValues } from "@/test/factories/auth.factory";
+import { createMockSignInValues } from "@/test/factories/auth-factory";
 import { mockSessionStorage } from "@/test/setup";
-import { useSignInForm } from "./useSignInForm";
+import { useSignInForm } from "./use-sign-in-form";
 
 // Mock authClient
 vi.mock("@/lib/better-auth/auth-client", () => ({

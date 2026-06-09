@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { safePromise } from "@/utils";
-import { useSendEmail } from "./email.mutation";
+import { useSendEmail } from "./email.mutations";
 
 /**
  * Hook for sending welcome emails with toast notifications.
