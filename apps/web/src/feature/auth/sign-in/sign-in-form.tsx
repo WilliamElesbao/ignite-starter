@@ -1,8 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { AuthForm } from "@/feature/auth/components";
-import { useSignInForm } from "@/feature/auth/sign-in/hooks/useSignInForm";
+import { AuthForm } from "@/feature/auth/components/auth-form";
+import { useSignInForm } from "@/feature/auth/sign-in/hooks/use-sign-in-form";
 import { cn } from "@/lib/shadcn/utils";
 import { signInWithGoogle } from "../hooks/sign-in";
 

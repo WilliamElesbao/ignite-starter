@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { useGetStripeSubscriptionDetails } from "./stripe.queries";
-import { useSubscription, useUpdateSubscription } from "./useSubscription";
+import { useSubscription, useUpdateSubscription } from "./use-subscription";
 
 const formSchema = z.object({
   priceId: z.string(),

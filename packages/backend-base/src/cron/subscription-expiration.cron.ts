@@ -4,7 +4,7 @@ import {
   CRON_NAME,
   fetchUsersWithSubscriptions,
   processUser,
-} from "./subscription-expiration.helpers";
+} from "./subscription-expiration.util";
 
 const subscriptionExpirationCron = cron({
   name: CRON_NAME,
