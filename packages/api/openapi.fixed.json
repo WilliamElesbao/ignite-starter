@@ -59,12 +59,7 @@
             "readOnly": true
           }
         },
-        "required": [
-          "name",
-          "email",
-          "createdAt",
-          "updatedAt"
-        ]
+        "required": ["name", "email", "createdAt", "updatedAt"]
       },
       "Session": {
         "type": "object",
@@ -98,13 +93,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "expiresAt",
-          "token",
-          "createdAt",
-          "updatedAt",
-          "userId"
-        ]
+        "required": ["expiresAt", "token", "createdAt", "updatedAt", "userId"]
       },
       "Account": {
         "type": "object",
@@ -180,9 +169,7 @@
   "paths": {
     "/user/{id}": {
       "get": {
-        "tags": [
-          "User"
-        ],
+        "tags": ["User"],
         "description": "Get user by ID",
         "parameters": [
           {
@@ -284,15 +271,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "AUTH_UNAUTHORIZED"
-                      ],
+                      "enum": ["AUTH_UNAUTHORIZED"],
                       "type": "string"
                     },
                     "message": {
@@ -309,15 +291,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "USER_NOT_FOUND"
-                      ],
+                      "enum": ["USER_NOT_FOUND"],
                       "type": "string"
                     },
                     "message": {
@@ -334,15 +311,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "USER_FETCH_FAILED"
-                      ],
+                      "enum": ["USER_FETCH_FAILED"],
                       "type": "string"
                     },
                     "message": {
@@ -359,9 +331,7 @@
     },
     "/email/send": {
       "post": {
-        "tags": [
-          "Email"
-        ],
+        "tags": ["Email"],
         "description": "Queue a welcome email for asynchronous processing. Returns immediately with a job ID.",
         "responses": {
           "200": {
@@ -370,11 +340,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "message",
-                    "success",
-                    "jobId"
-                  ],
+                  "required": ["message", "success", "jobId"],
                   "properties": {
                     "message": {
                       "type": "string"
@@ -396,15 +362,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "EMAIL_SEND_FAILED"
-                      ],
+                      "enum": ["EMAIL_SEND_FAILED"],
                       "type": "string"
                     },
                     "message": {
@@ -421,15 +382,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "EMAIL_PROVIDER_ERROR"
-                      ],
+                      "enum": ["EMAIL_PROVIDER_ERROR"],
                       "type": "string"
                     },
                     "message": {
@@ -446,9 +402,7 @@
     },
     "/stripe/products": {
       "get": {
-        "tags": [
-          "Stripe"
-        ],
+        "tags": ["Stripe"],
         "description": "Get all products from Stripe",
         "responses": {
           "200": {
@@ -521,15 +475,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "STRIPE_INTERNAL_SERVER_ERROR"
-                      ],
+                      "enum": ["STRIPE_INTERNAL_SERVER_ERROR"],
                       "type": "string"
                     },
                     "message": {
@@ -546,10 +495,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
                       "enum": [
@@ -572,9 +518,7 @@
     },
     "/stripe/subscription": {
       "post": {
-        "tags": [
-          "Stripe"
-        ],
+        "tags": ["Stripe"],
         "description": "Create a new subscription",
         "requestBody": {
           "required": true,
@@ -582,10 +526,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "priceId",
-                  "planName"
-                ],
+                "required": ["priceId", "planName"],
                 "properties": {
                   "priceId": {
                     "type": "string"
@@ -599,10 +540,7 @@
             "application/x-www-form-urlencoded": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "priceId",
-                  "planName"
-                ],
+                "required": ["priceId", "planName"],
                 "properties": {
                   "priceId": {
                     "type": "string"
@@ -616,10 +554,7 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "priceId",
-                  "planName"
-                ],
+                "required": ["priceId", "planName"],
                 "properties": {
                   "priceId": {
                     "type": "string"
@@ -639,9 +574,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "url"
-                  ],
+                  "required": ["url"],
                   "properties": {
                     "url": {
                       "type": "string"
@@ -657,15 +590,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "AUTH_UNAUTHORIZED"
-                      ],
+                      "enum": ["AUTH_UNAUTHORIZED"],
                       "type": "string"
                     },
                     "message": {
@@ -682,15 +610,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "STRIPE_SUBSCRIPTION_NOT_FOUND"
-                      ],
+                      "enum": ["STRIPE_SUBSCRIPTION_NOT_FOUND"],
                       "type": "string"
                     },
                     "message": {
@@ -707,15 +630,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "STRIPE_INTERNAL_SERVER_ERROR"
-                      ],
+                      "enum": ["STRIPE_INTERNAL_SERVER_ERROR"],
                       "type": "string"
                     },
                     "message": {
@@ -732,10 +650,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
                       "enum": [
@@ -756,9 +671,7 @@
         "operationId": "postStripeSubscription"
       },
       "patch": {
-        "tags": [
-          "Stripe"
-        ],
+        "tags": ["Stripe"],
         "description": "Update an existing subscription",
         "requestBody": {
           "required": true,
@@ -766,10 +679,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "priceId",
-                  "planName"
-                ],
+                "required": ["priceId", "planName"],
                 "properties": {
                   "priceId": {
                     "type": "string"
@@ -783,10 +693,7 @@
             "application/x-www-form-urlencoded": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "priceId",
-                  "planName"
-                ],
+                "required": ["priceId", "planName"],
                 "properties": {
                   "priceId": {
                     "type": "string"
@@ -800,10 +707,7 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "priceId",
-                  "planName"
-                ],
+                "required": ["priceId", "planName"],
                 "properties": {
                   "priceId": {
                     "type": "string"
@@ -829,15 +733,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "AUTH_UNAUTHORIZED"
-                      ],
+                      "enum": ["AUTH_UNAUTHORIZED"],
                       "type": "string"
                     },
                     "message": {
@@ -854,15 +753,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "STRIPE_SUBSCRIPTION_NOT_FOUND"
-                      ],
+                      "enum": ["STRIPE_SUBSCRIPTION_NOT_FOUND"],
                       "type": "string"
                     },
                     "message": {
@@ -879,10 +773,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
                       "enum": [
@@ -905,10 +796,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
                       "enum": [
@@ -931,9 +819,7 @@
     },
     "/stripe/subscription/details": {
       "get": {
-        "tags": [
-          "Stripe"
-        ],
+        "tags": ["Stripe"],
         "description": "Get subscription details",
         "responses": {
           "200": {
@@ -942,9 +828,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "hasActiveSubscription"
-                  ],
+                  "required": ["hasActiveSubscription"],
                   "properties": {
                     "hasActiveSubscription": {
                       "type": "boolean"
@@ -996,11 +880,7 @@
                     },
                     "plan": {
                       "type": "object",
-                      "required": [
-                        "priceId",
-                        "amount",
-                        "currency"
-                      ],
+                      "required": ["priceId", "amount", "currency"],
                       "properties": {
                         "priceId": {
                           "type": "string"
@@ -1013,23 +893,14 @@
                           "type": "string"
                         },
                         "interval": {
-                          "enum": [
-                            "day",
-                            "week",
-                            "month",
-                            "year"
-                          ],
+                          "enum": ["day", "week", "month", "year"],
                           "type": "string"
                         }
                       }
                     },
                     "product": {
                       "type": "object",
-                      "required": [
-                        "id",
-                        "name",
-                        "description"
-                      ],
+                      "required": ["id", "name", "description"],
                       "properties": {
                         "id": {
                           "type": "string"
@@ -1054,15 +925,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "AUTH_UNAUTHORIZED"
-                      ],
+                      "enum": ["AUTH_UNAUTHORIZED"],
                       "type": "string"
                     },
                     "message": {
@@ -1079,15 +945,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "STRIPE_INTERNAL_SERVER_ERROR"
-                      ],
+                      "enum": ["STRIPE_INTERNAL_SERVER_ERROR"],
                       "type": "string"
                     },
                     "message": {
@@ -1104,10 +965,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
                       "enum": [
@@ -1132,9 +990,7 @@
     },
     "/stripe/subscription/revoke": {
       "patch": {
-        "tags": [
-          "Stripe"
-        ],
+        "tags": ["Stripe"],
         "description": "Revoke subscription access immediately",
         "responses": {
           "204": {
@@ -1149,15 +1005,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "AUTH_UNAUTHORIZED"
-                      ],
+                      "enum": ["AUTH_UNAUTHORIZED"],
                       "type": "string"
                     },
                     "message": {
@@ -1174,15 +1025,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "STRIPE_SUBSCRIPTION_NOT_FOUND"
-                      ],
+                      "enum": ["STRIPE_SUBSCRIPTION_NOT_FOUND"],
                       "type": "string"
                     },
                     "message": {
@@ -1199,10 +1045,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
                       "enum": [
@@ -1225,15 +1068,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
-                      "enum": [
-                        "STRIPE_SUBSCRIPTION_REVOKE_FAILED"
-                      ],
+                      "enum": ["STRIPE_SUBSCRIPTION_REVOKE_FAILED"],
                       "type": "string"
                     },
                     "message": {
@@ -1250,9 +1088,7 @@
     },
     "/stripe/webhook": {
       "post": {
-        "tags": [
-          "Stripe"
-        ],
+        "tags": ["Stripe"],
         "description": "Stripe webhook",
         "responses": {
           "200": {
@@ -1261,9 +1097,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "message"
-                  ],
+                  "required": ["message"],
                   "properties": {
                     "message": {
                       "type": "string"
@@ -1279,10 +1113,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
                       "enum": [
@@ -1306,10 +1137,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "code",
-                    "message"
-                  ],
+                  "required": ["code", "message"],
                   "properties": {
                     "code": {
                       "enum": [
@@ -1332,9 +1160,7 @@
     },
     "/auth/sign-in/social": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Sign in with a social provider",
         "operationId": "socialSignIn",
         "security": [
@@ -1424,9 +1250,7 @@
                         "nullable": true
                       }
                     },
-                    "required": [
-                      "token"
-                    ],
+                    "required": ["token"],
                     "type": "object",
                     "nullable": true
                   },
@@ -1450,9 +1274,7 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "provider"
-                ]
+                "required": ["provider"]
               }
             }
           }
@@ -1480,9 +1302,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "redirect"
-                  ]
+                  "required": ["redirect"]
                 }
               }
             }
@@ -1497,9 +1317,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -1515,9 +1333,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -1588,9 +1404,7 @@
     },
     "/auth/callback/{id}": {
       "get": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "security": [
           {
             "bearerAuth": []
@@ -1608,9 +1422,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -1626,9 +1438,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -1697,9 +1507,7 @@
         }
       },
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "security": [
           {
             "bearerAuth": []
@@ -1727,9 +1535,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -1745,9 +1551,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -1818,9 +1622,7 @@
     },
     "/auth/get-session": {
       "get": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Get the current session",
         "operationId": "getSession",
         "security": [
@@ -1843,10 +1645,7 @@
                       "$ref": "#/components/schemas/User"
                     }
                   },
-                  "required": [
-                    "session",
-                    "user"
-                  ],
+                  "required": ["session", "user"],
                   "type": "object",
                   "nullable": true
                 }
@@ -1863,9 +1662,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -1881,9 +1678,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -1952,9 +1747,7 @@
         }
       },
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Get the current session",
         "operationId": "getSession",
         "security": [
@@ -1987,10 +1780,7 @@
                       "$ref": "#/components/schemas/User"
                     }
                   },
-                  "required": [
-                    "session",
-                    "user"
-                  ],
+                  "required": ["session", "user"],
                   "type": "object",
                   "nullable": true
                 }
@@ -2007,9 +1797,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -2025,9 +1813,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -2098,9 +1884,7 @@
     },
     "/auth/sign-out": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Sign out the current user",
         "operationId": "signOut",
         "security": [
@@ -2145,9 +1929,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -2163,9 +1945,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -2236,9 +2016,7 @@
     },
     "/auth/sign-up/email": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Sign up a user using email and password",
         "operationId": "signUpWithEmailAndPassword",
         "security": [
@@ -2278,11 +2056,7 @@
                     "description": "If this is false, the session will not be remembered. Default is `true`."
                   }
                 },
-                "required": [
-                  "name",
-                  "email",
-                  "password"
-                ]
+                "required": ["name", "email", "password"]
               }
             }
           }
@@ -2347,9 +2121,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "user"
-                  ]
+                  "required": ["user"]
                 }
               }
             }
@@ -2364,9 +2136,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -2382,9 +2152,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -2470,9 +2238,7 @@
     },
     "/auth/sign-in/email": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Sign in with email and password",
         "operationId": "signInEmail",
         "security": [
@@ -2508,10 +2274,7 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "email",
-                  "password"
-                ]
+                "required": ["email", "password"]
               }
             }
           }
@@ -2527,9 +2290,7 @@
                   "properties": {
                     "redirect": {
                       "type": "boolean",
-                      "enum": [
-                        false
-                      ]
+                      "enum": [false]
                     },
                     "token": {
                       "type": "string",
@@ -2544,11 +2305,7 @@
                       "$ref": "#/components/schemas/User"
                     }
                   },
-                  "required": [
-                    "redirect",
-                    "token",
-                    "user"
-                  ]
+                  "required": ["redirect", "token", "user"]
                 }
               }
             }
@@ -2563,9 +2320,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -2581,9 +2336,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -2654,9 +2407,7 @@
     },
     "/auth/reset-password": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Reset the password for a user",
         "operationId": "resetPassword",
         "security": [
@@ -2682,9 +2433,7 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "newPassword"
-                ]
+                "required": ["newPassword"]
               }
             }
           }
@@ -2715,9 +2464,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -2733,9 +2480,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -2806,9 +2551,7 @@
     },
     "/auth/verify-password": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Verify the current user's password",
         "operationId": "verifyPassword",
         "security": [
@@ -2829,9 +2572,7 @@
                     "description": "The password to verify"
                   }
                 },
-                "required": [
-                  "password"
-                ]
+                "required": ["password"]
               }
             }
           }
@@ -2862,9 +2603,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -2880,9 +2619,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -2953,9 +2690,7 @@
     },
     "/auth/verify-email": {
       "get": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Verify the email of the user",
         "security": [
           {
@@ -2999,10 +2734,7 @@
                       "description": "Indicates if the email was verified successfully"
                     }
                   },
-                  "required": [
-                    "user",
-                    "status"
-                  ]
+                  "required": ["user", "status"]
                 }
               }
             }
@@ -3017,9 +2749,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -3035,9 +2765,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -3108,9 +2836,7 @@
     },
     "/auth/send-verification-email": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Send a verification email to the user",
         "operationId": "sendVerificationEmail",
         "security": [
@@ -3137,9 +2863,7 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "email"
-                ]
+                "required": ["email"]
               }
             }
           }
@@ -3189,9 +2913,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -3262,9 +2984,7 @@
     },
     "/auth/change-email": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "operationId": "changeEmail",
         "security": [
           {
@@ -3289,9 +3009,7 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "newEmail"
-                ]
+                "required": ["newEmail"]
               }
             }
           }
@@ -3314,17 +3032,12 @@
                     },
                     "message": {
                       "type": "string",
-                      "enum": [
-                        "Email updated",
-                        "Verification email sent"
-                      ],
+                      "enum": ["Email updated", "Verification email sent"],
                       "description": "Status message of the email change process",
                       "nullable": true
                     }
                   },
-                  "required": [
-                    "status"
-                  ]
+                  "required": ["status"]
                 }
               }
             }
@@ -3339,9 +3052,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -3357,9 +3068,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -3430,9 +3139,7 @@
     },
     "/auth/change-password": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Change the password of the user",
         "operationId": "changePassword",
         "security": [
@@ -3462,10 +3169,7 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "newPassword",
-                  "currentPassword"
-                ]
+                "required": ["newPassword", "currentPassword"]
               }
             }
           }
@@ -3530,9 +3234,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "user"
-                  ]
+                  "required": ["user"]
                 }
               }
             }
@@ -3547,9 +3249,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -3565,9 +3265,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -3638,9 +3336,7 @@
     },
     "/auth/update-session": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Update the current session",
         "operationId": "updateSession",
         "security": [
@@ -3686,9 +3382,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -3704,9 +3398,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -3777,9 +3469,7 @@
     },
     "/auth/update-user": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Update the current user",
         "operationId": "updateUser",
         "security": [
@@ -3835,9 +3525,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -3853,9 +3541,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -3926,9 +3612,7 @@
     },
     "/auth/delete-user": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Delete the user",
         "operationId": "deleteUser",
         "security": [
@@ -3974,17 +3658,11 @@
                     },
                     "message": {
                       "type": "string",
-                      "enum": [
-                        "User deleted",
-                        "Verification email sent"
-                      ],
+                      "enum": ["User deleted", "Verification email sent"],
                       "description": "Status message of the deletion process"
                     }
                   },
-                  "required": [
-                    "success",
-                    "message"
-                  ]
+                  "required": ["success", "message"]
                 }
               }
             }
@@ -3999,9 +3677,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -4017,9 +3693,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -4090,9 +3764,7 @@
     },
     "/auth/request-password-reset": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Send a password reset email to the user",
         "operationId": "requestPasswordReset",
         "security": [
@@ -4118,9 +3790,7 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "email"
-                ]
+                "required": ["email"]
               }
             }
           }
@@ -4154,9 +3824,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -4172,9 +3840,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -4245,9 +3911,7 @@
     },
     "/auth/reset-password/{token}": {
       "get": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Redirects the user to the callback URL with the token",
         "operationId": "resetPasswordCallback",
         "security": [
@@ -4301,9 +3965,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -4319,9 +3981,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -4392,9 +4052,7 @@
     },
     "/auth/list-sessions": {
       "get": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "List all active sessions for the user",
         "operationId": "listUserSessions",
         "security": [
@@ -4427,9 +4085,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -4445,9 +4101,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -4518,9 +4172,7 @@
     },
     "/auth/revoke-session": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Revoke a single session",
         "security": [
           {
@@ -4539,9 +4191,7 @@
                     "description": "The token to revoke"
                   }
                 },
-                "required": [
-                  "token"
-                ]
+                "required": ["token"]
               }
             }
           }
@@ -4559,9 +4209,7 @@
                       "description": "Indicates if the session was revoked successfully"
                     }
                   },
-                  "required": [
-                    "status"
-                  ]
+                  "required": ["status"]
                 }
               }
             }
@@ -4576,9 +4224,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -4594,9 +4240,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -4667,9 +4311,7 @@
     },
     "/auth/revoke-sessions": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Revoke all sessions for the user",
         "security": [
           {
@@ -4700,9 +4342,7 @@
                       "description": "Indicates if all sessions were revoked successfully"
                     }
                   },
-                  "required": [
-                    "status"
-                  ]
+                  "required": ["status"]
                 }
               }
             }
@@ -4717,9 +4357,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -4735,9 +4373,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -4808,9 +4444,7 @@
     },
     "/auth/revoke-other-sessions": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Revoke all other sessions for the user except the current one",
         "security": [
           {
@@ -4841,9 +4475,7 @@
                       "description": "Indicates if all other sessions were revoked successfully"
                     }
                   },
-                  "required": [
-                    "status"
-                  ]
+                  "required": ["status"]
                 }
               }
             }
@@ -4858,9 +4490,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -4876,9 +4506,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -4949,9 +4577,7 @@
     },
     "/auth/link-social": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Link a social account to the user",
         "operationId": "linkSocialAccount",
         "security": [
@@ -4997,9 +4623,7 @@
                         "nullable": true
                       }
                     },
-                    "required": [
-                      "token"
-                    ],
+                    "required": ["token"],
                     "type": "object",
                     "nullable": true
                   },
@@ -5027,9 +4651,7 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "provider"
-                ]
+                "required": ["provider"]
               }
             }
           }
@@ -5054,9 +4676,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "redirect"
-                  ]
+                  "required": ["redirect"]
                 }
               }
             }
@@ -5071,9 +4691,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -5089,9 +4707,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -5162,9 +4778,7 @@
     },
     "/auth/list-accounts": {
       "get": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "List all accounts linked to the user",
         "operationId": "listUserAccounts",
         "security": [
@@ -5234,9 +4848,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -5252,9 +4864,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -5325,9 +4935,7 @@
     },
     "/auth/delete-user/callback": {
       "get": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Callback to complete user deletion with verification token",
         "security": [
           {
@@ -5367,16 +4975,11 @@
                     },
                     "message": {
                       "type": "string",
-                      "enum": [
-                        "User deleted"
-                      ],
+                      "enum": ["User deleted"],
                       "description": "Confirmation message"
                     }
                   },
-                  "required": [
-                    "success",
-                    "message"
-                  ]
+                  "required": ["success", "message"]
                 }
               }
             }
@@ -5391,9 +4994,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -5409,9 +5010,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -5482,9 +5081,7 @@
     },
     "/auth/unlink-account": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Unlink an account",
         "security": [
           {
@@ -5507,9 +5104,7 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "providerId"
-                ]
+                "required": ["providerId"]
               }
             }
           }
@@ -5540,9 +5135,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -5558,9 +5151,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -5631,9 +5222,7 @@
     },
     "/auth/refresh-token": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Refresh the access token using a refresh token",
         "security": [
           {
@@ -5663,9 +5252,7 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "providerId"
-                ]
+                "required": ["providerId"]
               }
             }
           }
@@ -5716,9 +5303,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -5789,9 +5374,7 @@
     },
     "/auth/get-access-token": {
       "post": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Get a valid access token, doing a refresh if needed",
         "security": [
           {
@@ -5821,9 +5404,7 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "providerId"
-                ]
+                "required": ["providerId"]
               }
             }
           }
@@ -5867,9 +5448,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -5940,9 +5519,7 @@
     },
     "/auth/account-info": {
       "get": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Get the account info provided by the provider",
         "security": [
           {
@@ -5977,10 +5554,7 @@
                           "type": "boolean"
                         }
                       },
-                      "required": [
-                        "id",
-                        "emailVerified"
-                      ]
+                      "required": ["id", "emailVerified"]
                     },
                     "data": {
                       "type": "object",
@@ -5988,10 +5562,7 @@
                       "additionalProperties": true
                     }
                   },
-                  "required": [
-                    "user",
-                    "data"
-                  ],
+                  "required": ["user", "data"],
                   "additionalProperties": false
                 }
               }
@@ -6007,9 +5578,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -6025,9 +5594,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -6098,9 +5665,7 @@
     },
     "/auth/ok": {
       "get": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Check if the API is working",
         "security": [
           {
@@ -6121,9 +5686,7 @@
                       "description": "Indicates if the API is working"
                     }
                   },
-                  "required": [
-                    "ok"
-                  ]
+                  "required": ["ok"]
                 }
               }
             }
@@ -6138,9 +5701,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -6156,9 +5717,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -6229,9 +5788,7 @@
     },
     "/auth/error": {
       "get": {
-        "tags": [
-          "Better Auth"
-        ],
+        "tags": ["Better Auth"],
         "description": "Displays an error page",
         "security": [
           {
@@ -6261,9 +5818,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
@@ -6279,9 +5834,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "message"
-                  ]
+                  "required": ["message"]
                 }
               }
             },
