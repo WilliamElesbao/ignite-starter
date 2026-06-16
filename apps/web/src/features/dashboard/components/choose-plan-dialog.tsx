@@ -18,7 +18,7 @@ import { Form, FormField } from "@repo/ui/components/ui/form";
 import { Label } from "@repo/ui/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 import { CheckIcon, RefreshCcwIcon } from "lucide-react";
-import { useDialog } from "@/context/dialog-context";
+import { useDialog } from "@/contexts/dialog-context";
 import { useSubscriptionForm } from "@/hooks/stripe/use-subscription-form";
 import { formatPrice } from "@/utils";
 

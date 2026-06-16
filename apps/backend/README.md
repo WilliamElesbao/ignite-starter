@@ -1,5 +1,3 @@
-<!-- @format -->
-
 # Backend Application
 
 Elysia.js backend API server with Bun runtime. This is a thin entry point that

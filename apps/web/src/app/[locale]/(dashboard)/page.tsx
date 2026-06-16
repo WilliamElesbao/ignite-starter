@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { DashboardPage } from "@/feature/dashboard";
+import { DashboardPage } from "@/features/dashboard";
 import { getSession } from "@/lib/better-auth/auth-server";
 
 interface Props {

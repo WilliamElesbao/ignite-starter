@@ -1,7 +1,7 @@
 "use client";
 
 import { SidebarInset, SidebarProvider } from "@repo/ui/components/ui/sidebar";
-import { DialogProvider } from "@/context/dialog-context";
+import { DialogProvider } from "@/contexts/dialog-context";
 import {
   useGetStripeProducts,
   useGetStripeSubscriptionDetails,

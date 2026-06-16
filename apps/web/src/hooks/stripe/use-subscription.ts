@@ -2,7 +2,7 @@ import { getStripeSubscriptionDetailsQueryKey } from "@repo/api";
 import { useTranslations } from "next-intl";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { useDialog } from "@/context/dialog-context";
+import { useDialog } from "@/contexts/dialog-context";
 import { queryClient } from "@/lib/react-query";
 import { delay } from "@/utils";
 import {
