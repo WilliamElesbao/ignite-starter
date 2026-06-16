@@ -4,8 +4,8 @@ import { Separator } from "@repo/ui/components/ui/separator";
 import { SidebarTrigger } from "@repo/ui/components/ui/sidebar";
 import Link from "next/link";
 import * as IconsSi from "rocketicons/si";
-import CancelSubscriptionDialog from "@/feature/dashboard/components/cancel-plan-dialog";
-import { ThemeToggle } from "@/feature/dashboard/components/theme-toggle";
+import CancelSubscriptionDialog from "@/features/dashboard/components/cancel-plan-dialog";
+import { ThemeToggle } from "@/features/dashboard/components/theme-toggle";
 import { LanguageSwitcher } from "./language-switcher";
 
 export function SiteHeader({

@@ -1,8 +1,4 @@
-# CLAUDE.md — packages/database
-
-## Overview
-
-Drizzle ORM schema and PostgreSQL client shared across the monorepo. Exported as `@repo/db`. All schema definitions, the database client, and migration artifacts live here. Business logic does **not** belong here — this package is a pure data-access layer.
+You are an expert in relational data modeling with Drizzle and PostgreSQL. This package (`@repo/db`) owns the schema, the database client, and migration artifacts. It is a pure data-access layer — business logic never belongs here.
 
 ---
 

@@ -1,4 +1,4 @@
-import type { SignInFormValues } from "@/feature/auth/sign-in/hooks/form-schema";
+import type { SignInFormValues } from "@/features/auth/sign-in/hooks/form-schema";
 import type { User } from "@/lib/better-auth/auth.types";
 
 /**

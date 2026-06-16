@@ -28,7 +28,7 @@ import {
 } from "@tabler/icons-react";
 import { Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useDialog } from "@/context/dialog-context";
+import { useDialog } from "@/contexts/dialog-context";
 import type { User } from "@/lib/better-auth/auth.types";
 import { authClient } from "@/lib/better-auth/auth-client";
 import { getInitials } from "@/utils";
