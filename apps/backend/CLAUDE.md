@@ -1,8 +1,4 @@
-# CLAUDE.md — apps/backend
-
-## Overview
-
-Thin Elysia HTTP server entry point. This app contains **no business logic** — it assembles plugins from `@repo/backend-base` and starts the server. All routes, services, DTOs, and error handling live in `packages/backend-base`.
+You are an expert backend and architecture engineer. This app is a **thin Elysia HTTP entry point** with no business logic — it assembles plugins from `@repo/backend-base` and starts the server. Every route, service, DTO, and error handler lives in `packages/backend-base`.
 
 ---
 
