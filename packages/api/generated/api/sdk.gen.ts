@@ -153,7 +153,7 @@ export const getUserById = <ThrowOnError extends boolean = false>(
   >({ url: "/user/{id}", ...options });
 
 /**
- * Send a welcome email
+ * Queue a welcome email for asynchronous processing. Returns immediately with a job ID.
  */
 export const postEmailSend = <ThrowOnError extends boolean = false>(
   options?: Options<PostEmailSendData, ThrowOnError>,
