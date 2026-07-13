@@ -1,304 +1,372 @@
 #!/usr/bin/env bun
 
 /**
- * Unused i18n Keys Detection Script
+ * Unused i18n key detection using TypeScript AST (ts-morph).
  *
- * Scans the codebase to find translation keys that are defined in locale files
- * but never used in the source code. Helps identify dead translations that can
- * be safely removed.
+ * Handles patterns that regex cannot:
+ *   t(feature)                           → resolves "key-a" | "key-b" via type system
+ *   t(`settings.${interval}`)            → resolves interpolated union types (e.g., "day" | "month")
+ *   t(`prefix.${dynamicValue}`)          → falls back to marking "prefix.*" if unresolvable
+ *   useTranslations(x ? "ns-a" : "ns-b") → extracts both namespaces from ternary
  */
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import type { SourceFile, Type } from "ts-morph";
+import { Node, Project, SyntaxKind } from "ts-morph";
 
-// ============================================================================
-// Type Definitions
-// ============================================================================
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 type KeyPath = string;
 
-interface UnusedKeyResult {
-  unusedKeys: KeyPath[];
-  totalKeys: number;
-  usedKeys: number;
-}
+// ─── JSON key extraction ──────────────────────────────────────────────────────
 
-// ============================================================================
-// Key Extractor (reused from validate-i18n.ts)
-// ============================================================================
-
-/**
- * Recursively extracts all key paths from a nested JSON object
- */
-function extractKeys(obj: Record<string, unknown>, prefix = ""): KeyPath[] {
+function extractJsonKeys(obj: Record<string, unknown>, prefix = ""): KeyPath[] {
   const keys: KeyPath[] = [];
-
   for (const [key, value] of Object.entries(obj)) {
-    const currentPath = prefix ? `${prefix}.${key}` : key;
-
+    const current = prefix ? `${prefix}.${key}` : key;
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-      // Recursively traverse nested objects
-      keys.push(...extractKeys(value as Record<string, unknown>, currentPath));
+      keys.push(...extractJsonKeys(value as Record<string, unknown>, current));
     } else {
-      // Leaf value - this is a translation key
-      keys.push(currentPath);
+      keys.push(current);
+    }
+  }
+  return keys;
+}
+
+// ─── Type-system resolution ───────────────────────────────────────────────────
+
+/**
+ * Extracts all string literal values from a TypeScript type.
+ * Handles string literal types and unions of string literals.
+ *
+ * This is the key advantage over regex — TypeScript already knows that
+ * `feature: Feature` resolves to `"key-a" | "key-b" | ...`
+ */
+function extractStringLiteralsFromType(type: Type): string[] {
+  if (type.isStringLiteral()) {
+    const value = type.getLiteralValue();
+    return typeof value === "string" ? [value] : [];
+  }
+  if (type.isUnion()) {
+    return type.getUnionTypes().flatMap(extractStringLiteralsFromType);
+  }
+  return [];
+}
+
+// ─── Namespace resolution ─────────────────────────────────────────────────────
+
+/**
+ * Extracts all possible namespace strings from a useTranslations argument.
+ *
+ * Handles:
+ *   "namespace"               → ["namespace"]
+ *   x ? "ns-a" : "ns-b"      → ["ns-a", "ns-b"]
+ *   variable (typed)          → resolved via type system
+ *   no argument               → [""]  (root namespace)
+ */
+function extractNamespacesFromNode(node: Node | undefined): string[] {
+  if (!node) return [""];
+
+  if (Node.isStringLiteral(node)) {
+    return [node.getLiteralValue()];
+  }
+
+  if (Node.isConditionalExpression(node)) {
+    return [
+      ...extractNamespacesFromNode(node.getWhenTrue()),
+      ...extractNamespacesFromNode(node.getWhenFalse()),
+    ];
+  }
+
+  const literals = extractStringLiteralsFromType(node.getType());
+  return literals.length > 0 ? literals : [""];
+}
+
+// ─── Per-file analysis ────────────────────────────────────────────────────────
+
+const TRANSLATION_FUNCTIONS = new Set(["useTranslations", "getTranslations"]);
+const TRANSLATION_METHODS = new Set(["rich", "raw", "markup"]);
+const SKIP_PATHS = [
+  "/node_modules/",
+  "/.next/",
+  "/dist/",
+  "/build/",
+  "/scripts/",
+];
+
+function analyzeFile(
+  sourceFile: SourceFile,
+  usedKeys: Set<string>,
+  templatePrefixes: Set<string>,
+): void {
+  const filePath = sourceFile.getFilePath();
+
+  // Skip auto-generated declarations and build artifacts
+  if (filePath.endsWith(".d.ts")) return;
+  if (SKIP_PATHS.some((segment) => filePath.includes(segment))) return;
+
+  // ── Step 1: Collect translation function bindings ──────────────────────────
+  // Map of variable name → possible namespaces.
+  // We union namespaces for the same variable name to handle the case where
+  // multiple functions in the same file reuse the identifier "t" with different
+  // namespaces (e.g., useTranslations() vs useTranslations("features.free")).
+  const bindings = new Map<string, string[]>();
+
+  // Helper function to process Promise.all() patterns
+  function processPromiseAll(
+    _declaration: Node,
+    arrayArg: Node,
+    bindingPattern: Node,
+  ): void {
+    if (!Node.isArrayLiteralExpression(arrayArg)) return;
+    if (!Node.isArrayBindingPattern(bindingPattern)) return;
+
+    const elements = arrayArg.getElements();
+    const bindingElements = bindingPattern.getElements();
+
+    if (bindingElements.length !== elements.length) return;
+
+    for (let i = 0; i < elements.length; i++) {
+      const element = elements[i];
+      const bindingElement = bindingElements[i];
+
+      if (!bindingElement || Node.isOmittedExpression(bindingElement)) continue;
+
+      let elemInit = element;
+      if (Node.isAwaitExpression(elemInit)) elemInit = elemInit.getExpression();
+      if (!Node.isCallExpression(elemInit)) continue;
+
+      const elemCallee = elemInit.getExpression();
+      if (!Node.isIdentifier(elemCallee)) continue;
+      if (!TRANSLATION_FUNCTIONS.has(elemCallee.getText())) continue;
+
+      const bindingName = bindingElement.getText();
+      const args = elemInit.getArguments();
+      const namespaces =
+        args.length > 0 ? extractNamespacesFromNode(args[0]) : [""];
+
+      const existing = bindings.get(bindingName) ?? [];
+      bindings.set(bindingName, [...new Set([...existing, ...namespaces])]);
     }
   }
 
-  return keys.sort();
-}
+  for (const decl of sourceFile.getDescendantsOfKind(
+    SyntaxKind.VariableDeclaration,
+  )) {
+    let init = decl.getInitializer();
+    if (!init) continue;
 
-// ============================================================================
-// Source Code Scanner
-// ============================================================================
+    const bindingPattern = decl.getNameNode();
 
-/**
- * Recursively scans a directory for source files
- */
-function scanSourceFiles(
-  dir: string,
-  extensions: string[] = [".ts", ".tsx"],
-): string[] {
-  const files: string[] = [];
+    // Unwrap: const t = await getTranslations(...)
+    if (Node.isAwaitExpression(init)) init = init.getExpression();
 
-  function scan(currentDir: string) {
-    const entries = fs.readdirSync(currentDir, { withFileTypes: true });
+    // Handle: const [t, data] = await Promise.all([getTranslations(), ...])
+    if (Node.isCallExpression(init)) {
+      const expr = init.getExpression();
+      if (Node.isPropertyAccessExpression(expr)) {
+        const obj = expr.getExpression();
+        const prop = expr.getName();
+        if (
+          Node.isIdentifier(obj) &&
+          obj.getText() === "Promise" &&
+          prop === "all"
+        ) {
+          const promiseAllArg = init.getArguments()[0];
+          processPromiseAll(decl, promiseAllArg ?? init, bindingPattern);
+          continue;
+        }
+      }
+    }
 
-    for (const entry of entries) {
-      const fullPath = path.join(currentDir, entry.name);
+    if (!Node.isCallExpression(init)) continue;
 
-      // Skip node_modules, .next, and other build directories
+    const callee = init.getExpression();
+    if (!Node.isIdentifier(callee)) continue;
+    if (!TRANSLATION_FUNCTIONS.has(callee.getText())) continue;
+
+    const args = init.getArguments();
+    const namespaces =
+      args.length > 0 ? extractNamespacesFromNode(args[0]) : [""];
+
+    const existing = bindings.get(decl.getName()) ?? [];
+    bindings.set(decl.getName(), [...new Set([...existing, ...namespaces])]);
+  }
+
+  if (bindings.size === 0) return;
+
+  // ── Step 2: Resolve every translation call ─────────────────────────────────
+  for (const call of sourceFile.getDescendantsOfKind(
+    SyntaxKind.CallExpression,
+  )) {
+    const callee = call.getExpression();
+    let varName: string | null = null;
+
+    if (Node.isIdentifier(callee) && bindings.has(callee.getText())) {
+      varName = callee.getText();
+    } else if (Node.isPropertyAccessExpression(callee)) {
+      const obj = callee.getExpression();
       if (
-        entry.isDirectory() &&
-        !entry.name.startsWith(".") &&
-        entry.name !== "node_modules" &&
-        entry.name !== "dist" &&
-        entry.name !== "build"
+        Node.isIdentifier(obj) &&
+        bindings.has(obj.getText()) &&
+        TRANSLATION_METHODS.has(callee.getName())
       ) {
-        scan(fullPath);
-      } else if (
-        entry.isFile() &&
-        extensions.some((ext) => entry.name.endsWith(ext))
-      ) {
-        files.push(fullPath);
+        varName = obj.getText();
+      }
+    }
+
+    if (!varName) continue;
+
+    const namespaces = bindings.get(varName) ?? [""];
+    const args = call.getArguments();
+    if (args.length === 0) continue;
+
+    const keyArg = args[0];
+
+    function addKey(suffix: string) {
+      for (const ns of namespaces) {
+        usedKeys.add(ns ? `${ns}.${suffix}` : suffix);
+      }
+    }
+
+    if (Node.isStringLiteral(keyArg)) {
+      // t("some.key")
+      addKey(keyArg.getLiteralValue());
+    } else if (Node.isNoSubstitutionTemplateLiteral(keyArg)) {
+      // t(`key`) — template literal without interpolation
+      addKey(keyArg.getLiteralValue());
+    } else if (Node.isTemplateExpression(keyArg)) {
+      // t(`settings.${interval}`) — try to resolve interpolated values first
+      const prefix = keyArg.getHead().getLiteralText();
+      if (!prefix) continue;
+
+      // Try to resolve interpolated expressions via type system
+      const spans = keyArg.getTemplateSpans();
+      let resolvedValues: string[] | null = null;
+
+      // If there's exactly one interpolation, try to extract its possible values
+      if (spans.length === 1) {
+        const expr = spans[0].getExpression();
+        const literals = extractStringLiteralsFromType(expr.getType());
+        if (literals.length > 0) {
+          resolvedValues = literals;
+        }
+      }
+
+      if (resolvedValues) {
+        // Type system resolved the values — mark specific keys
+        for (const value of resolvedValues) {
+          for (const ns of namespaces) {
+            usedKeys.add(ns ? `${ns}.${prefix}${value}` : `${prefix}${value}`);
+          }
+        }
+      } else {
+        // Fallback: mark entire prefix subtree as used
+        for (const ns of namespaces) {
+          templatePrefixes.add(ns ? `${ns}.${prefix}` : prefix);
+        }
+      }
+    } else {
+      // t(variable) — ask TypeScript what values this variable can be
+      // e.g. feature: "key-a" | "key-b" → marks both as used
+      const literals = extractStringLiteralsFromType(keyArg.getType());
+      for (const val of literals) {
+        addKey(val);
       }
     }
   }
-
-  scan(dir);
-  return files;
 }
 
-/**
- * Finds namespace bindings for useTranslations/getTranslations calls
- */
-interface TranslationBinding {
-  variableName: string;
-  namespace: string;
-}
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
-function getNamespaceBindings(content: string): TranslationBinding[] {
-  const bindings: TranslationBinding[] = [];
-  const bindingRegex =
-    /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:await\s+)?(?:useTranslations|getTranslations)\s*\(\s*(?:['"`]([^'"`]*)['"`])?\s*\)/g;
-
-  for (const match of content.matchAll(bindingRegex)) {
-    const variableName = match[1];
-    const namespace = match[2] ?? "";
-    bindings.push({ variableName, namespace });
-  }
-
-  return bindings;
-}
-
-/**
- * Checks if a translation key is used in the source code
- */
-function isKeyUsedInCode(key: KeyPath, sourceFiles: string[]): boolean {
-  const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const directKeyPattern = new RegExp(`['"\`]${escapedKey}['"\`]`, "g");
-
-  const keyParts = key.split(".");
-
-  for (const filePath of sourceFiles) {
-    try {
-      const content = fs.readFileSync(filePath, "utf-8");
-
-      if (directKeyPattern.test(content)) {
-        return true;
-      }
-
-      const bindings = getNamespaceBindings(content);
-      for (const binding of bindings) {
-        const namespaceParts: string[] = binding.namespace
-          ? binding.namespace.split(".")
-          : [];
-
-        if (namespaceParts.length > keyParts.length) {
-          continue;
-        }
-
-        const matchesPrefix = namespaceParts.every(
-          (part: string, index: number) => keyParts[index] === part,
-        );
-
-        if (!matchesPrefix) {
-          continue;
-        }
-
-        const suffix = keyParts.slice(namespaceParts.length).join(".");
-        const escapedSuffix = suffix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const callPattern = new RegExp(
-          `\\b${binding.variableName}(?:\\.(?:rich|raw|markup))?\\s*\\(\\s*['"\`]${escapedSuffix}['"\`]`,
-          "g",
-        );
-
-        if (callPattern.test(content)) {
-          return true;
-        }
-      }
-    } catch {}
-  }
-
-  return false;
-}
-
-// ============================================================================
-// Main Logic
-// ============================================================================
-
-/**
- * Finds unused translation keys in the codebase
- */
-function findUnusedKeys(
-  localeFilePath: string,
-  sourceDir: string,
-): UnusedKeyResult {
-  // Load and parse the locale file
-  const localeContent = fs.readFileSync(localeFilePath, "utf-8");
-  const localeData = JSON.parse(localeContent) as Record<string, unknown>;
-
-  // Extract all translation keys
-  const allKeys = extractKeys(localeData);
-
-  // Scan source files
-  console.log("Scanning source files...");
-  const sourceFiles = scanSourceFiles(sourceDir);
-  console.log(`Found ${sourceFiles.length} source files\n`);
-
-  // Check each key for usage
-  const unusedKeys: KeyPath[] = [];
-  let checkedCount = 0;
-
-  for (const key of allKeys) {
-    checkedCount++;
-    if (checkedCount % 10 === 0) {
-      process.stdout.write(
-        `\rChecking keys: ${checkedCount}/${allKeys.length}`,
-      );
-    }
-
-    if (!isKeyUsedInCode(key, sourceFiles)) {
-      unusedKeys.push(key);
-    }
-  }
-
-  process.stdout.write(
-    `\rChecking keys: ${allKeys.length}/${allKeys.length}\n\n`,
+async function main() {
+  const localeFilePath = path.join(
+    process.cwd(),
+    "src/lib/i18n/locales/en.json",
   );
+  const tsConfigFilePath = path.join(process.cwd(), "tsconfig.json");
 
-  return {
-    unusedKeys,
-    totalKeys: allKeys.length,
-    usedKeys: allKeys.length - unusedKeys.length,
-  };
-}
+  if (!fs.existsSync(localeFilePath))
+    throw new Error(`Locale file not found: ${localeFilePath}`);
+  if (!fs.existsSync(tsConfigFilePath))
+    throw new Error(`tsconfig.json not found: ${tsConfigFilePath}`);
 
-/**
- * Reports unused keys to the console
- */
-function reportUnusedKeys(result: UnusedKeyResult): void {
-  if (result.unusedKeys.length === 0) {
-    console.log("✓ All translation keys are being used!");
-    console.log(
-      `\nTotal keys: ${result.totalKeys}, Used: ${result.usedKeys}\n`,
-    );
-    return;
-  }
+  console.log("🔍 Unused i18n key detection (AST-based)\n");
 
-  console.error("⚠ Found unused translation keys:\n");
+  const allKeys = new Set(
+    extractJsonKeys(
+      JSON.parse(fs.readFileSync(localeFilePath, "utf-8")) as Record<
+        string,
+        unknown
+      >,
+    ),
+  );
+  console.log(`Keys in en.json: ${allKeys.size}`);
 
-  // Group keys by namespace (first part of the key)
-  const keysByNamespace = new Map<string, KeyPath[]>();
+  // ts-morph loads the full TypeScript compiler — slower than regex but type-aware
+  console.log("Loading TypeScript project...");
+  const project = new Project({ tsConfigFilePath });
 
-  for (const key of result.unusedKeys) {
-    const namespace = key.split(".")[0];
-    const keys = keysByNamespace.get(namespace) || [];
-    keys.push(key);
-    keysByNamespace.set(namespace, keys);
-  }
+  const sourceFiles = project.getSourceFiles();
+  console.log(`Source files: ${sourceFiles.length}\n`);
 
-  // Display grouped by namespace
-  for (const [namespace, keys] of keysByNamespace) {
-    console.error(`  ${namespace}:`);
-    for (const key of keys) {
-      console.error(`    - ${key}`);
+  const usedKeys = new Set<string>();
+  const templatePrefixes = new Set<string>();
+
+  let analyzed = 0;
+  for (const sourceFile of sourceFiles) {
+    analyzeFile(sourceFile, usedKeys, templatePrefixes);
+    if (++analyzed % 20 === 0 || analyzed === sourceFiles.length) {
+      process.stdout.write(`\rAnalyzing: ${analyzed}/${sourceFiles.length}`);
     }
+  }
+  process.stdout.write("\n\n");
+
+  if (templatePrefixes.size > 0) {
+    console.log(`Template prefixes (entire subtree marked as used):`);
+    for (const p of templatePrefixes) console.log(`  ${p}*`);
+    console.log("");
+  }
+
+  const unusedKeys = [...allKeys]
+    .filter((key) => {
+      if (usedKeys.has(key)) return false;
+      if ([...templatePrefixes].some((p) => key.startsWith(p))) return false;
+      return true;
+    })
+    .sort();
+
+  if (unusedKeys.length === 0) {
+    console.log("✓ All translation keys are being used!\n");
+    console.log(`Total: ${allKeys.size} keys, all in use.`);
+    process.exit(0);
+  }
+
+  console.error(`⚠ Found ${unusedKeys.length} unused key(s):\n`);
+
+  const byNs = new Map<string, string[]>();
+  for (const key of unusedKeys) {
+    const ns = key.split(".")[0];
+    byNs.set(ns, [...(byNs.get(ns) ?? []), key]);
+  }
+
+  for (const [ns, keys] of byNs) {
+    console.error(`  ${ns}:`);
+    for (const key of keys) console.error(`    - ${key}`);
     console.error("");
   }
 
-  console.error(`Total unused keys: ${result.unusedKeys.length}`);
-  console.error(`Total keys: ${result.totalKeys}`);
-  console.error(`Used keys: ${result.usedKeys}`);
+  const usedCount = allKeys.size - unusedKeys.length;
+  console.error(`Total unused: ${unusedKeys.length} / ${allKeys.size}`);
   console.error(
-    `Usage rate: ${((result.usedKeys / result.totalKeys) * 100).toFixed(1)}%\n`,
+    `Usage rate: ${((usedCount / allKeys.size) * 100).toFixed(1)}%`,
   );
+
+  process.exit(1);
 }
 
-/**
- * Main entry point
- */
-async function main() {
-  try {
-    const localeFilePath = path.join(
-      process.cwd(),
-      "src/lib/i18n/locales/en.json",
-    );
-    const sourceDir = path.join(process.cwd(), "src");
-
-    // Validate paths
-    if (!fs.existsSync(localeFilePath)) {
-      throw new Error(
-        `Locale file not found: ${localeFilePath}\n` +
-          `Please ensure the file exists.`,
-      );
-    }
-
-    if (!fs.existsSync(sourceDir)) {
-      throw new Error(
-        `Source directory not found: ${sourceDir}\n` +
-          `Please ensure the directory exists.`,
-      );
-    }
-
-    console.log("🔍 Checking for unused translation keys...\n");
-    console.log(`Locale file: ${localeFilePath}`);
-    console.log(`Source directory: ${sourceDir}\n`);
-
-    const result = findUnusedKeys(localeFilePath, sourceDir);
-    reportUnusedKeys(result);
-
-    // Exit with code 1 if there are unused keys (for CI/CD)
-    process.exit(result.unusedKeys.length > 0 ? 1 : 0);
-  } catch (error) {
-    console.error(
-      `Error: ${error instanceof Error ? error.message : String(error)}`,
-    );
-    process.exit(1);
-  }
-}
-
-// Run main function if executed directly
-if (import.meta.main) {
-  main();
-}
+main().catch((err) => {
+  console.error(err instanceof Error ? err.message : String(err));
+  process.exit(1);
+});
