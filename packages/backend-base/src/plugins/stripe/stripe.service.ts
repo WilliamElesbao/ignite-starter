@@ -12,6 +12,7 @@ import {
 import { AppError } from "../../shared/errors/app-error";
 import type { db } from "../../shared/shared.plugin";
 import type { LoggerErrorDependency } from "../../shared/types/logger-dependency";
+import { formatPrice } from "../../utils/format-price";
 import { safePromise } from "../../utils/safe-promise";
 import type { TSubscriptionBodyDto } from "./dtos/subscription/subscription-body.dto";
 import { STRIPE_ERROR_MAP, StripeErrorCode } from "./stripe.errors";
@@ -37,27 +38,11 @@ export class StripeService {
   }
 
   async getProducts() {
-    const [prices, pricesError] = await safePromise(
-      this.stripe.prices.list({
-        limit: 3,
-      }),
-    );
-
-    if (pricesError) {
-      this.logger.error({
-        msg: "Failed to list Stripe prices",
-        error: pricesError,
-      });
-
-      throw AppError.fromCatalog({
-        code: StripeErrorCode.STRIPE_PRICES_LIST_FAILED,
-        catalog: STRIPE_ERROR_MAP,
-        details: pricesError,
-      });
-    }
-
     const [products, productsError] = await safePromise(
-      this.stripe.products.list(),
+      this.stripe.products.list({
+        active: true,
+        expand: ["data.default_price"],
+      }),
     );
 
     if (productsError) {
@@ -73,18 +58,20 @@ export class StripeService {
       });
     }
 
-    const normalizedProducts = prices.data.map((price) => {
-      const product = products.data.find((p) => p.id === price.product);
+    const normalizedPlans = products.data.map((product) => {
+      const price = product.default_price as Stripe.Price;
       return {
         id: price.id,
-        planName: product?.name ?? "Unknown Plan",
-        currency: price.currency,
-        price: price.unit_amount,
-        recurring: price.recurring,
+        planName: product.name.toLowerCase(),
+        price: formatPrice({
+          currency: price.currency as "usd" | "brl",
+          amount: price.unit_amount ?? 0,
+        }),
+        recurring: price.recurring?.interval,
       };
     });
 
-    return normalizedProducts;
+    return normalizedPlans;
   }
 
   async createSubscription({

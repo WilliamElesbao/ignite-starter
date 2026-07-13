@@ -53,8 +53,8 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
       .get(
         "/products",
         async ({ store: { stripeService } }) => {
-          const products = await stripeService.getProducts();
-          return products;
+          const plans = await stripeService.getProducts();
+          return plans;
         },
         {
           detail: { description: "Get all products from Stripe" },
