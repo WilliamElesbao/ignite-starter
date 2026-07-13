@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { AuthForm } from "@/features/auth/components/auth-form";
 import { cn } from "@/lib/shadcn/utils";
 import { signInWithGoogle } from "../hooks/sign-in";
-import { useSignUpForm } from "./hooks/useSignUpForm";
+import { useSignUpForm } from "./hooks/use-sign-up-form";
 
 export function SignUpForm({
   className,

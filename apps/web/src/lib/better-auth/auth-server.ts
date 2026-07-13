@@ -2,7 +2,7 @@
 
 import type { GetSessionResponse } from "@repo/api/generated/api/types.gen";
 import { cookies } from "next/headers";
-import { safePromise } from "@/utils";
+import { safePromise } from "@/utils/safe-promise";
 
 export async function getSession(): Promise<GetSessionResponse> {
   const cookieStore = await cookies();

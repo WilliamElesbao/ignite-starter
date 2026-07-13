@@ -2,9 +2,8 @@ import { getStripeSubscriptionDetailsQueryKey } from "@repo/api";
 import { useTranslations } from "next-intl";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { useDialog } from "@/contexts/dialog-context";
 import { queryClient } from "@/lib/react-query";
-import { delay } from "@/utils";
+import { delay } from "@/utils/delay";
 import {
   useStripeRevokeSubscription,
   useStripeSubscription,
@@ -20,7 +19,6 @@ import type { SubscriptionFormValues } from "./use-subscription-form";
 export const useSubscription = () => {
   const t = useTranslations("dashboard.toast.subscription");
   const { mutateAsync, isPending } = useStripeSubscription();
-  const { setDialogIsOpen } = useDialog();
 
   const onSubmit = useCallback(
     async (data: SubscriptionFormValues) => {
@@ -48,13 +46,10 @@ export const useSubscription = () => {
               position: "top-center",
             });
           },
-          onSettled: () => {
-            setDialogIsOpen(false);
-          },
         },
       );
     },
-    [mutateAsync, setDialogIsOpen, t],
+    [mutateAsync, t],
   );
 
   return {
@@ -71,7 +66,6 @@ export const useSubscription = () => {
 export const useUpdateSubscription = () => {
   const t = useTranslations("dashboard.toast.update-subscription");
   const { mutateAsync, isPending } = useStripeUpdateSubscription();
-  const { setDialogIsOpen } = useDialog();
 
   const onSubmit = useCallback(
     async (data: SubscriptionFormValues) => {
@@ -83,7 +77,7 @@ export const useUpdateSubscription = () => {
               description: t("your-subscription-has-been-updated"),
               position: "top-center",
             });
-            setDialogIsOpen(false);
+
             queryClient.invalidateQueries({
               queryKey: getStripeSubscriptionDetailsQueryKey(),
             });
@@ -100,7 +94,7 @@ export const useUpdateSubscription = () => {
         },
       );
     },
-    [mutateAsync, setDialogIsOpen, t],
+    [mutateAsync, t],
   );
 
   return {
@@ -117,7 +111,6 @@ export const useUpdateSubscription = () => {
 export const useCancelSubscription = () => {
   const t = useTranslations("dashboard.toast.cancel-subscription");
   const mutation = useStripeRevokeSubscription();
-  const { setDialogIsOpen } = useDialog();
 
   const onSubmit = useCallback(async () => {
     await mutation.mutateAsync(
@@ -133,7 +126,6 @@ export const useCancelSubscription = () => {
             ),
             position: "top-center",
           });
-          setDialogIsOpen(false);
         },
         onError: (err) => {
           console.error("[Hook][useCancelSubscription] onSubmit error:", err);
@@ -146,7 +138,7 @@ export const useCancelSubscription = () => {
         },
       },
     );
-  }, [mutation, setDialogIsOpen, t]);
+  }, [mutation, t]);
 
   return {
     onSubmit,

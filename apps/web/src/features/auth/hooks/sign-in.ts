@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { WELCOME_TOAST } from "@/constants";
+import { WELCOME_TOAST } from "@/constants/session-storage";
 import { authClient } from "@/lib/better-auth/auth-client";
 
 /**

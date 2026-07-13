@@ -12,10 +12,9 @@ import {
 import Link from "next/link";
 import type * as React from "react";
 import * as IconsGi from "rocketicons/gi";
-import { data } from "@/constants";
-import { NavDocuments } from "@/features/dashboard/components/nav-documents";
-import { NavMain } from "@/features/dashboard/components/nav-main";
-import { NavSecondary } from "@/features/dashboard/components/nav-secondary";
+// import { NavDocuments } from "@/features/dashboard/components/nav-documents";
+// import { NavMain } from "@/features/dashboard/components/nav-main";
+// import { NavSecondary } from "@/features/dashboard/components/nav-secondary";
 import { NavUser } from "@/features/dashboard/components/nav-user";
 import type { User } from "@/lib/better-auth/auth.types";
 
@@ -46,9 +45,9 @@ export function AppSidebar({
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        {/* <NavMain items={data.navMain} /> */}
+        {/* <NavDocuments items={data.documents} /> */}
+        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

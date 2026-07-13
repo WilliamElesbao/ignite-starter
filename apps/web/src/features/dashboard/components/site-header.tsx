@@ -1,21 +1,12 @@
-import type { GetStripeSubscriptionDetailsResponse } from "@repo/api/generated/api/types.gen";
 import { Button } from "@repo/ui/components/ui/button";
 import { Separator } from "@repo/ui/components/ui/separator";
 import { SidebarTrigger } from "@repo/ui/components/ui/sidebar";
 import Link from "next/link";
 import * as IconsSi from "rocketicons/si";
-import CancelSubscriptionDialog from "@/features/dashboard/components/cancel-plan-dialog";
 import { ThemeToggle } from "@/features/dashboard/components/theme-toggle";
 import { LanguageSwitcher } from "./language-switcher";
 
-export function SiteHeader({
-  subscription,
-}: Readonly<{
-  subscription?: GetStripeSubscriptionDetailsResponse | null;
-}>) {
-  const shouldShowRevokeButton =
-    subscription?.hasActiveSubscription && !subscription?.cancel_at_period_end;
-
+export function SiteHeader() {
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
@@ -35,8 +26,6 @@ export function SiteHeader({
               <IconsSi.SiGithub className="size-5" />
             </Link>
           </Button>
-
-          {shouldShowRevokeButton && <CancelSubscriptionDialog />}
 
           <LanguageSwitcher />
           <ThemeToggle />

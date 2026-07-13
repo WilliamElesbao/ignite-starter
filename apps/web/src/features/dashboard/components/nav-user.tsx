@@ -28,14 +28,12 @@ import {
 } from "@tabler/icons-react";
 import { Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useDialog } from "@/contexts/dialog-context";
 import type { User } from "@/lib/better-auth/auth.types";
 import { authClient } from "@/lib/better-auth/auth-client";
-import { getInitials } from "@/utils";
+import { getInitials } from "@/utils/get-initials";
 
 export function NavUser({ user }: Readonly<{ user: User }>) {
   const { isMobile } = useSidebar();
-  const { setDialogIsOpen } = useDialog();
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -45,10 +43,6 @@ export function NavUser({ user }: Readonly<{ user: User }>) {
     } catch (error) {
       console.error("[NavUser] signOut error:", error);
     }
-  };
-
-  const handleDialogOpen = () => {
-    setDialogIsOpen(true);
   };
 
   return (
@@ -103,7 +97,7 @@ export function NavUser({ user }: Readonly<{ user: User }>) {
                 <IconUserCircle />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDialogOpen}>
+              <DropdownMenuItem>
                 <Sparkles />
                 Upgrade to Pro
               </DropdownMenuItem>

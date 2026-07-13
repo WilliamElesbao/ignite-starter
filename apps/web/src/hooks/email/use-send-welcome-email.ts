@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { safePromise } from "@/utils";
+import { safePromise } from "@/utils/safe-promise";
 import { useSendEmail } from "./email.mutations";
 
 /**

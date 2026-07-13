@@ -1,10 +1,6 @@
 import type { NextRequest } from "next/server";
-import {
-  handleAuth,
-  handleI18nRouting,
-  redirectTo,
-  resolveLocale,
-} from "@/middleware";
+import { handleAuth, redirectTo } from "./middleware/auth";
+import { handleI18nRouting, resolveLocale } from "./middleware/i18n";
 
 export async function proxy(request: NextRequest) {
   const response = handleI18nRouting(request);

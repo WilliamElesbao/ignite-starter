@@ -1,4 +1,4 @@
-import { cn } from "@/lib/shadcn";
+import { cn } from "@/lib/shadcn/utils";
 
 export const AuthFormRoot = ({
   children,

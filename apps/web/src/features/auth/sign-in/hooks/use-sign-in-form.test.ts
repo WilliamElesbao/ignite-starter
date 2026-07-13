@@ -5,7 +5,7 @@
 import { renderHook } from "@testing-library/react";
 import { toast } from "sonner";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { WELCOME_TOAST } from "@/constants";
+import { WELCOME_TOAST } from "@/constants/session-storage";
 import { authClient } from "@/lib/better-auth/auth-client";
 import { createMockSignInValues } from "@/test/factories/auth-factory";
 import { mockSessionStorage } from "@/test/setup";

@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { WELCOME_TOAST } from "@/constants";
+import { WELCOME_TOAST } from "@/constants/session-storage";
 
 /**
  * Custom hook to show a welcome toast after successful authentication.
