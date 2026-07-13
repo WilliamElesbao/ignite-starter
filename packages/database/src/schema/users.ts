@@ -2,7 +2,6 @@ import { randomUUIDv7 } from "bun";
 import { type InferSelectModel, relations } from "drizzle-orm";
 import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { accounts } from "./accounts";
-import { sessions } from "./sessions";
 
 export const users = pgTable("users", {
   id: text("id")
@@ -16,11 +15,10 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at")
     .$onUpdate(() => new Date())
     .notNull(),
-  stripeSubscriptionId: text("stripe_subscription_id"),
+  stripeCustomerId: text("stripe_customer_id"),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
-  sessions: many(sessions),
   accounts: many(accounts),
 }));
 
