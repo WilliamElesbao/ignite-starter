@@ -5,6 +5,7 @@ import type { LoggerErrorDependency } from "../shared/types/logger-dependency";
 export const EVENT_TYPE = {
   STRIPE_PAYMENT_FAILED: "STRIPE_PAYMENT_FAILED",
   SUBSCRIPTION_CANCELED: "SUBSCRIPTION_CANCELED",
+  SUBSCRIPTION_RENEWED: "SUBSCRIPTION_RENEWED",
   LOGIN_SUSPICIOUS: "LOGIN_SUSPICIOUS",
 } as const;
 
