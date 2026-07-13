@@ -25,6 +25,12 @@
       "skillPath": "better-auth/emailAndPassword/SKILL.md",
       "computedHash": "747d7f73bd9e2ec5317b8ef88dc70f97df716d00e3d02de4051feebaa48b062d"
     },
+    "nextjs-app-architecture": {
+      "source": "aurorascharff/nextjs-app-architecture-skill",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "1cbe8f6ed0e0cba02bbd7eed32101205024373bce44cb24d56eea71a1cf34690"
+    },
     "organization-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
