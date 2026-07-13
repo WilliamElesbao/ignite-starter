@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { logger } from "@/utils/logger";
 import { handleAuth, redirectTo } from "./middleware/auth";
 import { handleI18nRouting, resolveLocale } from "./middleware/i18n";
 
@@ -14,7 +15,7 @@ export async function proxy(request: NextRequest) {
   try {
     return await handleAuth(request, response, locale, pathnameWithoutLocale);
   } catch (error) {
-    console.error("[middleware] Error getting session:", error);
+    logger.error("[middleware] Error getting session:", error);
     return redirectTo(`/${locale}/sign-in`, request);
   }
 }
