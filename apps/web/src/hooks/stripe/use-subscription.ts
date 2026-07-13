@@ -2,7 +2,7 @@ import { getStripeSubscriptionDetailsQueryKey } from "@repo/api";
 import { useTranslations } from "next-intl";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { queryClient } from "@/lib/react-query";
+import { getQueryClient } from "@/lib/react-query/query-client";
 import { delay } from "@/utils/delay";
 import {
   useStripeRevokeSubscription,
@@ -66,6 +66,7 @@ export const useSubscription = () => {
 export const useUpdateSubscription = () => {
   const t = useTranslations("dashboard.toast.update-subscription");
   const { mutateAsync, isPending } = useStripeUpdateSubscription();
+  const queryClient = getQueryClient();
 
   const onSubmit = useCallback(
     async (data: SubscriptionFormValues) => {
@@ -94,7 +95,7 @@ export const useUpdateSubscription = () => {
         },
       );
     },
-    [mutateAsync, t],
+    [mutateAsync, t, queryClient],
   );
 
   return {
@@ -111,6 +112,7 @@ export const useUpdateSubscription = () => {
 export const useCancelSubscription = () => {
   const t = useTranslations("dashboard.toast.cancel-subscription");
   const mutation = useStripeRevokeSubscription();
+  const queryClient = getQueryClient();
 
   const onSubmit = useCallback(async () => {
     await mutation.mutateAsync(
@@ -138,7 +140,7 @@ export const useCancelSubscription = () => {
         },
       },
     );
-  }, [mutation, t]);
+  }, [mutation, t, queryClient]);
 
   return {
     onSubmit,
