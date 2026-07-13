@@ -60,6 +60,14 @@
       }
     }
   },
+  "welcome-toast": {
+    "title": "Hey D3v!",
+    "description": "Welcome to Next Starter, Wow, the authentication worked perfectly!"
+  },
+  "send-email": {
+    "failed-to-send-email": "Failed to send email. Please try again later.",
+    "email-sent-successfully": "Email sent successfully!"
+  },
   "subscription": {
     "plan": "Plan",
     "developer-access": "Developer Access",
@@ -82,6 +90,44 @@
     "current-plan": "Current plan",
     "recommended": "Recommended",
     "upgrade-to-pro": "Upgrade to Pro"
+  },
+  "plans": {
+    "errors": {
+      "unauthenticated": "Unauthenticated",
+      "failed-to-update-subscription": "Failed to update subscription in database."
+    },
+    "cancel": {
+      "no-active-subscription": "No active subscription found.",
+      "subscription-canceled": "Subscription canceled",
+      "your-pro-access-continues-until-the-end-of-the-billing-period": "Your Pro access continues until the end of the billing period.",
+      "failed-to-cancel": "Failed to cancel subscription.",
+      "please-try-again": "Please try again."
+    },
+    "renew": {
+      "no-subscription-found": "No subscription found to renew.",
+      "subscription-renewed": "Subscription renewed",
+      "your-pro-access-subscription-will-continue-normally": "Your Pro access subscription will continue normally.",
+      "failed-to-renew": "Failed to renew",
+      "please-try-again": "Please try again."
+    }
+  },
+  "features": {
+    "free": {
+      "manual-setup": "Manual setup",
+      "manual-auth-configuration": "Manual auth configuration",
+      "manual-stripe-configuration": "Manual Stripe configuration",
+      "manual-database-setup": "Manual database setup",
+      "manual-email-configuration": "Manual email configuration"
+    },
+    "pro": {
+      "rocket-propulsion": "Rocket propulsion",
+      "preconfigured-auth": "Preconfigured auth",
+      "preconfigured-stripe": "Preconfigured Stripe",
+      "preconfigured-database": "Preconfigured database",
+      "preconfigured-email": "Preconfigured email",
+      "docker-ready": "Docker ready",
+      "production-ready": "Production ready"
+    }
   },
   "validation": {
     "name": {

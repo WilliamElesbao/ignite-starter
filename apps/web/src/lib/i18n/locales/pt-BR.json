@@ -60,6 +60,14 @@
       }
     }
   },
+  "welcome-toast": {
+    "title": "Eai D3v!",
+    "description": "Bem-vindo ao Next Starter, Wow, a autenticação funcionou perfeitamente!"
+  },
+  "send-email": {
+    "failed-to-send-email": "Falha ao enviar email. Por favor, tente novamente mais tarde.",
+    "email-sent-successfully": "Email enviado com sucesso!"
+  },
   "subscription": {
     "plan": "Plano",
     "developer-access": "Acesso de desenvolvedor",
@@ -82,6 +90,44 @@
     "current-plan": "Plano atual",
     "recommended": "Recomendado",
     "upgrade-to-pro": "Fazer upgrade para o Pro"
+  },
+  "plans": {
+    "errors": {
+      "unauthenticated": "Não autenticado",
+      "failed-to-update-subscription": "Falha ao atualizar assinatura no banco de dados."
+    },
+    "cancel": {
+      "no-active-subscription": "Nenhuma assinatura ativa encontrada.",
+      "subscription-canceled": "Assinatura cancelada",
+      "your-pro-access-continues-until-the-end-of-the-billing-period": "Seu acesso Pro continuará ativo até o fim do período de cobrança.",
+      "failed-to-cancel": "Falha ao cancelar a assinatura.",
+      "please-try-again": "Tente novamente."
+    },
+    "renew": {
+      "no-subscription-found": "Nenhuma assinatura encontrada para renovar.",
+      "subscription-renewed": "Assinatura reativada",
+      "your-pro-access-subscription-will-continue-normally": "Sua assinatura Pro continuará normalmente.",
+      "failed-to-renew": "Falha ao reativar a assinatura.",
+      "please-try-again": "Tente novamente."
+    }
+  },
+  "features": {
+    "free": {
+      "manual-setup": "Configuração manual",
+      "manual-auth-configuration": "Configuração manual da autenticação",
+      "manual-stripe-configuration": "Configuração manual do Stripe",
+      "manual-database-setup": "Configuração manual do banco de dados",
+      "manual-email-configuration": "Configuração manual de e-mail"
+    },
+    "pro": {
+      "rocket-propulsion": "Propulsão de foguete",
+      "preconfigured-auth": "Autenticação pré-configurada",
+      "preconfigured-stripe": "Stripe pré-configurado",
+      "preconfigured-database": "Banco de dados pré-configurado",
+      "preconfigured-email": "E-mail pré-configurado",
+      "docker-ready": "Docker pronto para uso",
+      "production-ready": "Pronto para produção"
+    }
   },
   "validation": {
     "name": {
