@@ -2,5 +2,6 @@
   "sonarlint.connectedMode.project": {
     "connectionId": "org-key-evo",
     "projectKey": "project-key-ignite-starter"
-  }
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
