@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "enabledPlugins": {
+    "code-review@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "expo@claude-plugins-official": true
+  },
+  "worktree": {
+    "symlinkDirectories": []
+  },
+  "permissions": {
+    "allow": [
+      "Bash(bun run *)",
+      "Bash(git *)",
+      "Bash(docker *)",
+      "Read",
+      "Write",
+      "Edit"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Read(.env)",
+      "Read(.env.local)",
+      "Read(.env.*.local)",
+      "Write(prisma/generated/**)"
+    ]
+  },
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "hooks": {
+    "setup": [
+      {
+        "matcher": "always",
+        "commands": ["bun install", "bun run db:generate"]
+      }
+    ],
+    "preCommit": [
+      {
+        "matcher": "always",
+        "commands": ["bun run lint-fix", "bun run format"]
+      }
+    ]
+  }
+}
