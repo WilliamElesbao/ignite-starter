@@ -8,5 +8,5 @@ export const UserResponseDto = t.Object({
   emailVerified: t.Boolean(),
   createdAt: t.Date({ format: "date-time" }),
   updatedAt: t.Date({ format: "date-time" }),
-  stripeSubscriptionId: t.Nullable(t.String()),
+  stripeCustomerId: t.Nullable(t.String()),
 });
