@@ -1,6 +1,6 @@
 {
   "sonarlint.connectedMode.project": {
-    "connectionId": "ignite-starter",
-    "projectKey": "ignite-starter_ignite-starter"
+    "connectionId": "org-key-evo",
+    "projectKey": "project-key-ignite-starter"
   }
 }
