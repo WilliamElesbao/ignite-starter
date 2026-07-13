@@ -1,8 +1,11 @@
+import { stripe } from "@better-auth/stripe";
 import { db } from "@repo/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
+import type Stripe from "stripe";
 import { env } from "../../env";
+import { stripe as stripeClient } from "../../lib/stripe";
 import redisClient from "../../shared/redis.client";
 import { logger } from "../logger";
 
@@ -29,7 +32,49 @@ export const auth = betterAuth({
       logger.info(metadata);
     },
   },
-  plugins: [openAPI()],
+  plugins: [
+    openAPI(),
+    stripe({
+      onCustomerCreate: async (data, _ctx) => {
+        logger.info(
+          "[Customer Created]:" +
+            data.stripeCustomer.id +
+            "for userId:" +
+            data.user.id,
+        );
+      },
+      stripeClient,
+      stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
+      createCustomerOnSignUp: true,
+      subscription: {
+        enabled: true,
+        plans: async () => {
+          // Fetch directly from Stripe
+          const { data } = await stripeClient.products.list({
+            active: true,
+            expand: ["data.default_price"],
+          });
+
+          return data.map((product) => ({
+            name: product.name.toLowerCase(), // match your needs
+            priceId: (product.default_price as Stripe.Price).id,
+          }));
+        },
+        onSubscriptionComplete: async ({ subscription }) => {
+          logger.info(
+            "[Subscription Complete] Revalidating user plan cache for userId: " +
+              subscription.referenceId,
+          );
+        },
+        onSubscriptionUpdate: async ({ subscription }) => {
+          logger.info(`[Subscription Update]:${subscription.referenceId}`);
+        },
+        onSubscriptionCancel: async ({ subscription }) => {
+          logger.info(`[Subscription Cancel]:${subscription.referenceId}`);
+        },
+      },
+    }),
+  ],
   secondaryStorage: {
     get: async (key) => await redisClient.get(key),
     set: async (key, value, ttl) => {
@@ -49,15 +94,6 @@ export const auth = betterAuth({
       generateId: false,
     },
   },
-  user: {
-    additionalFields: {
-      stripeSubscriptionId: {
-        type: "string",
-        required: false,
-        input: false,
-      },
-    },
-  },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     cookieCache: {
@@ -68,10 +104,6 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
-    password: {
-      hash: (password) => Bun.password.hash(password),
-      verify: ({ password, hash }) => Bun.password.verify(password, hash),
-    },
   },
   socialProviders: {
     google: {
