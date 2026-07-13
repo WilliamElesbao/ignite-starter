@@ -15,35 +15,33 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
 import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@repo/ui/components/ui/sidebar";
-import {
   IconDotsVertical,
   IconLogout,
   IconNotification,
   IconUserCircle,
 } from "@tabler/icons-react";
-import { Sparkles } from "lucide-react";
-import { useRouter } from "next/navigation";
-import type { User } from "@/lib/better-auth/auth.types";
-import { authClient } from "@/lib/better-auth/auth-client";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/features/sidebar/components/sidebar";
+import { useSignOut } from "@/features/sidebar/hooks/use-sign-out";
 import { getInitials } from "@/utils/get-initials";
 
-export function NavUser({ user }: Readonly<{ user: User }>) {
-  const { isMobile } = useSidebar();
-  const router = useRouter();
+type NavUserClientProps = {
+  name: string;
+  email: string;
+  image: string | null;
+};
 
-  const handleSignOut = async () => {
-    try {
-      await authClient.signOut();
-      router.replace("/sign-in");
-    } catch (error) {
-      console.error("[NavUser] signOut error:", error);
-    }
-  };
+export function NavUserDropdown({
+  name,
+  email,
+  image,
+}: Readonly<NavUserClientProps>) {
+  const { isMobile } = useSidebar();
+  const { isPending, mutate } = useSignOut();
 
   return (
     <SidebarMenu>
@@ -55,15 +53,15 @@ export function NavUser({ user }: Readonly<{ user: User }>) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user?.image ?? ""} alt={user?.name} />
+                <AvatarImage src={image ?? ""} alt={name} />
                 <AvatarFallback className="rounded-lg">
-                  {getInitials(user?.name)}
+                  {getInitials(name)}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user?.name}</span>
+                <span className="truncate font-medium">{name}</span>
                 <span className="truncate text-muted-foreground text-xs">
-                  {user?.email}
+                  {email}
                 </span>
               </div>
               <IconDotsVertical className="ml-auto size-4" />
@@ -78,15 +76,15 @@ export function NavUser({ user }: Readonly<{ user: User }>) {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user?.image ?? ""} alt={user?.name} />
+                  <AvatarImage src={image ?? ""} alt={name} />
                   <AvatarFallback className="rounded-lg">
-                    {getInitials(user?.name)}
+                    {getInitials(name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user?.name}</span>
+                  <span className="truncate font-medium">{name}</span>
                   <span className="truncate text-muted-foreground text-xs">
-                    {user?.email}
+                    {email}
                   </span>
                 </div>
               </div>
@@ -98,16 +96,12 @@ export function NavUser({ user }: Readonly<{ user: User }>) {
                 Account
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-              <DropdownMenuItem>
                 <IconNotification />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut}>
+            <DropdownMenuItem onClick={() => mutate()} disabled={isPending}>
               <IconLogout />
               Log out
             </DropdownMenuItem>
