@@ -14,7 +14,9 @@
       "!dist",
       "!build",
       "!generated",
-      "!**/generated"
+      "!**/generated",
+      "!.agents",
+      "!.claude"
     ]
   },
   "formatter": {
