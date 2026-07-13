@@ -60,6 +60,29 @@
       }
     }
   },
+  "subscription": {
+    "plan": "Plan",
+    "developer-access": "Developer Access",
+    "you-have-full-pro-access-as-a-developer": "You have full pro access as a developer",
+    "pro": "Pro",
+    "free-plan": "Free Plan",
+    "pro-plan": "Pro Plan",
+    "active": "Active",
+    "renews-on": "Renews on {date}",
+    "cancel-subscription": "Cancel subscription",
+    "subscription-canceling": "Subscription canceling",
+    "your-pro-access-is-active-until": "Your Pro access is active until <span>{date}</span>. You won't be charged after this date.",
+    "end-of-billing-period": "end of billing period",
+    "renew-subscription": "Renew subscription",
+    "free": "Free",
+    "day": "Day",
+    "month": "Month",
+    "week": "Week",
+    "year": "Year",
+    "current-plan": "Current plan",
+    "recommended": "Recommended",
+    "upgrade-to-pro": "Upgrade to Pro"
+  },
   "validation": {
     "name": {
       "min-length": "Name must be at least {min} characters long"
