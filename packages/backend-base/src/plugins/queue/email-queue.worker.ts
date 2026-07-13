@@ -118,7 +118,9 @@ export class EmailQueueWorker {
     await job.updateProgress(50);
 
     // Send welcome email
-    const result = await emailService.sendWelcomeEmail();
+    const result = await emailService.sendWelcomeEmail({
+      emailTo: job.data.email,
+    });
 
     await job.updateProgress(75);
 
