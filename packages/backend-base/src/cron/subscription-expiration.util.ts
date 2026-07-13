@@ -28,17 +28,17 @@ export const fetchUsersWithSubscriptions = async () => {
   return db
     .select({
       id: schema.users.id,
-      stripeSubscriptionId: schema.users.stripeSubscriptionId,
+      stripeSubscriptionId: schema.users.stripeCustomerId,
     })
     .from(schema.users)
-    .where(isNotNull(schema.users.stripeSubscriptionId));
+    .where(isNotNull(schema.users.stripeCustomerId));
 };
 
 const clearUserSubscription = async (userId: string) => {
   return db
     .update(schema.users)
     .set({
-      stripeSubscriptionId: null,
+      stripeCustomerId: null,
       updatedAt: dayjs().toDate(),
     })
     .where(eq(schema.users.id, userId));
