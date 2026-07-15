@@ -1,6 +1,6 @@
 import {
+  patchStripeSubscriptionCancelMutation,
   patchStripeSubscriptionMutation,
-  patchStripeSubscriptionRevokeMutation,
   postStripeSubscriptionMutation,
 } from "@repo/api";
 import { useMutation } from "@tanstack/react-query";
@@ -26,11 +26,11 @@ export const useStripeUpdateSubscription = () =>
   });
 
 /**
- * Revokes or cancels an active Stripe subscription.
+ * Cancels an active Stripe subscription.
  *
- * @returns Mutation hook for revoking a subscription
+ * @returns Mutation hook for canceling a subscription
  */
-export const useStripeRevokeSubscription = () =>
+export const useStripeCancelSubscription = () =>
   useMutation({
-    ...patchStripeSubscriptionRevokeMutation(),
+    ...patchStripeSubscriptionCancelMutation(),
   });
