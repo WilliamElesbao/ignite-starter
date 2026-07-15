@@ -32,7 +32,7 @@
   },
   "welcome-toast": {
     "title": "Hey D3v!",
-    "description": "Welcome to Next Starter, Wow, the authentication worked perfectly!"
+    "description": "Welcome to Ignite Starter, Wow, the authentication worked perfectly!"
   },
   "send-email": {
     "failed-to-send-email": "Failed to send email. Please try again later.",
