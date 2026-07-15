@@ -30,36 +30,6 @@
       "sign-up-failed": "Falha no cadastro"
     }
   },
-  "dashboard": {
-    "toast": {
-      "welcome": {
-        "title": "Eai D3v!",
-        "description": "Bem-vindo ao Ignite Starter, Wow, a autenticação funcionou perfeitamente!"
-      },
-      "send-email": {
-        "failed-to-send-email": "Falha ao enviar email. Por favor, tente novamente mais tarde.",
-        "email-sent-successfully": "Email enviado com sucesso!"
-      },
-      "subscription": {
-        "redirecting-to-stripe-for-subscription": "Redirecionando para Stripe para assinatura...",
-        "please-wait-while-we-set-up-your-subscription": "Por favor, aguarde enquanto configuramos sua assinatura.",
-        "failed-to-create-subscription": "Falha ao criar assinatura.",
-        "an-error-occurred-while-creating-your-subscription": "Ocorreu um erro ao criar sua assinatura. Por favor, tente novamente."
-      },
-      "update-subscription": {
-        "subscription-updated-successfully": "Assinatura atualizada com sucesso!",
-        "your-subscription-has-been-updated": "Sua assinatura foi atualizada.",
-        "failed-to-update-subscription": "Falha ao atualizar assinatura.",
-        "an-error-occurred-while-updating-your-subscription": "Ocorreu um erro ao atualizar sua assinatura. Por favor, tente novamente."
-      },
-      "cancel-subscription": {
-        "your-subscription-has-been-canceled": "Sua assinatura foi cancelada.",
-        "you-will-not-be-charged-for-the-next-billing-cycle": "Você não será cobrado pelo próximo ciclo de cobrança\nMas você ainda pode acessar sua conta até o final do período atual.",
-        "failed-to-cancel-subscription": "Falha ao cancelar assinatura.",
-        "an-error-occurred-while-canceling-your-subscription": "Ocorreu um erro ao cancelar sua assinatura. Por favor, tente novamente."
-      }
-    }
-  },
   "welcome-toast": {
     "title": "Eai D3v!",
     "description": "Bem-vindo ao Next Starter, Wow, a autenticação funcionou perfeitamente!"
@@ -92,19 +62,13 @@
     "upgrade-to-pro": "Fazer upgrade para o Pro"
   },
   "plans": {
-    "errors": {
-      "unauthenticated": "Não autenticado",
-      "failed-to-update-subscription": "Falha ao atualizar assinatura no banco de dados."
-    },
     "cancel": {
-      "no-active-subscription": "Nenhuma assinatura ativa encontrada.",
       "subscription-canceled": "Assinatura cancelada",
       "your-pro-access-continues-until-the-end-of-the-billing-period": "Seu acesso Pro continuará ativo até o fim do período de cobrança.",
       "failed-to-cancel": "Falha ao cancelar a assinatura.",
       "please-try-again": "Tente novamente."
     },
     "renew": {
-      "no-subscription-found": "Nenhuma assinatura encontrada para renovar.",
       "subscription-renewed": "Assinatura reativada",
       "your-pro-access-subscription-will-continue-normally": "Sua assinatura Pro continuará normalmente.",
       "failed-to-renew": "Falha ao reativar a assinatura.",
