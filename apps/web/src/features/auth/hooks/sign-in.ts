@@ -2,6 +2,8 @@ import { toast } from "sonner";
 import { WELCOME_TOAST } from "@/constants/session-storage";
 import { authClient } from "@/lib/better-auth/auth-client";
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+
 /**
  * Initiates Google OAuth sign-in flow and sets welcome toast flag.
  *
@@ -14,7 +16,7 @@ export const signInWithGoogle = async () => {
     await authClient.signIn.social(
       {
         provider: "google",
-        callbackURL: `${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}`,
+        callbackURL: `${baseUrl}/subscription`,
       },
       {
         onError: (context) => {
