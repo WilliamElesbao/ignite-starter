@@ -1,6 +1,6 @@
 import {
   getStripeProductsOptions,
-  getStripeSubscriptionDetailsOptions,
+  getStripeSubscriptionOptions,
 } from "@repo/api";
 import { useQuery } from "@tanstack/react-query";
 
@@ -21,5 +21,5 @@ export const useGetStripeProducts = () =>
  */
 export const useGetStripeSubscriptionDetails = () =>
   useQuery({
-    ...getStripeSubscriptionDetailsOptions(),
+    ...getStripeSubscriptionOptions(),
   });
