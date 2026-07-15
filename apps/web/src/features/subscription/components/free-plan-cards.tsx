@@ -1,6 +1,5 @@
 "use client";
 
-import type { GetStripeSubscriptionResponse } from "@repo/api/generated/api/types.gen";
 import { Badge } from "@repo/ui/components/ui/badge";
 import { Button } from "@repo/ui/components/ui/button";
 import {
@@ -18,24 +17,19 @@ import { FREE_FEATURES, PRO_FEATURES } from "../constants/constants";
 import { FeatureList } from "./feature-list";
 import { UpgradeToProButton } from "./upgrade-to-pro-button";
 
-export interface PlanSectionProps {
-  resolvedPlan?: GetStripeSubscriptionResponse;
-  proPlanPriceId: string;
-  proPlanPrice: string;
-  proPlanInterval: Stripe.Price.Recurring.Interval;
+interface Props {
+  priceId: string;
+  price: string;
+  recurring: Stripe.Price.Recurring.Interval;
 }
 
-export function FreePlanCards({
-  proPlanPriceId,
-  proPlanPrice,
-  proPlanInterval,
-}: Readonly<Omit<PlanSectionProps, "resolvedPlan">>) {
+export function FreePlanCards({ priceId, price, recurring }: Readonly<Props>) {
   const t = useTranslations();
 
   const { mutateAsync } = useMutation({
     mutationFn: async () => {
       await upgradeSubscriptionAction({
-        priceId: proPlanPriceId,
+        priceId,
         planName: "pro",
       });
     },
@@ -79,10 +73,10 @@ export function FreePlanCards({
             </Badge>
           </div>
           <p>
-            <span className="text-2xl font-bold">{proPlanPrice}</span>
+            <span className="text-2xl font-bold">{price}</span>
             <span className="text-sm text-muted-foreground">
               {" "}
-              / {t(`subscription.${proPlanInterval}`)}
+              / {t(`subscription.${recurring}`)}
             </span>
           </p>
         </CardHeader>

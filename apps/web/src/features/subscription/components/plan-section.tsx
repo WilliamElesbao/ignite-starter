@@ -1,35 +1,37 @@
+"use client";
+
 import { Text } from "@repo/ui/components/text";
-import { getTranslations } from "next-intl/server";
-import { getSettingsData } from "../actions/get-settings.action";
-import { stripePlansAction } from "../actions/stripe-plans.action";
+import { useTranslations } from "next-intl";
+import {
+  useGetStripeProducts,
+  useGetStripeSubscriptionDetails,
+} from "@/hooks/stripe/stripe.queries";
 import { ActivePlanCard } from "./active-plan-card";
 import { CancelingPlanCard } from "./canceling-plan-card";
 import { DeveloperPlanCard } from "./developer-plan-card";
 import { FreePlanCards } from "./free-plan-cards";
 
-export async function PlanSection() {
-  const [t, { plans }, data] = await Promise.all([
-    getTranslations(),
-    stripePlansAction(),
-    getSettingsData(),
-  ]);
+export function PlanSection() {
+  const t = useTranslations();
+  const { data: plans } = useGetStripeProducts();
+  const { data: subscription } = useGetStripeSubscriptionDetails();
 
-  const proPlan = plans.find((plan) => plan.planName === "pro");
+  const proPlan = plans?.find((plan) => plan.planName === "pro");
 
   function renderPlanView() {
-    switch (data?.resolvedPlan?.status) {
+    switch (subscription?.status) {
       case "whitelisted":
         return <DeveloperPlanCard />;
       case "active":
-        return <ActivePlanCard plan={data?.resolvedPlan} />;
+        return <ActivePlanCard plan={subscription} />;
       case "canceling":
-        return <CancelingPlanCard plan={data?.resolvedPlan} />;
+        return <CancelingPlanCard plan={subscription} />;
       case "free":
         return (
           <FreePlanCards
-            proPlanPriceId={proPlan?.id ?? ""}
-            proPlanPrice={proPlan?.price ?? ""}
-            proPlanInterval={proPlan?.recurring ?? "month"}
+            priceId={proPlan?.id ?? ""}
+            price={proPlan?.price ?? ""}
+            recurring={proPlan?.recurring ?? "month"}
           />
         );
       default:
