@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { authClient } from "@/lib/better-auth/auth-client";
-import { type SignUpFormValues, signUpFormSchema } from "./form.schema";
+import { type SignUpFormValues, signUpFormSchema } from "./form-schema";
 
 /**
  * Manages sign-up form state and submission logic with email authentication.
