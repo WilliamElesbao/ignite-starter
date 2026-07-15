@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { authClient } from "@/lib/better-auth/auth-client";
+import { logger } from "@/utils/logger";
 import { type SignUpFormValues, useSignUpFormSchema } from "./form-schema";
 
 /**
@@ -32,7 +33,7 @@ export const useSignUpForm = () => {
       },
       {
         onSuccess: (context) => {
-          console.log("[useSignupForm] - Sign-up successful:", context.data);
+          logger.log("[useSignupForm] - Sign-up successful:", context.data);
           globalThis.location.replace("/");
         },
         onError: (context) => {
