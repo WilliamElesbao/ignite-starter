@@ -41,7 +41,3 @@ yarn-error.log*
 
 *storybook.log
 storybook-static
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
