@@ -13,7 +13,6 @@ import {
 import stripePlugin, {
   type StripePlugin,
 } from "./src/plugins/stripe/stripe.plugin";
-import userPlugin, { type UserPlugin } from "./src/plugins/user/user.plugin";
 
 export {
   OpenAPI,
@@ -22,8 +21,6 @@ export {
   type AuthPlugin,
   emailPlugin,
   type EmailPlugin,
-  userPlugin,
-  type UserPlugin,
   type SessionResponse,
   stripePlugin,
   type StripePlugin,
