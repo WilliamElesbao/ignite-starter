@@ -14,6 +14,7 @@ export function useSignOut() {
     },
     onSuccess: () => {
       router.replace("/sign-in");
+      router.refresh();
     },
     onError: (err) => {
       toast.error("failed-to-sign-out", {
