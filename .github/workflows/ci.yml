@@ -105,6 +105,5 @@ jobs:
 
       - name: Build
         run: bun run build
-
         env:
           API_URL: ${{ secrets.API_URL }}
