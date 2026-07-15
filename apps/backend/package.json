@@ -14,7 +14,7 @@
   "dependencies": {
     "@elysiajs/openapi": "^1.4.15",
     "@elysiajs/opentelemetry": "1.4.11",
-    "@opentelemetry/exporter-trace-otlp-proto": "0.218.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.220.0",
     "@opentelemetry/instrumentation-pg": "0.70.0",
     "@opentelemetry/sdk-trace-node": "2.7.1",
     "@repo/backend-base": "workspace:*",
