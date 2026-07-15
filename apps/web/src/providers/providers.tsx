@@ -2,10 +2,10 @@
 
 import { Toaster } from "@repo/ui/components/ui/sonner";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
+import { useIsMobile } from "@repo/ui/lib/shadcn";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { PropsWithChildren } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { getQueryClient } from "@/lib/react-query/query-client";
 
 function ToasterWithPosition() {

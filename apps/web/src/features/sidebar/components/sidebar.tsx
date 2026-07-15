@@ -16,11 +16,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
+import { useIsMobile } from "@repo/ui/lib/shadcn";
 import { cva, type VariantProps } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
 import { Slot } from "radix-ui";
 import * as React from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/shadcn/utils";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
