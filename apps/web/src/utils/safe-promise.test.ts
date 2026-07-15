@@ -18,7 +18,9 @@ describe("safePromise", () => {
   });
 
   it("should wrap a non-Error rejection value into an Error instance", async () => {
-    const [value, error] = await safePromise(Promise.reject("plain string reason"));
+    const [value, error] = await safePromise(
+      Promise.reject("plain string reason"),
+    );
 
     expect(value).toBeNull();
     expect(error).toBeInstanceOf(Error);
