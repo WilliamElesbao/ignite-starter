@@ -4,7 +4,7 @@ const ProductDto = t.Object({
   id: t.String(),
   planName: t.String(),
   price: t.String(),
-  recurring: t.Optional(
+  recurring: t.Nullable(
     t.Union([
       t.Literal("day"),
       t.Literal("week"),

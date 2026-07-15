@@ -10,6 +10,7 @@ import {
   stripeDetails502ErrorDto,
   stripeInternalErrorDto,
   stripeProductsErrorDto,
+  stripeProductsNotFoundErrorDto,
   stripeRevoke500ErrorDto,
   stripeRevoke502ErrorDto,
   stripeSubscriptionNotFoundErrorDto,
@@ -26,6 +27,7 @@ import { SubscriptionResponseDto } from "./dtos/subscription/subscription-respon
 import { WebhookResponseDto } from "./dtos/webhook-response.dto";
 import { STRIPE_ERROR_MAP, StripeErrorCode } from "./stripe.errors";
 import { StripeService } from "./stripe.service";
+import { SubscriptionService } from "./subscription.service";
 
 const stripePlugin = new Elysia({ tags: ["Stripe"] })
   .use(shared)
@@ -47,6 +49,7 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
       state.logger,
       state.eventService,
     ),
+    subscriptionService: new SubscriptionService(state.db),
   }))
   .group("/stripe", (app) =>
     app
@@ -60,14 +63,38 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
           detail: { description: "Get all products from Stripe" },
           response: {
             200: ProductsResponseDto,
+            404: stripeProductsNotFoundErrorDto,
             500: stripeInternalErrorDto,
             502: stripeProductsErrorDto,
           },
         },
       )
+      .get(
+        "/subscription",
+        async ({ store: { subscriptionService }, user }) => {
+          const subscription =
+            await subscriptionService.getSubscriptionByUserId(
+              user.id,
+              user.email,
+            );
+
+          return subscription;
+        },
+        {
+          auth: true,
+          detail: { description: "Get the current subscription for the user" },
+          response: {
+            200: SubscriptionDetailsResponseDto,
+            401: stripeUnauthorizedErrorDto,
+            404: stripeSubscriptionNotFoundErrorDto,
+            500: stripeInternalErrorDto,
+            502: stripeDetails502ErrorDto,
+          },
+        },
+      )
       .post(
         "/subscription",
-        async ({ store: { stripeService }, body, user }) => {
+        async ({ request, store: { stripeService }, body, user }) => {
           if (!user) {
             throw AppError.fromCatalog({
               code: AuthErrorCode.AUTH_UNAUTHORIZED,
@@ -75,9 +102,10 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
             });
           }
 
-          const { url } = await stripeService.createSubscription({
+          const { url } = await stripeService.upgradeSubscription({
             ...body,
             user,
+            headers: request.headers,
           });
 
           return { url };
@@ -95,34 +123,9 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
           },
         },
       )
-      .get(
-        "/subscription/details",
-        async ({ store: { stripeService }, user }) => {
-          if (!user) {
-            throw AppError.fromCatalog({
-              code: AuthErrorCode.AUTH_UNAUTHORIZED,
-              catalog: AUTH_ERROR_MAP,
-            });
-          }
-
-          const res = await stripeService.subscriptionDetails({ user });
-
-          return res;
-        },
-        {
-          auth: true,
-          detail: { description: "Get subscription details" },
-          response: {
-            200: SubscriptionDetailsResponseDto,
-            401: stripeUnauthorizedErrorDto,
-            500: stripeInternalErrorDto,
-            502: stripeDetails502ErrorDto,
-          },
-        },
-      )
       .patch(
         "/subscription",
-        async ({ store: { stripeService }, body, set, user }) => {
+        async ({ store: { stripeService }, set, user }) => {
           if (!user) {
             throw AppError.fromCatalog({
               code: AuthErrorCode.AUTH_UNAUTHORIZED,
@@ -130,8 +133,7 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
             });
           }
 
-          await stripeService.updateSubscription({
-            ...body,
+          await stripeService.renewSubscription({
             user,
           });
 
@@ -141,7 +143,6 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
         {
           auth: true,
           detail: { description: "Update an existing subscription" },
-          body: SubscriptionBodyDto,
           response: {
             204: t.Void(),
             401: stripeUnauthorizedErrorDto,
@@ -152,7 +153,7 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
         },
       )
       .patch(
-        "/subscription/revoke",
+        "/subscription/cancel",
         async ({ store: { stripeService }, set, user }) => {
           if (!user) {
             throw AppError.fromCatalog({
@@ -161,14 +162,14 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
             });
           }
 
-          await stripeService.revokeSubscription({ user });
+          await stripeService.cancelSubscription({ user });
 
           set.status = 204;
           return;
         },
         {
           auth: true,
-          detail: { description: "Revoke subscription access immediately" },
+          detail: { description: "Cancel an existing subscription" },
           response: {
             204: t.Void(),
             401: stripeUnauthorizedErrorDto,

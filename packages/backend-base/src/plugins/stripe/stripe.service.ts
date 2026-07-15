@@ -3,7 +3,8 @@ import dayjs from "dayjs";
 import { eq } from "drizzle-orm";
 import type Stripe from "stripe";
 import { env } from "../../env";
-import type { SessionResponse } from "../../lib/better-auth/auth";
+import { auth, type SessionResponse } from "../../lib/better-auth/auth";
+import { stripe } from "../../lib/stripe";
 import {
   EVENT_TYPE,
   type EventService,
@@ -60,6 +61,7 @@ export class StripeService {
 
     const normalizedPlans = products.data.map((product) => {
       const price = product.default_price as Stripe.Price;
+
       return {
         id: price.id,
         planName: product.name.toLowerCase(),
@@ -67,79 +69,87 @@ export class StripeService {
           currency: price.currency as "usd" | "brl",
           amount: price.unit_amount ?? 0,
         }),
-        recurring: price.recurring?.interval,
+        recurring: price.recurring?.interval ?? null,
       };
     });
 
     return normalizedPlans;
   }
 
-  async createSubscription({
+  async upgradeSubscription({
     priceId,
     planName,
     user,
-  }: TSubscriptionBodyDto & { user: SessionResponse["user"] }) {
-    const [createSubscription, createSubscriptionError] = await safePromise(
-      this.stripe.checkout.sessions.create({
-        line_items: [{ price: priceId, quantity: 1 }],
-        mode: "subscription",
-        success_url: env.WEB_URL,
-        cancel_url: env.WEB_URL,
-        customer_email: user.email,
-
-        metadata: {
-          userId: user.id,
-          planName: planName,
+    headers,
+  }: TSubscriptionBodyDto & {
+    user: SessionResponse["user"];
+    headers: Headers;
+  }) {
+    const [result, error] = await safePromise(
+      auth.api.upgradeSubscription({
+        body: {
+          plan: planName,
+          customerType: "user",
+          successUrl: `${env.WEB_URL}/subscription`,
+          cancelUrl: `${env.WEB_URL}/subscription`,
+          disableRedirect: true,
         },
+        headers,
       }),
     );
 
-    if (createSubscriptionError) {
+    if (error) {
       this.logger.error({
-        msg: "Failed to create Stripe checkout session",
+        msg: "Failed to upgrade subscription via better-auth",
         userId: user.id,
         planName,
         priceId,
-        error: createSubscriptionError,
-      });
-
-      await this.trackBusinessEvent({
-        type: EVENT_TYPE.STRIPE_PAYMENT_FAILED,
-        userId: user.id,
-        payload: {
-          planName,
-          priceId,
-          reason: "CHECKOUT_CREATE_FAILED",
-        },
+        error,
       });
 
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_CHECKOUT_CREATE_FAILED,
         catalog: STRIPE_ERROR_MAP,
-        details: createSubscriptionError,
+        details: error,
       });
     }
 
-    if (!createSubscription.url) {
+    return result;
+  }
+
+  async renewSubscription({ user }: { user: SessionResponse["user"] }) {
+    if (!user.stripeCustomerId) {
       throw AppError.fromCatalog({
-        code: StripeErrorCode.STRIPE_CHECKOUT_URL_MISSING,
+        code: StripeErrorCode.STRIPE_CUSTOMER_NOT_FOUND,
         catalog: STRIPE_ERROR_MAP,
       });
     }
 
-    return { url: createSubscription.url };
-  }
+    const [userSubscription, userSubscriptionError] = await safePromise(
+      this.db
+        .select({
+          stripeSubscriptionId: schema.subscriptions.stripeSubscriptionId,
+        })
+        .from(schema.subscriptions)
+        .where(
+          eq(schema.subscriptions.stripeCustomerId, user.stripeCustomerId),
+        ),
+    );
 
-  async updateSubscription({
-    priceId,
-    planName,
-    user,
-  }: TSubscriptionBodyDto & { user: SessionResponse["user"] }) {
-    const [subscription] = await this.db
-      .select({ stripeSubscriptionId: schema.users.stripeSubscriptionId })
-      .from(schema.users)
-      .where(eq(schema.users.id, user.id));
+    if (userSubscriptionError) {
+      this.logger.error({
+        msg: "Failed to retrieve user subscription",
+        userId: user.id,
+        error: userSubscriptionError,
+      });
 
+      throw AppError.fromCatalog({
+        code: StripeErrorCode.STRIPE_SUBSCRIPTION_NOT_FOUND,
+        catalog: STRIPE_ERROR_MAP,
+      });
+    }
+
+    const [subscription] = userSubscription;
     if (!subscription?.stripeSubscriptionId) {
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_SUBSCRIPTION_NOT_FOUND,
@@ -147,228 +157,132 @@ export class StripeService {
       });
     }
 
-    const [currentSubscription, currentSubscriptionError] = await safePromise(
-      this.stripe.subscriptions.retrieve(subscription.stripeSubscriptionId),
-    );
-
-    if (currentSubscriptionError) {
-      throw AppError.fromCatalog({
-        code: StripeErrorCode.STRIPE_SUBSCRIPTION_RETRIEVE_FAILED,
-        catalog: STRIPE_ERROR_MAP,
-        details: currentSubscriptionError,
-      });
-    }
-
-    const [updated, updateError] = await safePromise(
-      this.stripe.subscriptions.update(subscription.stripeSubscriptionId, {
-        items: [
-          {
-            id: currentSubscription.items.data[0].id,
-            price: priceId,
-          },
-        ],
-        proration_behavior: "create_prorations",
-
-        metadata: {
-          userId: user.id,
-          planName: planName,
-        },
+    const subscriptionId = subscription.stripeSubscriptionId;
+    const [, stripeError] = await safePromise(
+      stripe.subscriptions.update(subscriptionId, {
+        cancel_at_period_end: false,
       }),
     );
-
-    if (updateError) {
+    if (stripeError) {
       this.logger.error({
-        msg: "Failed to update Stripe subscription",
+        msg: "Failed to renew Stripe subscription",
         userId: user.id,
-        subscriptionId: subscription.stripeSubscriptionId,
-        planName,
-        priceId,
-        error: updateError,
+        subscriptionId,
+        error: stripeError,
       });
 
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_SUBSCRIPTION_UPDATE_FAILED,
         catalog: STRIPE_ERROR_MAP,
-        details: updateError,
+        details: stripeError,
       });
     }
 
-    const [_, updateUserError] = await safePromise(
+    const [renewSubscription, renewSubscriptionError] = await safePromise(
       this.db
-        .update(schema.users)
-        .set({
-          stripeSubscriptionId: updated.id,
-          updatedAt: dayjs().toDate(),
-        })
-        .where(eq(schema.users.id, user.id))
+        .update(schema.subscriptions)
+        .set({ cancelAtPeriodEnd: false })
+        .where(eq(schema.subscriptions.referenceId, user.id))
         .returning(),
     );
 
-    if (updateUserError) {
-      throw AppError.fromCatalog({
-        code: StripeErrorCode.STRIPE_USER_SUBSCRIPTION_PERSISTENCE_FAILED,
-        catalog: STRIPE_ERROR_MAP,
-        message: "Failed to persist subscription update",
-        details: updateUserError,
-      });
-    }
-  }
-
-  async subscriptionDetails({ user }: { user: SessionResponse["user"] }) {
-    const [subscription] = await this.db
-      .select({ stripeSubscriptionId: schema.users.stripeSubscriptionId })
-      .from(schema.users)
-      .where(eq(schema.users.id, user.id));
-
-    if (!subscription?.stripeSubscriptionId) {
-      return {
-        hasActiveSubscription: false,
-        code: StripeErrorCode.STRIPE_SUBSCRIPTION_NOT_FOUND,
-        message: "User has no active subscription",
-      };
-    }
-
-    const [subscriptionDetails, subscriptionDetailsError] = await safePromise(
-      this.stripe.subscriptions.retrieve(subscription.stripeSubscriptionId),
-    );
-
-    if (subscriptionDetailsError) {
+    if (renewSubscriptionError) {
       this.logger.error({
-        msg: "Failed to retrieve Stripe subscription details",
+        msg: "Failed to renew subscription in DB",
         userId: user.id,
-        subscriptionId: subscription.stripeSubscriptionId,
-        error: subscriptionDetailsError,
+        error: renewSubscriptionError,
       });
 
       throw AppError.fromCatalog({
-        code: StripeErrorCode.STRIPE_SUBSCRIPTION_DETAILS_FAILED,
+        code: StripeErrorCode.STRIPE_SUBSCRIPTION_UPDATE_FAILED,
         catalog: STRIPE_ERROR_MAP,
-        details: subscriptionDetailsError,
+        details: renewSubscriptionError,
       });
     }
 
-    const priceId = subscriptionDetails.items.data[0]?.price?.id;
-    const productId = subscriptionDetails.items.data[0]?.price
-      ?.product as string;
-
-    if (!priceId || !productId) {
-      throw AppError.fromCatalog({
-        code: StripeErrorCode.STRIPE_SUBSCRIPTION_DATA_INVALID,
-        catalog: STRIPE_ERROR_MAP,
-      });
-    }
-
-    const [price, priceError] = await safePromise(
-      this.stripe.prices.retrieve(priceId),
-    );
-    if (priceError) {
-      throw AppError.fromCatalog({
-        code: StripeErrorCode.STRIPE_PRICE_RETRIEVE_FAILED,
-        catalog: STRIPE_ERROR_MAP,
-        details: priceError,
-      });
-    }
-
-    const [product, productError] = await safePromise(
-      this.stripe.products.retrieve(productId),
-    );
-    if (productError) {
-      throw AppError.fromCatalog({
-        code: StripeErrorCode.STRIPE_PRODUCT_RETRIEVE_FAILED,
-        catalog: STRIPE_ERROR_MAP,
-        details: productError,
-      });
-    }
-
-    const current_period_start = dayjs
-      .unix(subscriptionDetails.items.data[0].current_period_start)
-      .toISOString();
-    const current_period_end = dayjs
-      .unix(subscriptionDetails.items.data[0].current_period_end)
-      .toISOString();
-    const created = dayjs.unix(subscriptionDetails.created).toISOString();
-
-    const normalizedSubscriptionDetails = {
-      hasActiveSubscription: true,
-      id: subscriptionDetails.id,
-      status: subscriptionDetails.status,
-      current_period_start,
-      current_period_end,
-      cancel_at_period_end: subscriptionDetails.cancel_at_period_end,
-      customer: subscriptionDetails.customer,
-      created,
-      plan: {
-        priceId: price.id,
-        amount: price.unit_amount,
-        currency: price.currency,
-        interval: price.recurring?.interval,
+    const [renewed] = renewSubscription;
+    await this.trackBusinessEvent({
+      type: EVENT_TYPE.SUBSCRIPTION_RENEWED,
+      userId: user.id,
+      payload: {
+        renewed,
       },
-      product: {
-        id: product.id,
-        name: product.name,
-        description: product.description,
-      },
-    };
-
-    return normalizedSubscriptionDetails;
+    });
   }
 
-  async revokeSubscription({ user }: { user: SessionResponse["user"] }) {
-    const [subscription] = await this.db
-      .select({ stripeSubscriptionId: schema.users.stripeSubscriptionId })
-      .from(schema.users)
-      .where(eq(schema.users.id, user.id));
+  async cancelSubscription({ user }: { user: SessionResponse["user"] }) {
+    if (!user.stripeCustomerId) {
+      throw AppError.fromCatalog({
+        code: StripeErrorCode.STRIPE_CUSTOMER_NOT_FOUND,
+        catalog: STRIPE_ERROR_MAP,
+      });
+    }
 
-    if (!subscription?.stripeSubscriptionId) {
+    const [currentSubscription] = await this.db
+      .select({
+        stripeSubscriptionId: schema.subscriptions.stripeSubscriptionId,
+      })
+      .from(schema.subscriptions)
+      .where(eq(schema.subscriptions.stripeCustomerId, user.stripeCustomerId));
+
+    if (!currentSubscription?.stripeSubscriptionId) {
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_SUBSCRIPTION_NOT_FOUND,
         catalog: STRIPE_ERROR_MAP,
       });
     }
 
-    const [, revokeError] = await safePromise(
-      this.stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+    const subscriptionId = currentSubscription.stripeSubscriptionId;
+    const [, stripeError] = await safePromise(
+      stripe.subscriptions.update(subscriptionId, {
         cancel_at_period_end: true,
       }),
     );
 
-    if (revokeError) {
+    if (stripeError) {
       this.logger.error({
         msg: "Failed to revoke Stripe subscription",
         userId: user.id,
-        subscriptionId: subscription.stripeSubscriptionId,
-        error: revokeError,
+        subscriptionId,
+        error: stripeError,
       });
 
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_SUBSCRIPTION_REVOKE_FAILED,
         catalog: STRIPE_ERROR_MAP,
-        details: revokeError,
+        details: stripeError,
       });
     }
 
-    const [, updateUserError] = await safePromise(
+    const [subscription, subscriptionError] = await safePromise(
       this.db
-        .update(schema.users)
-        .set({ updatedAt: dayjs().toDate() })
-        .where(eq(schema.users.id, user.id))
+        .update(schema.subscriptions)
+        .set({ cancelAtPeriodEnd: true })
+        .where(eq(schema.subscriptions.referenceId, user.id))
         .returning(),
     );
 
-    if (updateUserError) {
+    if (subscriptionError) {
+      this.logger.error({
+        msg: "Failed to revoke subscription in DB",
+        userId: user.id,
+        error: subscriptionError,
+      });
+
       throw AppError.fromCatalog({
-        code: StripeErrorCode.STRIPE_USER_SUBSCRIPTION_PERSISTENCE_FAILED,
+        code: StripeErrorCode.STRIPE_SUBSCRIPTION_REVOKE_FAILED,
         catalog: STRIPE_ERROR_MAP,
-        message: "Failed to persist subscription revoke",
-        details: updateUserError,
+        details: subscriptionError,
       });
     }
+
+    const [revoked] = subscription;
 
     await this.trackBusinessEvent({
       type: EVENT_TYPE.SUBSCRIPTION_CANCELED,
       userId: user.id,
       payload: {
-        subscriptionId: subscription.stripeSubscriptionId,
+        revoked,
       },
     });
   }
@@ -380,25 +294,30 @@ export class StripeService {
     payload: string;
     signature: string;
   }) {
-    let event: Stripe.Event;
-
-    try {
-      event = await this.stripe.webhooks.constructEventAsync(
+    const [event, eventError] = await safePromise(
+      this.stripe.webhooks.constructEventAsync(
         payload,
         signature,
         env.STRIPE_WEBHOOK_SECRET,
-      );
-    } catch (error) {
+      ),
+    );
+
+    if (eventError) {
+      this.logger.error({
+        msg: "Failed to process Stripe webhook",
+        error: eventError,
+      });
+
       this.logger.error({
         msg: "Invalid Stripe webhook signature",
-        error,
+        error: eventError,
       });
 
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_WEBHOOK_INVALID_SIGNATURE,
         catalog: STRIPE_ERROR_MAP,
-        message: `Webhook Error: ${(error as Error).message}`,
-        details: error,
+        message: `Webhook Error: ${eventError.message}`,
+        details: eventError,
       });
     }
 
@@ -422,7 +341,6 @@ export class StripeService {
           this.db
             .update(schema.users)
             .set({
-              stripeSubscriptionId,
               updatedAt: dayjs().toDate(),
             })
             .where(eq(schema.users.id, userId)),
