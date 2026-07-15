@@ -18,7 +18,7 @@
       "name": "@apps/backend",
       "version": "0.0.0",
       "dependencies": {
-        "@elysiajs/openapi": "^1.4.14",
+        "@elysiajs/openapi": "^1.4.15",
         "@elysiajs/opentelemetry": "1.4.11",
         "@opentelemetry/exporter-trace-otlp-proto": "0.218.0",
         "@opentelemetry/instrumentation-pg": "0.70.0",
