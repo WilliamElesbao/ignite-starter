@@ -4,8 +4,8 @@ import { refresh, revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { getSessionAction } from "@/action/get-session.action";
 import { cacheKeys } from "@/constants/cache/cache-key";
-import { getSession } from "@/lib/better-auth/auth-server";
 import type { SubscriptionSchema } from "../schema/use-subscription-schema";
 
 export type ManageSubscriptionResult =
@@ -36,7 +36,7 @@ export async function upgradeSubscriptionAction(
 export async function cancelSubscriptionAction(): Promise<ManageSubscriptionResult> {
   const t = await getTranslations("plans");
 
-  const session = await getSession();
+  const session = await getSessionAction();
   const user = session?.user;
   if (!user?.id) return { success: false, error: t("errors.unauthenticated") };
 
@@ -54,7 +54,7 @@ export async function cancelSubscriptionAction(): Promise<ManageSubscriptionResu
 export async function renewSubscriptionAction(): Promise<ManageSubscriptionResult> {
   const t = await getTranslations("plans");
 
-  const session = await getSession();
+  const session = await getSessionAction();
   const user = session?.user;
   if (!user?.id) return { success: false, error: t("errors.unauthenticated") };
 

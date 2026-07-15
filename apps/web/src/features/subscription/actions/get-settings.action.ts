@@ -1,7 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { getSession } from "@/lib/better-auth/auth-server";
+import { getSessionAction } from "@/action/get-session.action";
 import type { ResolvedPlan } from "../utils/plan-utils";
 
 export interface SettingsData {
@@ -14,7 +14,7 @@ export interface SettingsData {
 }
 
 export async function getSettingsData(): Promise<SettingsData | null> {
-  const session = await getSession();
+  const session = await getSessionAction();
   const user = session?.user;
   if (!user?.id) return null;
 

@@ -35,7 +35,7 @@ const sessionSchema: z.ZodType<GetSessionResponse> = z
 
 type SessionResponse = z.infer<typeof sessionSchema>;
 
-export async function getSession(): Promise<SessionResponse> {
+export async function getSessionAction(): Promise<SessionResponse> {
   "use cache: private";
 
   const cookieStore = await cookies();

@@ -3,8 +3,8 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Separator } from "@repo/ui/components/ui/separator";
 import { IconBrandGithub } from "@tabler/icons-react";
 import { getTranslations } from "next-intl/server";
+import { getSessionAction } from "@/action/get-session.action";
 import { SidebarTrigger } from "@/features/sidebar/components/sidebar";
-import { getSession } from "@/lib/better-auth/auth-server";
 import { Link } from "@/lib/i18n/navigation";
 import { planStatusToLabelMap } from "@/utils/plan-status-to-label";
 import { LanguageSwitcher } from "../../../components/language-switcher";
@@ -15,7 +15,7 @@ import { SendEmailButton } from "./send-email-button";
 export async function SiteHeader() {
   const [t, session, userPlan] = await Promise.all([
     getTranslations("subscription"),
-    getSession(),
+    getSessionAction(),
     getSettingsData(),
   ]);
   if (!session?.user.id || !userPlan?.resolvedPlan.status) return null;

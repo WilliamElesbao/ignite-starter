@@ -1,6 +1,6 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/better-auth/auth-server";
+import { getSessionAction } from "@/action/get-session.action";
 import { clearAuthCookies } from "./cookies";
 
 // Routes that require no authentication
@@ -53,7 +53,7 @@ export async function handleAuth(
   }
 
   // ── Has a token — validate it ────────────────────────────────────────────
-  const data = await getSession();
+  const data = await getSessionAction();
   const session = data?.session;
 
   if (!session) {

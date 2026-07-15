@@ -1,8 +1,8 @@
-import { getSession } from "@/lib/better-auth/auth-server";
+import { getSessionAction } from "@/action/get-session.action";
 import { NavUserDropdown } from "./nav-user-dropdown";
 
 export async function NavUser() {
-  const session = await getSession();
+  const session = await getSessionAction();
   if (!session?.user) return null;
 
   return (
