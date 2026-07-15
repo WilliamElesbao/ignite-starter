@@ -50,7 +50,7 @@ describe("signInWithGoogle", () => {
     expect(mockSignInSocial).toHaveBeenCalledWith(
       {
         provider: "google",
-        callbackURL: "http://localhost:3000",
+        callbackURL: "http://localhost:3000/subscription",
       },
       expect.objectContaining({
         onError: expect.any(Function),
@@ -82,7 +82,7 @@ describe("signInWithGoogle", () => {
 
     expect(mockSignInSocial).toHaveBeenCalledWith(
       expect.objectContaining({
-        callbackURL: "http://localhost:3000",
+        callbackURL: "http://localhost:3000/subscription",
       }),
       expect.any(Object),
     );
@@ -136,7 +136,7 @@ describe("signInWithGoogle", () => {
 
     expect(mockSignInSocial).toHaveBeenCalledWith(
       expect.objectContaining({
-        callbackURL: process.env.NEXT_PUBLIC_BASE_URL,
+        callbackURL: `${process.env.NEXT_PUBLIC_BASE_URL}/subscription`,
       }),
       expect.any(Object),
     );
@@ -156,7 +156,7 @@ describe("signInWithGoogle", () => {
 
     expect(mockSignInSocial).toHaveBeenCalledWith(
       expect.objectContaining({
-        callbackURL: "http://localhost:3000",
+        callbackURL: "http://localhost:3000/subscription",
       }),
       expect.any(Object),
     );
