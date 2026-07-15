@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { authClient } from "@/lib/better-auth/auth-client";
-import { type SignUpFormValues, signUpFormSchema } from "./form-schema";
+import { type SignUpFormValues, useSignUpFormSchema } from "./form-schema";
 
 /**
  * Manages sign-up form state and submission logic with email authentication.
@@ -12,9 +12,10 @@ import { type SignUpFormValues, signUpFormSchema } from "./form-schema";
  */
 export const useSignUpForm = () => {
   const t = useTranslations("sign-up");
+  const schema = useSignUpFormSchema();
 
   const form = useForm<SignUpFormValues>({
-    resolver: zodResolver(signUpFormSchema()),
+    resolver: zodResolver(schema),
     defaultValues: {
       name: "",
       email: "",

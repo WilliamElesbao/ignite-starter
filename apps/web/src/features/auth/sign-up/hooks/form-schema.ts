@@ -4,7 +4,7 @@ import z from "zod";
 const MIN_NAME_LENGTH = 5;
 const MIN_PASSWORD_LENGTH = 8;
 
-export const signUpFormSchema = () => {
+export const useSignUpFormSchema = () => {
   const t = useTranslations("validation");
 
   return z.object({
@@ -18,4 +18,4 @@ export const signUpFormSchema = () => {
   });
 };
 
-export type SignUpFormValues = z.infer<ReturnType<typeof signUpFormSchema>>;
+export type SignUpFormValues = z.infer<ReturnType<typeof useSignUpFormSchema>>;
