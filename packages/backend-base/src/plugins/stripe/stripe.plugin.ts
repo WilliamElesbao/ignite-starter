@@ -3,7 +3,7 @@ import { AppError } from "../../shared/errors/app-error";
 import { toErrorResponse } from "../../shared/errors/to-error-response";
 import shared from "../../shared/shared.plugin";
 import { AUTH_ERROR_MAP, AuthErrorCode } from "../auth/auth.errors";
-import authPLugin from "../auth/auth.plugin";
+import authPlugin from "../auth/auth.plugin";
 import {
   stripeCreateSubscription404ErrorDto,
   stripeCreateSubscription502ErrorDto,
@@ -31,7 +31,7 @@ import { SubscriptionService } from "./subscription.service";
 
 const stripePlugin = new Elysia({ tags: ["Stripe"] })
   .use(shared)
-  .use(authPLugin)
+  .use(authPlugin)
   .onError(({ error, set }) => {
     const response = toErrorResponse(error, {
       code: StripeErrorCode.STRIPE_INTERNAL_SERVER_ERROR,
