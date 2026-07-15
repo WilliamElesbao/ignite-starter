@@ -16,11 +16,13 @@ import {
   SidebarMenuItem,
 } from "@/features/sidebar/components/sidebar";
 import { Link } from "@/lib/i18n/navigation";
+import { WelcomeToast } from "../welcome-toast/welcome-toast";
 import { menu } from "./constants/constants";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
+      <WelcomeToast />
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>

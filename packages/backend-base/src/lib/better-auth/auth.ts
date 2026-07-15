@@ -4,6 +4,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
 import type Stripe from "stripe";
+import { WELCOME_COOKIE } from "../../constants/welcome-cookie";
 import { env } from "../../env";
 import redisClient from "../../shared/redis.client";
 import { logger } from "../logger";
@@ -35,7 +36,11 @@ export const auth = betterAuth({
   plugins: [
     openAPI(),
     stripe({
-      onCustomerCreate: async (data, _ctx) => {
+      onCustomerCreate: async (data, ctx) => {
+        ctx.setCookie(WELCOME_COOKIE.key, WELCOME_COOKIE.value, {
+          maxAge: 60,
+          path: "/",
+        });
         logger.info(
           "[Customer Created]:" +
             data.stripeCustomer.id +
