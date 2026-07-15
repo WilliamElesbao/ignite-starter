@@ -1,3 +1,4 @@
+import { stripeClient } from "@better-auth/stripe/client";
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
@@ -6,4 +7,9 @@ export const authClient = createAuthClient({
   fetchOptions: {
     credentials: "include",
   },
+  plugins: [
+    stripeClient({
+      subscription: true,
+    }),
+  ],
 });
