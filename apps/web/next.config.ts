@@ -5,6 +5,15 @@ const nextConfig: NextConfig = {
   output: "standalone",
   cacheComponents: true,
   reactCompiler: true,
+
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${process.env.API_URL}/:path*`,
+      },
+    ];
+  },
 };
 
 const withNextIntl = createNextIntlPlugin({
