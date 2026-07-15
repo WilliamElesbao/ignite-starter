@@ -20,9 +20,8 @@ export default defineConfig({
       reporter: ["text", "json", "html", "lcov"],
       include: [
         "src/features/auth/hooks/sign-in.ts",
-        "src/features/auth/sign-in/hooks/form.schema.ts",
-        "src/features/auth/sign-in/hooks/useSignInForm.ts",
-        "src/hooks/email/useSendWelcomeEmail.ts",
+        "src/features/auth/sign-in/hooks/form-schema.ts",
+        "src/features/auth/sign-in/hooks/use-sign-in-form.ts",
         "src/utils/safe-promise.ts",
       ],
       exclude: [
