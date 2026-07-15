@@ -1,7 +1,7 @@
 "use server";
 
 import { refresh, revalidateTag } from "next/cache";
-import { headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { cacheKeys } from "@/constants/cache/cache-key";
@@ -15,18 +15,14 @@ export type ManageSubscriptionResult =
 export async function upgradeSubscriptionAction(
   formValues: SubscriptionSchema,
 ) {
-  const incomingHeaders = await headers();
-  const cookie = incomingHeaders.get("cookie");
+  const cookieStore = await cookies();
   const res = await fetch(`${process.env.API_URL}/stripe/subscription`, {
     method: "POST",
     body: JSON.stringify({
       priceId: formValues.priceId,
       planName: formValues.planName,
     }),
-    headers: {
-      "Content-Type": "application/json",
-      ...(cookie ? { cookie } : {}),
-    },
+    headers: { cookie: cookieStore.toString() },
   });
 
   const data = (await res.json()) as { url: string };
@@ -44,14 +40,10 @@ export async function cancelSubscriptionAction(): Promise<ManageSubscriptionResu
   const user = session?.user;
   if (!user?.id) return { success: false, error: t("errors.unauthenticated") };
 
-  const incomingHeaders = await headers();
-  const cookie = incomingHeaders.get("cookie");
+  const cookieStore = await cookies();
   await fetch(`${process.env.API_URL}/stripe/subscription/cancel`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      ...(cookie ? { cookie } : {}),
-    },
+    headers: { cookie: cookieStore.toString() },
   });
 
   revalidateTag(cacheKeys.userPlan(user.id), "hours");
@@ -66,14 +58,11 @@ export async function renewSubscriptionAction(): Promise<ManageSubscriptionResul
   const user = session?.user;
   if (!user?.id) return { success: false, error: t("errors.unauthenticated") };
 
-  const incomingHeaders = await headers();
-  const cookie = incomingHeaders.get("cookie");
+  const cookieStore = await cookies();
+  console.log("[renewSubscriptionAction] cookieStore", cookieStore.toString());
   await fetch(`${process.env.API_URL}/stripe/subscription`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      ...(cookie ? { cookie } : {}),
-    },
+    headers: { cookie: cookieStore.toString() },
   });
 
   revalidateTag(cacheKeys.userPlan(user.id), "hours");
