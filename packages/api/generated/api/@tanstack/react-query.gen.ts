@@ -4,8 +4,10 @@ import { queryOptions, type UseMutationOptions } from "@tanstack/react-query";
 
 import { client } from "../client.gen";
 import {
+  cancelSubscription,
   changeEmail,
   changePassword,
+  createBillingPortal,
   deleteUser,
   getAuthAccountInfo,
   getAuthCallbackById,
@@ -14,16 +16,18 @@ import {
   getAuthOk,
   getAuthVerifyEmail,
   getSession,
-  getSession2,
+  getSessionPost,
   getStripeProducts,
-  getStripeSubscriptionDetails,
-  getUserById,
+  getStripeSubscription,
+  handleStripeWebhook,
+  handleSubscriptionSuccess,
   linkSocialAccount,
+  listActiveSubscriptions,
   listUserAccounts,
   listUserSessions,
   type Options,
   patchStripeSubscription,
-  patchStripeSubscriptionRevoke,
+  patchStripeSubscriptionCancel,
   postAuthCallbackById,
   postAuthGetAccessToken,
   postAuthRefreshToken,
@@ -37,6 +41,7 @@ import {
   requestPasswordReset,
   resetPassword,
   resetPasswordCallback,
+  restoreSubscription,
   sendVerificationEmail,
   signInEmail,
   signOut,
@@ -44,15 +49,20 @@ import {
   socialSignIn,
   updateSession,
   updateUser,
+  upgradeSubscription,
   verifyPassword,
 } from "../sdk.gen";
 import type {
+  CancelSubscriptionData,
+  CancelSubscriptionError,
   ChangeEmailData,
   ChangeEmailError,
   ChangeEmailResponse,
   ChangePasswordData,
   ChangePasswordError,
   ChangePasswordResponse,
+  CreateBillingPortalData,
+  CreateBillingPortalError,
   DeleteUserData,
   DeleteUserError,
   DeleteUserResponse,
@@ -73,34 +83,35 @@ import type {
   GetAuthVerifyEmailData,
   GetAuthVerifyEmailError,
   GetAuthVerifyEmailResponse,
-  GetSession2Data,
-  GetSession2Error,
-  GetSession2Response,
   GetSessionData,
   GetSessionError,
-  GetSessionResponse,
+  GetSessionPostData,
+  GetSessionPostError,
   GetStripeProductsData,
   GetStripeProductsError,
   GetStripeProductsResponse,
-  GetStripeSubscriptionDetailsData,
-  GetStripeSubscriptionDetailsError,
-  GetStripeSubscriptionDetailsResponse,
-  GetUserByIdData,
-  GetUserByIdError,
-  GetUserByIdResponse,
+  GetStripeSubscriptionData,
+  GetStripeSubscriptionError,
+  GetStripeSubscriptionResponse,
+  HandleStripeWebhookData,
+  HandleStripeWebhookError,
+  HandleSubscriptionSuccessData,
+  HandleSubscriptionSuccessError,
   LinkSocialAccountData,
   LinkSocialAccountError,
   LinkSocialAccountResponse,
+  ListActiveSubscriptionsData,
+  ListActiveSubscriptionsError,
   ListUserAccountsData,
   ListUserAccountsError,
   ListUserAccountsResponse,
   ListUserSessionsData,
   ListUserSessionsError,
   ListUserSessionsResponse,
+  PatchStripeSubscriptionCancelData,
+  PatchStripeSubscriptionCancelError,
   PatchStripeSubscriptionData,
   PatchStripeSubscriptionError,
-  PatchStripeSubscriptionRevokeData,
-  PatchStripeSubscriptionRevokeError,
   PostAuthCallbackByIdData,
   PostAuthCallbackByIdError,
   PostAuthGetAccessTokenData,
@@ -139,6 +150,8 @@ import type {
   ResetPasswordData,
   ResetPasswordError,
   ResetPasswordResponse,
+  RestoreSubscriptionData,
+  RestoreSubscriptionError,
   SendVerificationEmailData,
   SendVerificationEmailError,
   SendVerificationEmailResponse,
@@ -160,10 +173,39 @@ import type {
   UpdateUserData,
   UpdateUserError,
   UpdateUserResponse,
+  UpgradeSubscriptionData,
+  UpgradeSubscriptionError,
   VerifyPasswordData,
   VerifyPasswordError,
   VerifyPasswordResponse,
 } from "../types.gen";
+
+/**
+ * Queue a welcome email for asynchronous processing. Returns immediately with a job ID.
+ */
+export const postEmailSendMutation = (
+  options?: Partial<Options<PostEmailSendData>>,
+): UseMutationOptions<
+  PostEmailSendResponse,
+  PostEmailSendError,
+  Options<PostEmailSendData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PostEmailSendResponse,
+    PostEmailSendError,
+    Options<PostEmailSendData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await postEmailSend({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
 
 export type QueryKey<TOptions extends Options> = [
   Pick<TOptions, "baseUrl" | "body" | "headers" | "path" | "query"> & {
@@ -205,58 +247,6 @@ const createQueryKey = <TOptions extends Options>(
   return [params];
 };
 
-export const getUserByIdQueryKey = (options: Options<GetUserByIdData>) =>
-  createQueryKey("getUserById", options);
-
-/**
- * Get user by ID
- */
-export const getUserByIdOptions = (options: Options<GetUserByIdData>) =>
-  queryOptions<
-    GetUserByIdResponse,
-    GetUserByIdError,
-    GetUserByIdResponse,
-    ReturnType<typeof getUserByIdQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getUserById({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getUserByIdQueryKey(options),
-  });
-
-/**
- * Send a welcome email
- */
-export const postEmailSendMutation = (
-  options?: Partial<Options<PostEmailSendData>>,
-): UseMutationOptions<
-  PostEmailSendResponse,
-  PostEmailSendError,
-  Options<PostEmailSendData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    PostEmailSendResponse,
-    PostEmailSendError,
-    Options<PostEmailSendData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await postEmailSend({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      });
-      return data;
-    },
-  };
-  return mutationOptions;
-};
-
 export const getStripeProductsQueryKey = (
   options?: Options<GetStripeProductsData>,
 ) => createQueryKey("getStripeProducts", options);
@@ -283,6 +273,34 @@ export const getStripeProductsOptions = (
       return data;
     },
     queryKey: getStripeProductsQueryKey(options),
+  });
+
+export const getStripeSubscriptionQueryKey = (
+  options?: Options<GetStripeSubscriptionData>,
+) => createQueryKey("getStripeSubscription", options);
+
+/**
+ * Get the current subscription for the user
+ */
+export const getStripeSubscriptionOptions = (
+  options?: Options<GetStripeSubscriptionData>,
+) =>
+  queryOptions<
+    GetStripeSubscriptionResponse,
+    GetStripeSubscriptionError,
+    GetStripeSubscriptionResponse,
+    ReturnType<typeof getStripeSubscriptionQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getStripeSubscription({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getStripeSubscriptionQueryKey(options),
   });
 
 /**
@@ -339,51 +357,23 @@ export const postStripeSubscriptionMutation = (
   return mutationOptions;
 };
 
-export const getStripeSubscriptionDetailsQueryKey = (
-  options?: Options<GetStripeSubscriptionDetailsData>,
-) => createQueryKey("getStripeSubscriptionDetails", options);
-
 /**
- * Get subscription details
+ * Cancel an existing subscription
  */
-export const getStripeSubscriptionDetailsOptions = (
-  options?: Options<GetStripeSubscriptionDetailsData>,
-) =>
-  queryOptions<
-    GetStripeSubscriptionDetailsResponse,
-    GetStripeSubscriptionDetailsError,
-    GetStripeSubscriptionDetailsResponse,
-    ReturnType<typeof getStripeSubscriptionDetailsQueryKey>
-  >({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await getStripeSubscriptionDetails({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      });
-      return data;
-    },
-    queryKey: getStripeSubscriptionDetailsQueryKey(options),
-  });
-
-/**
- * Revoke subscription access immediately
- */
-export const patchStripeSubscriptionRevokeMutation = (
-  options?: Partial<Options<PatchStripeSubscriptionRevokeData>>,
+export const patchStripeSubscriptionCancelMutation = (
+  options?: Partial<Options<PatchStripeSubscriptionCancelData>>,
 ): UseMutationOptions<
   unknown,
-  PatchStripeSubscriptionRevokeError,
-  Options<PatchStripeSubscriptionRevokeData>
+  PatchStripeSubscriptionCancelError,
+  Options<PatchStripeSubscriptionCancelData>
 > => {
   const mutationOptions: UseMutationOptions<
     unknown,
-    PatchStripeSubscriptionRevokeError,
-    Options<PatchStripeSubscriptionRevokeData>
+    PatchStripeSubscriptionCancelError,
+    Options<PatchStripeSubscriptionCancelData>
   > = {
     mutationFn: async (fnOptions) => {
-      const { data } = await patchStripeSubscriptionRevoke({
+      const { data } = await patchStripeSubscriptionCancel({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -449,11 +439,11 @@ export const socialSignInMutation = (
 };
 
 export const getAuthCallbackByIdQueryKey = (
-  options?: Options<GetAuthCallbackByIdData>,
+  options: Options<GetAuthCallbackByIdData>,
 ) => createQueryKey("getAuthCallbackById", options);
 
 export const getAuthCallbackByIdOptions = (
-  options?: Options<GetAuthCallbackByIdData>,
+  options: Options<GetAuthCallbackByIdData>,
 ) =>
   queryOptions<
     unknown,
@@ -505,9 +495,9 @@ export const getSessionQueryKey = (options?: Options<GetSessionData>) =>
  */
 export const getSessionOptions = (options?: Options<GetSessionData>) =>
   queryOptions<
-    GetSessionResponse,
+    unknown,
     GetSessionError,
-    GetSessionResponse,
+    unknown,
     ReturnType<typeof getSessionQueryKey>
   >({
     queryFn: async ({ queryKey, signal }) => {
@@ -525,20 +515,20 @@ export const getSessionOptions = (options?: Options<GetSessionData>) =>
 /**
  * Get the current session
  */
-export const getSession2Mutation = (
-  options?: Partial<Options<GetSession2Data>>,
+export const getSessionPostMutation = (
+  options?: Partial<Options<GetSessionPostData>>,
 ): UseMutationOptions<
-  GetSession2Response,
-  GetSession2Error,
-  Options<GetSession2Data>
+  unknown,
+  GetSessionPostError,
+  Options<GetSessionPostData>
 > => {
   const mutationOptions: UseMutationOptions<
-    GetSession2Response,
-    GetSession2Error,
-    Options<GetSession2Data>
+    unknown,
+    GetSessionPostError,
+    Options<GetSessionPostData>
   > = {
     mutationFn: async (fnOptions) => {
-      const { data } = await getSession2({
+      const { data } = await getSessionPost({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -1272,3 +1262,173 @@ export const getAuthErrorOptions = (options?: Options<GetAuthErrorData>) =>
     },
     queryKey: getAuthErrorQueryKey(options),
   });
+
+export const handleStripeWebhookMutation = (
+  options?: Partial<Options<HandleStripeWebhookData>>,
+): UseMutationOptions<
+  unknown,
+  HandleStripeWebhookError,
+  Options<HandleStripeWebhookData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    HandleStripeWebhookError,
+    Options<HandleStripeWebhookData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await handleStripeWebhook({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const upgradeSubscriptionMutation = (
+  options?: Partial<Options<UpgradeSubscriptionData>>,
+): UseMutationOptions<
+  unknown,
+  UpgradeSubscriptionError,
+  Options<UpgradeSubscriptionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    UpgradeSubscriptionError,
+    Options<UpgradeSubscriptionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await upgradeSubscription({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const cancelSubscriptionMutation = (
+  options?: Partial<Options<CancelSubscriptionData>>,
+): UseMutationOptions<
+  unknown,
+  CancelSubscriptionError,
+  Options<CancelSubscriptionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    CancelSubscriptionError,
+    Options<CancelSubscriptionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await cancelSubscription({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const restoreSubscriptionMutation = (
+  options?: Partial<Options<RestoreSubscriptionData>>,
+): UseMutationOptions<
+  unknown,
+  RestoreSubscriptionError,
+  Options<RestoreSubscriptionData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    RestoreSubscriptionError,
+    Options<RestoreSubscriptionData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await restoreSubscription({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+export const listActiveSubscriptionsQueryKey = (
+  options?: Options<ListActiveSubscriptionsData>,
+) => createQueryKey("listActiveSubscriptions", options);
+
+export const listActiveSubscriptionsOptions = (
+  options?: Options<ListActiveSubscriptionsData>,
+) =>
+  queryOptions<
+    unknown,
+    ListActiveSubscriptionsError,
+    unknown,
+    ReturnType<typeof listActiveSubscriptionsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await listActiveSubscriptions({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: listActiveSubscriptionsQueryKey(options),
+  });
+
+export const handleSubscriptionSuccessQueryKey = (
+  options?: Options<HandleSubscriptionSuccessData>,
+) => createQueryKey("handleSubscriptionSuccess", options);
+
+export const handleSubscriptionSuccessOptions = (
+  options?: Options<HandleSubscriptionSuccessData>,
+) =>
+  queryOptions<
+    unknown,
+    HandleSubscriptionSuccessError,
+    unknown,
+    ReturnType<typeof handleSubscriptionSuccessQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await handleSubscriptionSuccess({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: handleSubscriptionSuccessQueryKey(options),
+  });
+
+export const createBillingPortalMutation = (
+  options?: Partial<Options<CreateBillingPortalData>>,
+): UseMutationOptions<
+  unknown,
+  CreateBillingPortalError,
+  Options<CreateBillingPortalData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    unknown,
+    CreateBillingPortalError,
+    Options<CreateBillingPortalData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createBillingPortal({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};

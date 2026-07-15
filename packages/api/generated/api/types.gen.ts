@@ -5,18 +5,18 @@ export type ClientOptions = {
 };
 
 export type User = {
-  id?: string;
+  readonly id: string;
   name: string;
   email: string;
-  readonly emailVerified?: boolean;
+  readonly emailVerified: boolean;
   image?: string;
   createdAt: string;
   updatedAt: string;
-  readonly stripeSubscriptionId?: string;
+  stripeCustomerId?: string;
 };
 
 export type Session = {
-  id?: string;
+  readonly id: string;
   expiresAt: string;
   token: string;
   createdAt: string;
@@ -27,7 +27,7 @@ export type Session = {
 };
 
 export type Account = {
-  id?: string;
+  readonly id: string;
   accountId: string;
   providerId: string;
   userId: string;
@@ -42,43 +42,92 @@ export type Account = {
   updatedAt: string;
 };
 
-export const CodeEnum = { AUTH_UNAUTHORIZED: "AUTH_UNAUTHORIZED" } as const;
+export type Subscription = {
+  readonly id: string;
+  plan: string;
+  referenceId: string;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  status?: string;
+  periodStart?: string;
+  periodEnd?: string;
+  trialStart?: string;
+  trialEnd?: string;
+  cancelAtPeriodEnd?: boolean;
+  cancelAt?: string;
+  canceledAt?: string;
+  endedAt?: string;
+  seats?: number;
+  billingInterval?: string;
+  stripeScheduleId?: string;
+};
+
+export const CodeEnum = { EMAIL_SEND_FAILED: "EMAIL_SEND_FAILED" } as const;
 
 export type CodeEnum = (typeof CodeEnum)[keyof typeof CodeEnum];
 
-export const CodeEnum2 = { USER_NOT_FOUND: "USER_NOT_FOUND" } as const;
+export const CodeEnum2 = {
+  EMAIL_PROVIDER_ERROR: "EMAIL_PROVIDER_ERROR",
+} as const;
 
 export type CodeEnum2 = (typeof CodeEnum2)[keyof typeof CodeEnum2];
 
-export const CodeEnum3 = { USER_FETCH_FAILED: "USER_FETCH_FAILED" } as const;
+export const RecurringEnum = {
+  DAY: "day",
+  WEEK: "week",
+  MONTH: "month",
+  YEAR: "year",
+} as const;
+
+export type RecurringEnum = (typeof RecurringEnum)[keyof typeof RecurringEnum];
+
+export const CodeEnum3 = {
+  STRIPE_PRODUCTS_NOT_FOUND: "STRIPE_PRODUCTS_NOT_FOUND",
+} as const;
 
 export type CodeEnum3 = (typeof CodeEnum3)[keyof typeof CodeEnum3];
 
-export const CodeEnum4 = { EMAIL_SEND_FAILED: "EMAIL_SEND_FAILED" } as const;
+export const CodeEnum4 = {
+  STRIPE_INTERNAL_SERVER_ERROR: "STRIPE_INTERNAL_SERVER_ERROR",
+} as const;
 
 export type CodeEnum4 = (typeof CodeEnum4)[keyof typeof CodeEnum4];
 
 export const CodeEnum5 = {
-  EMAIL_PROVIDER_ERROR: "EMAIL_PROVIDER_ERROR",
+  STRIPE_PRICES_LIST_FAILED: "STRIPE_PRICES_LIST_FAILED",
+  STRIPE_PRODUCTS_LIST_FAILED: "STRIPE_PRODUCTS_LIST_FAILED",
 } as const;
 
 export type CodeEnum5 = (typeof CodeEnum5)[keyof typeof CodeEnum5];
 
-export const CodeEnum6 = {
-  STRIPE_INTERNAL_SERVER_ERROR: "STRIPE_INTERNAL_SERVER_ERROR",
+export const TierEnum = { FREE: "free", PRO: "pro" } as const;
+
+export type TierEnum = (typeof TierEnum)[keyof typeof TierEnum];
+
+export const StatusEnum = {
+  FREE: "free",
+  ACTIVE: "active",
+  CANCELING: "canceling",
+  WHITELISTED: "whitelisted",
 } as const;
+
+export type StatusEnum = (typeof StatusEnum)[keyof typeof StatusEnum];
+
+export const CodeEnum6 = { AUTH_UNAUTHORIZED: "AUTH_UNAUTHORIZED" } as const;
 
 export type CodeEnum6 = (typeof CodeEnum6)[keyof typeof CodeEnum6];
 
 export const CodeEnum7 = {
-  STRIPE_PRICES_LIST_FAILED: "STRIPE_PRICES_LIST_FAILED",
-  STRIPE_PRODUCTS_LIST_FAILED: "STRIPE_PRODUCTS_LIST_FAILED",
+  STRIPE_SUBSCRIPTION_NOT_FOUND: "STRIPE_SUBSCRIPTION_NOT_FOUND",
 } as const;
 
 export type CodeEnum7 = (typeof CodeEnum7)[keyof typeof CodeEnum7];
 
 export const CodeEnum8 = {
-  STRIPE_SUBSCRIPTION_NOT_FOUND: "STRIPE_SUBSCRIPTION_NOT_FOUND",
+  STRIPE_SUBSCRIPTION_DETAILS_FAILED: "STRIPE_SUBSCRIPTION_DETAILS_FAILED",
+  STRIPE_SUBSCRIPTION_DATA_INVALID: "STRIPE_SUBSCRIPTION_DATA_INVALID",
+  STRIPE_PRICE_RETRIEVE_FAILED: "STRIPE_PRICE_RETRIEVE_FAILED",
+  STRIPE_PRODUCT_RETRIEVE_FAILED: "STRIPE_PRODUCT_RETRIEVE_FAILED",
 } as const;
 
 export type CodeEnum8 = (typeof CodeEnum8)[keyof typeof CodeEnum8];
@@ -105,57 +154,66 @@ export const CodeEnum11 = {
 
 export type CodeEnum11 = (typeof CodeEnum11)[keyof typeof CodeEnum11];
 
-export const StatusEnum = {
-  INCOMPLETE: "incomplete",
-  INCOMPLETE_EXPIRED: "incomplete_expired",
-  TRIALING: "trialing",
-  ACTIVE: "active",
-  PAST_DUE: "past_due",
-  CANCELED: "canceled",
-  UNPAID: "unpaid",
-  PAUSED: "paused",
-} as const;
-
-export type StatusEnum = (typeof StatusEnum)[keyof typeof StatusEnum];
-
-export const IntervalEnum = {
-  DAY: "day",
-  WEEK: "week",
-  MONTH: "month",
-  YEAR: "year",
-} as const;
-
-export type IntervalEnum = (typeof IntervalEnum)[keyof typeof IntervalEnum];
-
 export const CodeEnum12 = {
-  STRIPE_SUBSCRIPTION_DETAILS_FAILED: "STRIPE_SUBSCRIPTION_DETAILS_FAILED",
-  STRIPE_SUBSCRIPTION_DATA_INVALID: "STRIPE_SUBSCRIPTION_DATA_INVALID",
-  STRIPE_PRICE_RETRIEVE_FAILED: "STRIPE_PRICE_RETRIEVE_FAILED",
-  STRIPE_PRODUCT_RETRIEVE_FAILED: "STRIPE_PRODUCT_RETRIEVE_FAILED",
+  STRIPE_SUBSCRIPTION_REVOKE_FAILED: "STRIPE_SUBSCRIPTION_REVOKE_FAILED",
 } as const;
 
 export type CodeEnum12 = (typeof CodeEnum12)[keyof typeof CodeEnum12];
 
 export const CodeEnum13 = {
-  STRIPE_SUBSCRIPTION_REVOKE_FAILED: "STRIPE_SUBSCRIPTION_REVOKE_FAILED",
-} as const;
-
-export type CodeEnum13 = (typeof CodeEnum13)[keyof typeof CodeEnum13];
-
-export const CodeEnum14 = {
   STRIPE_SIGNATURE_MISSING: "STRIPE_SIGNATURE_MISSING",
   STRIPE_WEBHOOK_INVALID_SIGNATURE: "STRIPE_WEBHOOK_INVALID_SIGNATURE",
   STRIPE_WEBHOOK_METADATA_MISSING: "STRIPE_WEBHOOK_METADATA_MISSING",
 } as const;
 
-export type CodeEnum14 = (typeof CodeEnum14)[keyof typeof CodeEnum14];
+export type CodeEnum13 = (typeof CodeEnum13)[keyof typeof CodeEnum13];
 
-export const CodeEnum15 = {
+export const CodeEnum14 = {
   STRIPE_INTERNAL_SERVER_ERROR: "STRIPE_INTERNAL_SERVER_ERROR",
   STRIPE_WEBHOOK_USER_UPDATE_FAILED: "STRIPE_WEBHOOK_USER_UPDATE_FAILED",
 } as const;
 
-export type CodeEnum15 = (typeof CodeEnum15)[keyof typeof CodeEnum15];
+export type CodeEnum14 = (typeof CodeEnum14)[keyof typeof CodeEnum14];
+
+export const _0Enum = {
+  APPLE: "apple",
+  ATLASSIAN: "atlassian",
+  COGNITO: "cognito",
+  DISCORD: "discord",
+  FACEBOOK: "facebook",
+  FIGMA: "figma",
+  GITHUB: "github",
+  MICROSOFT: "microsoft",
+  GOOGLE: "google",
+  HUGGINGFACE: "huggingface",
+  SLACK: "slack",
+  SPOTIFY: "spotify",
+  TWITCH: "twitch",
+  TWITTER: "twitter",
+  DROPBOX: "dropbox",
+  KICK: "kick",
+  LINEAR: "linear",
+  LINKEDIN: "linkedin",
+  GITLAB: "gitlab",
+  TIKTOK: "tiktok",
+  REDDIT: "reddit",
+  ROBLOX: "roblox",
+  SALESFORCE: "salesforce",
+  VK: "vk",
+  ZOOM: "zoom",
+  NOTION: "notion",
+  KAKAO: "kakao",
+  NAVER: "naver",
+  LINE: "line",
+  PAYBIN: "paybin",
+  PAYPAL: "paypal",
+  POLAR: "polar",
+  RAILWAY: "railway",
+  VERCEL: "vercel",
+  WECHAT: "wechat",
+} as const;
+
+export type _0Enum = (typeof _0Enum)[keyof typeof _0Enum];
 
 export const RedirectEnum = { FALSE: false } as const;
 
@@ -197,68 +255,72 @@ export const MessageEnum3 = { USER_DELETED: "User deleted" } as const;
  */
 export type MessageEnum3 = (typeof MessageEnum3)[keyof typeof MessageEnum3];
 
+/**
+ * Customer type for the subscription. Eg: "user" or "organization"
+ */
+export const CustomerTypeEnum = {
+  USER: "user",
+  ORGANIZATION: "organization",
+} as const;
+
+/**
+ * Customer type for the subscription. Eg: "user" or "organization"
+ */
+export type CustomerTypeEnum =
+  (typeof CustomerTypeEnum)[keyof typeof CustomerTypeEnum];
+
 export type UserWritable = {
-  id?: string;
   name: string;
   email: string;
   image?: string;
   createdAt: string;
   updatedAt: string;
+  stripeCustomerId?: string;
 };
 
-export type GetUserByIdData = {
-  body?: never;
-  path: {
-    id: string;
-  };
-  query?: never;
-  url: "/user/{id}";
+export type SessionWritable = {
+  expiresAt: string;
+  token: string;
+  createdAt: string;
+  updatedAt: string;
+  ipAddress?: string;
+  userAgent?: string;
+  userId: string;
 };
 
-export type GetUserByIdErrors = {
-  /**
-   * Response for status 401
-   */
-  401: {
-    code: CodeEnum;
-    message: string;
-  };
-  /**
-   * Response for status 404
-   */
-  404: {
-    code: CodeEnum2;
-    message: string;
-  };
-  /**
-   * Response for status 500
-   */
-  500: {
-    code: CodeEnum3;
-    message: string;
-  };
+export type AccountWritable = {
+  accountId: string;
+  providerId: string;
+  userId: string;
+  accessToken?: string;
+  refreshToken?: string;
+  idToken?: string;
+  accessTokenExpiresAt?: string;
+  refreshTokenExpiresAt?: string;
+  scope?: string;
+  password?: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
-export type GetUserByIdError = GetUserByIdErrors[keyof GetUserByIdErrors];
-
-export type GetUserByIdResponses = {
-  /**
-   * Response for status 200
-   */
-  200: {
-    id: string;
-    image: string | null | null;
-    name: string;
-    email: string;
-    emailVerified: boolean;
-    createdAt: null | string | string | number;
-    updatedAt: null | string | string | number;
-    stripeSubscriptionId: string | null | null;
-  };
+export type SubscriptionWritable = {
+  plan: string;
+  referenceId: string;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  status?: string;
+  periodStart?: string;
+  periodEnd?: string;
+  trialStart?: string;
+  trialEnd?: string;
+  cancelAtPeriodEnd?: boolean;
+  cancelAt?: string;
+  canceledAt?: string;
+  endedAt?: string;
+  seats?: number;
+  billingInterval?: string;
+  stripeScheduleId?: string;
 };
-
-export type GetUserByIdResponse =
-  GetUserByIdResponses[keyof GetUserByIdResponses];
 
 export type PostEmailSendData = {
   body?: never;
@@ -268,6 +330,53 @@ export type PostEmailSendData = {
 };
 
 export type PostEmailSendErrors = {
+  /**
+   * Response for status 500
+   */
+  500: {
+    code: CodeEnum;
+    message: string;
+  };
+  /**
+   * Response for status 502
+   */
+  502: {
+    code: CodeEnum2;
+    message: string;
+  };
+};
+
+export type PostEmailSendError = PostEmailSendErrors[keyof PostEmailSendErrors];
+
+export type PostEmailSendResponses = {
+  /**
+   * Response for status 200
+   */
+  200: {
+    message: string;
+    success: boolean;
+    jobId: string;
+  };
+};
+
+export type PostEmailSendResponse =
+  PostEmailSendResponses[keyof PostEmailSendResponses];
+
+export type GetStripeProductsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/stripe/products";
+};
+
+export type GetStripeProductsErrors = {
+  /**
+   * Response for status 404
+   */
+  404: {
+    code: CodeEnum3;
+    message: string;
+  };
   /**
    * Response for status 500
    */
@@ -284,45 +393,6 @@ export type PostEmailSendErrors = {
   };
 };
 
-export type PostEmailSendError = PostEmailSendErrors[keyof PostEmailSendErrors];
-
-export type PostEmailSendResponses = {
-  /**
-   * Response for status 200
-   */
-  200: {
-    message: string;
-    success: boolean;
-  };
-};
-
-export type PostEmailSendResponse =
-  PostEmailSendResponses[keyof PostEmailSendResponses];
-
-export type GetStripeProductsData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: "/stripe/products";
-};
-
-export type GetStripeProductsErrors = {
-  /**
-   * Response for status 500
-   */
-  500: {
-    code: CodeEnum6;
-    message: string;
-  };
-  /**
-   * Response for status 502
-   */
-  502: {
-    code: CodeEnum7;
-    message: string;
-  };
-};
-
 export type GetStripeProductsError =
   GetStripeProductsErrors[keyof GetStripeProductsErrors];
 
@@ -333,26 +403,73 @@ export type GetStripeProductsResponses = {
   200: Array<{
     id: string;
     planName: string;
-    currency: string;
-    price: number | null | null;
-    recurring: {
-      interval: string;
-      interval_count: number;
-      meter: null | null;
-      trial_period_days: number | null | null;
-      usage_type: string;
-    } | null | null;
+    price: string;
+    recurring?: RecurringEnum;
   }>;
 };
 
 export type GetStripeProductsResponse =
   GetStripeProductsResponses[keyof GetStripeProductsResponses];
 
-export type PatchStripeSubscriptionData = {
-  body: {
-    priceId: string;
-    planName: string;
+export type GetStripeSubscriptionData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/stripe/subscription";
+};
+
+export type GetStripeSubscriptionErrors = {
+  /**
+   * Response for status 401
+   */
+  401: {
+    code: CodeEnum6;
+    message: string;
   };
+  /**
+   * Response for status 404
+   */
+  404: {
+    code: CodeEnum7;
+    message: string;
+  };
+  /**
+   * Response for status 500
+   */
+  500: {
+    code: CodeEnum4;
+    message: string;
+  };
+  /**
+   * Response for status 502
+   */
+  502: {
+    code: CodeEnum8;
+    message: string;
+  };
+};
+
+export type GetStripeSubscriptionError =
+  GetStripeSubscriptionErrors[keyof GetStripeSubscriptionErrors];
+
+export type GetStripeSubscriptionResponses = {
+  /**
+   * Response for status 200
+   */
+  200: {
+    tier: TierEnum;
+    status: StatusEnum;
+    periodEnd?: string;
+    isProAccess: boolean;
+    stripeSubscriptionId?: string;
+  };
+};
+
+export type GetStripeSubscriptionResponse =
+  GetStripeSubscriptionResponses[keyof GetStripeSubscriptionResponses];
+
+export type PatchStripeSubscriptionData = {
+  body?: never;
   path?: never;
   query?: never;
   url: "/stripe/subscription";
@@ -363,14 +480,14 @@ export type PatchStripeSubscriptionErrors = {
    * Response for status 401
    */
   401: {
-    code: CodeEnum;
+    code: CodeEnum6;
     message: string;
   };
   /**
    * Response for status 404
    */
   404: {
-    code: CodeEnum8;
+    code: CodeEnum7;
     message: string;
   };
   /**
@@ -396,7 +513,7 @@ export type PatchStripeSubscriptionResponses = {
   /**
    * Response for status 204
    */
-  204: null;
+  204: unknown;
 };
 
 export type PostStripeSubscriptionData = {
@@ -414,21 +531,21 @@ export type PostStripeSubscriptionErrors = {
    * Response for status 401
    */
   401: {
-    code: CodeEnum;
+    code: CodeEnum6;
     message: string;
   };
   /**
    * Response for status 404
    */
   404: {
-    code: CodeEnum8;
+    code: CodeEnum7;
     message: string;
   };
   /**
    * Response for status 500
    */
   500: {
-    code: CodeEnum6;
+    code: CodeEnum4;
     message: string;
   };
   /**
@@ -448,103 +565,33 @@ export type PostStripeSubscriptionResponses = {
    * Response for status 200
    */
   200: {
-    url: string;
+    url?: string;
   };
 };
 
 export type PostStripeSubscriptionResponse =
   PostStripeSubscriptionResponses[keyof PostStripeSubscriptionResponses];
 
-export type GetStripeSubscriptionDetailsData = {
+export type PatchStripeSubscriptionCancelData = {
   body?: never;
   path?: never;
   query?: never;
-  url: "/stripe/subscription/details";
+  url: "/stripe/subscription/cancel";
 };
 
-export type GetStripeSubscriptionDetailsErrors = {
+export type PatchStripeSubscriptionCancelErrors = {
   /**
    * Response for status 401
    */
   401: {
-    code: CodeEnum;
-    message: string;
-  };
-  /**
-   * Response for status 500
-   */
-  500: {
     code: CodeEnum6;
-    message: string;
-  };
-  /**
-   * Response for status 502
-   */
-  502: {
-    code: CodeEnum12;
-    message: string;
-  };
-};
-
-export type GetStripeSubscriptionDetailsError =
-  GetStripeSubscriptionDetailsErrors[keyof GetStripeSubscriptionDetailsErrors];
-
-export type GetStripeSubscriptionDetailsResponses = {
-  /**
-   * Response for status 200
-   */
-  200: {
-    hasActiveSubscription: boolean;
-    code?: string;
-    message?: string;
-    id?: string;
-    status?: StatusEnum;
-    current_period_start?: string;
-    current_period_end?: string;
-    cancel_at_period_end?: boolean;
-    customer?:
-      | string
-      | {
-          [key: string]: null;
-        };
-    created?: string;
-    plan?: {
-      priceId: string;
-      amount: number | null | null;
-      currency: string;
-      interval?: IntervalEnum;
-    };
-    product?: {
-      id: string;
-      name: string;
-      description: string | null | null;
-    };
-  };
-};
-
-export type GetStripeSubscriptionDetailsResponse =
-  GetStripeSubscriptionDetailsResponses[keyof GetStripeSubscriptionDetailsResponses];
-
-export type PatchStripeSubscriptionRevokeData = {
-  body?: never;
-  path?: never;
-  query?: never;
-  url: "/stripe/subscription/revoke";
-};
-
-export type PatchStripeSubscriptionRevokeErrors = {
-  /**
-   * Response for status 401
-   */
-  401: {
-    code: CodeEnum;
     message: string;
   };
   /**
    * Response for status 404
    */
   404: {
-    code: CodeEnum8;
+    code: CodeEnum7;
     message: string;
   };
   /**
@@ -558,19 +605,19 @@ export type PatchStripeSubscriptionRevokeErrors = {
    * Response for status 502
    */
   502: {
-    code: CodeEnum13;
+    code: CodeEnum12;
     message: string;
   };
 };
 
-export type PatchStripeSubscriptionRevokeError =
-  PatchStripeSubscriptionRevokeErrors[keyof PatchStripeSubscriptionRevokeErrors];
+export type PatchStripeSubscriptionCancelError =
+  PatchStripeSubscriptionCancelErrors[keyof PatchStripeSubscriptionCancelErrors];
 
-export type PatchStripeSubscriptionRevokeResponses = {
+export type PatchStripeSubscriptionCancelResponses = {
   /**
    * Response for status 204
    */
-  204: null;
+  204: unknown;
 };
 
 export type PostStripeWebhookData = {
@@ -585,14 +632,14 @@ export type PostStripeWebhookErrors = {
    * Response for status 400
    */
   400: {
-    code: CodeEnum14;
+    code: CodeEnum13;
     message: string;
   };
   /**
    * Response for status 500
    */
   500: {
-    code: CodeEnum15;
+    code: CodeEnum14;
     message: string;
   };
 };
@@ -617,31 +664,64 @@ export type SocialSignInData = {
     /**
      * Callback URL to redirect to after the user has signed in
      */
-    callbackURL?: null;
-    newUserCallbackURL?: null;
+    callbackURL?: string;
+    newUserCallbackURL?: string;
     /**
      * Callback URL to redirect to if an error happens
      */
-    errorCallbackURL?: null;
-    provider: string;
+    errorCallbackURL?: string;
+    provider: _0Enum | string;
     /**
      * Disable automatic redirection to the provider. Useful for handling the redirection yourself
      */
-    disableRedirect?: null;
-    idToken?: null;
+    disableRedirect?: boolean;
+    idToken?: {
+      /**
+       * ID token from the provider
+       */
+      token: string;
+      /**
+       * Nonce used to generate the token
+       */
+      nonce?: string;
+      /**
+       * Access token from the provider
+       */
+      accessToken?: string;
+      /**
+       * Refresh token from the provider
+       */
+      refreshToken?: string;
+      /**
+       * Expiry date of the token
+       */
+      expiresAt?: number;
+      /**
+       * The user object from the provider. Only available for some providers like Apple.
+       */
+      user?: {
+        name?: {
+          firstName?: string;
+          lastName?: string;
+        };
+        email?: string;
+      };
+    };
     /**
      * Array of scopes to request from the provider. This will override the default scopes passed.
      */
-    scopes?: null;
+    scopes?: Array<string>;
     /**
      * Explicitly request sign-up. Useful when disableImplicitSignUp is true for this provider
      */
-    requestSignUp?: null;
+    requestSignUp?: boolean;
     /**
      * The login hint to use for the authorization code request
      */
-    loginHint?: null;
-    additionalData?: null;
+    loginHint?: string;
+    additionalData?: {
+      [key: string]: unknown;
+    };
   };
   path?: never;
   query?: never;
@@ -691,13 +771,13 @@ export type SocialSignInError = SocialSignInErrors[keyof SocialSignInErrors];
 
 export type SocialSignInResponses = {
   /**
-   * Session response when idToken is provided
+   * Returns session details when idToken is provided, or an authorize URL otherwise
    */
   200: {
-    token: string;
-    user: User;
+    token?: string;
+    user?: User;
     url?: string;
-    redirect: RedirectEnum;
+    redirect: boolean;
   };
 };
 
@@ -706,7 +786,9 @@ export type SocialSignInResponse =
 
 export type GetAuthCallbackByIdData = {
   body?: never;
-  path?: never;
+  path: {
+    id: string;
+  };
   query?: never;
   url: "/auth/callback/{id}";
 };
@@ -755,9 +837,16 @@ export type GetAuthCallbackByIdError =
 
 export type PostAuthCallbackByIdData = {
   body?: {
-    [key: string]: null;
+    code?: string;
+    error?: string;
+    device_id?: string;
+    error_description?: string;
+    state?: string;
+    user?: string;
   };
-  path?: never;
+  path: {
+    id: string;
+  };
   query?: never;
   url: "/auth/callback/{id}";
 };
@@ -856,24 +945,19 @@ export type GetSessionResponses = {
   /**
    * Success
    */
-  200: {
-    session: Session;
-    user: User;
-  } | null;
+  200: unknown;
 };
 
-export type GetSessionResponse = GetSessionResponses[keyof GetSessionResponses];
-
-export type GetSession2Data = {
+export type GetSessionPostData = {
   body?: {
-    [key: string]: null;
+    [key: string]: unknown;
   };
   path?: never;
   query?: never;
   url: "/auth/get-session";
 };
 
-export type GetSession2Errors = {
+export type GetSessionPostErrors = {
   /**
    * Bad Request. Usually due to missing parameters, or invalid parameters.
    */
@@ -912,24 +996,19 @@ export type GetSession2Errors = {
   };
 };
 
-export type GetSession2Error = GetSession2Errors[keyof GetSession2Errors];
+export type GetSessionPostError =
+  GetSessionPostErrors[keyof GetSessionPostErrors];
 
-export type GetSession2Responses = {
+export type GetSessionPostResponses = {
   /**
    * Success
    */
-  200: {
-    session: Session;
-    user: User;
-  } | null;
+  200: unknown;
 };
-
-export type GetSession2Response =
-  GetSession2Responses[keyof GetSession2Responses];
 
 export type SignOutData = {
   body?: {
-    [key: string]: null;
+    [key: string]: unknown;
   };
   path?: never;
   query?: never;
@@ -1126,11 +1205,11 @@ export type SignInEmailData = {
     /**
      * Callback URL to use as a redirect for email verification
      */
-    callbackURL?: null;
+    callbackURL?: string;
     /**
      * If this is false, the session will not be remembered. Default is `true`.
      */
-    rememberMe?: null;
+    rememberMe?: boolean;
   };
   path?: never;
   query?: never;
@@ -1205,7 +1284,7 @@ export type ResetPasswordData = {
     /**
      * The token to reset the password
      */
-    token?: null;
+    token?: string;
   };
   path?: never;
   query?: never;
@@ -1490,7 +1569,7 @@ export type ChangeEmailData = {
     /**
      * The URL to redirect to after email verification
      */
-    callbackURL?: null;
+    callbackURL?: string;
   };
   path?: never;
   query?: never;
@@ -1568,7 +1647,7 @@ export type ChangePasswordData = {
     /**
      * Must be a boolean value
      */
-    revokeOtherSessions?: null;
+    revokeOtherSessions?: boolean;
   };
   path?: never;
   query?: never;
@@ -1663,8 +1742,8 @@ export type ChangePasswordResponse =
   ChangePasswordResponses[keyof ChangePasswordResponses];
 
 export type UpdateSessionData = {
-  body?: {
-    [key: string]: null;
+  body: {
+    [key: string]: unknown;
   };
   path?: never;
   query?: never;
@@ -1877,7 +1956,7 @@ export type RequestPasswordResetData = {
     /**
      * The URL to redirect the user to reset their password. If the token isn't valid or expired, it'll be redirected with a query parameter `?error=INVALID_TOKEN`. If the token is valid, it'll be redirected with a query parameter `?token=VALID_TOKEN
      */
-    redirectTo?: null;
+    redirectTo?: string;
   };
   path?: never;
   query?: never;
@@ -2140,7 +2219,7 @@ export type PostAuthRevokeSessionResponse =
 
 export type PostAuthRevokeSessionsData = {
   body?: {
-    [key: string]: null;
+    [key: string]: unknown;
   };
   path?: never;
   query?: never;
@@ -2206,7 +2285,7 @@ export type PostAuthRevokeSessionsResponse =
 
 export type PostAuthRevokeOtherSessionsData = {
   body?: {
-    [key: string]: null;
+    [key: string]: unknown;
   };
   path?: never;
   query?: never;
@@ -2275,23 +2354,31 @@ export type LinkSocialAccountData = {
     /**
      * The URL to redirect to after the user has signed in
      */
-    callbackURL?: null;
-    provider: string;
-    idToken?: null;
-    requestSignUp?: null;
+    callbackURL?: string;
+    provider: _0Enum | string;
+    idToken?: {
+      token: string;
+      nonce?: string;
+      accessToken?: string;
+      refreshToken?: string;
+      scopes?: Array<string>;
+    };
+    requestSignUp?: boolean;
     /**
      * Additional scopes to request from the provider
      */
-    scopes?: null;
+    scopes?: Array<string>;
     /**
      * The URL to redirect to if there is an error during the link process
      */
-    errorCallbackURL?: null;
+    errorCallbackURL?: string;
     /**
      * Disable automatic redirection to the provider. Useful for handling the redirection yourself
      */
-    disableRedirect?: null;
-    additionalData?: null;
+    disableRedirect?: boolean;
+    additionalData?: {
+      [key: string]: unknown;
+    };
   };
   path?: never;
   query?: never;
@@ -2438,7 +2525,7 @@ export type GetAuthDeleteUserCallbackData = {
     /**
      * The URL to redirect to after deletion
      */
-    callbackURL?: null;
+    callbackURL?: string;
   };
   url: "/auth/delete-user/callback";
 };
@@ -2504,7 +2591,7 @@ export type GetAuthDeleteUserCallbackResponse =
 export type PostAuthUnlinkAccountData = {
   body: {
     providerId: string;
-    accountId?: null;
+    accountId?: string;
   };
   path?: never;
   query?: never;
@@ -2574,11 +2661,11 @@ export type PostAuthRefreshTokenData = {
     /**
      * The account ID associated with the refresh token
      */
-    accountId?: null;
+    accountId?: string;
     /**
      * The user ID associated with the account
      */
-    userId?: null;
+    userId?: string;
   };
   path?: never;
   query?: never;
@@ -2589,7 +2676,7 @@ export type PostAuthRefreshTokenErrors = {
   /**
    * Invalid refresh token or provider configuration
    */
-  400: null;
+  400: unknown;
   /**
    * Unauthorized. Due to missing or invalid authentication.
    */
@@ -2651,11 +2738,11 @@ export type PostAuthGetAccessTokenData = {
     /**
      * The account ID associated with the refresh token
      */
-    accountId?: null;
+    accountId?: string;
     /**
      * The user ID associated with the account
      */
-    userId?: null;
+    userId?: string;
   };
   path?: never;
   query?: never;
@@ -2666,7 +2753,7 @@ export type PostAuthGetAccessTokenErrors = {
   /**
    * Invalid refresh token or provider configuration
    */
-  400: null;
+  400: unknown;
   /**
    * Unauthorized. Due to missing or invalid authentication.
    */
@@ -2779,7 +2866,7 @@ export type GetAuthAccountInfoResponses = {
       emailVerified: boolean;
     };
     data: {
-      [key: string]: null;
+      [key: string]: unknown;
     };
   };
 };
@@ -2906,3 +2993,435 @@ export type GetAuthErrorResponses = {
 
 export type GetAuthErrorResponse =
   GetAuthErrorResponses[keyof GetAuthErrorResponses];
+
+export type HandleStripeWebhookData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/auth/stripe/webhook";
+};
+
+export type HandleStripeWebhookErrors = {
+  /**
+   * Bad Request. Usually due to missing parameters, or invalid parameters.
+   */
+  400: {
+    message: string;
+  };
+  /**
+   * Unauthorized. Due to missing or invalid authentication.
+   */
+  401: {
+    message: string;
+  };
+  /**
+   * Forbidden. You do not have permission to access this resource or to perform this action.
+   */
+  403: {
+    message?: string;
+  };
+  /**
+   * Not Found. The requested resource was not found.
+   */
+  404: {
+    message?: string;
+  };
+  /**
+   * Too Many Requests. You have exceeded the rate limit. Try again later.
+   */
+  429: {
+    message?: string;
+  };
+  /**
+   * Internal Server Error. This is a problem with the server that you cannot fix.
+   */
+  500: {
+    message?: string;
+  };
+};
+
+export type HandleStripeWebhookError =
+  HandleStripeWebhookErrors[keyof HandleStripeWebhookErrors];
+
+export type UpgradeSubscriptionData = {
+  body: {
+    /**
+     * The name of the plan to upgrade to. Eg: "pro"
+     */
+    plan: string;
+    /**
+     * Whether to upgrade to an annual plan. Eg: true
+     */
+    annual?: boolean;
+    /**
+     * Reference ID for the subscription. Eg: "org_123"
+     */
+    referenceId?: string;
+    /**
+     * The Stripe subscription ID to upgrade. Eg: "sub_1ABC2DEF3GHI4JKL"
+     */
+    subscriptionId?: string;
+    customerType?: CustomerTypeEnum;
+    metadata?: {
+      [key: string]: unknown;
+    };
+    /**
+     * Number of seats to upgrade to (if applicable). Eg: 1
+     */
+    seats?: number;
+    /**
+     * The locale to display Checkout in. Eg: 'en', 'ko'. If not provided or set to `auto`, the browser's locale is used.
+     */
+    locale?: string;
+    /**
+     * Callback URL to redirect back after successful subscription. Eg: "https://example.com/success"
+     */
+    successUrl?: string;
+    /**
+     * If set, checkout shows a back button and customers will be directed here if they cancel payment. Eg: "https://example.com/pricing"
+     */
+    cancelUrl?: string;
+    /**
+     * URL to take customers to when they click on the billing portal’s link to return to your website. Eg: "https://example.com/dashboard"
+     */
+    returnUrl?: string;
+    /**
+     * Schedule the plan change at the end of the current billing period instead of applying immediately.
+     */
+    scheduleAtPeriodEnd?: boolean;
+    /**
+     * Disable redirect after successful subscription. Eg: true
+     */
+    disableRedirect?: boolean;
+  };
+  path?: never;
+  query?: never;
+  url: "/auth/subscription/upgrade";
+};
+
+export type UpgradeSubscriptionErrors = {
+  /**
+   * Bad Request. Usually due to missing parameters, or invalid parameters.
+   */
+  400: {
+    message: string;
+  };
+  /**
+   * Unauthorized. Due to missing or invalid authentication.
+   */
+  401: {
+    message: string;
+  };
+  /**
+   * Forbidden. You do not have permission to access this resource or to perform this action.
+   */
+  403: {
+    message?: string;
+  };
+  /**
+   * Not Found. The requested resource was not found.
+   */
+  404: {
+    message?: string;
+  };
+  /**
+   * Too Many Requests. You have exceeded the rate limit. Try again later.
+   */
+  429: {
+    message?: string;
+  };
+  /**
+   * Internal Server Error. This is a problem with the server that you cannot fix.
+   */
+  500: {
+    message?: string;
+  };
+};
+
+export type UpgradeSubscriptionError =
+  UpgradeSubscriptionErrors[keyof UpgradeSubscriptionErrors];
+
+export type CancelSubscriptionData = {
+  body: {
+    /**
+     * Reference id of the subscription to cancel. Eg: '123'
+     */
+    referenceId?: string;
+    /**
+     * The Stripe subscription ID to cancel. Eg: 'sub_1ABC2DEF3GHI4JKL'
+     */
+    subscriptionId?: string;
+    customerType?: CustomerTypeEnum;
+    /**
+     * URL to take customers to when they click on the billing portal's link to return to your website. Eg: "/account"
+     */
+    returnUrl: string;
+    /**
+     * Disable redirect after successful subscription cancellation. Eg: true
+     */
+    disableRedirect?: boolean;
+  };
+  path?: never;
+  query?: never;
+  url: "/auth/subscription/cancel";
+};
+
+export type CancelSubscriptionErrors = {
+  /**
+   * Bad Request. Usually due to missing parameters, or invalid parameters.
+   */
+  400: {
+    message: string;
+  };
+  /**
+   * Unauthorized. Due to missing or invalid authentication.
+   */
+  401: {
+    message: string;
+  };
+  /**
+   * Forbidden. You do not have permission to access this resource or to perform this action.
+   */
+  403: {
+    message?: string;
+  };
+  /**
+   * Not Found. The requested resource was not found.
+   */
+  404: {
+    message?: string;
+  };
+  /**
+   * Too Many Requests. You have exceeded the rate limit. Try again later.
+   */
+  429: {
+    message?: string;
+  };
+  /**
+   * Internal Server Error. This is a problem with the server that you cannot fix.
+   */
+  500: {
+    message?: string;
+  };
+};
+
+export type CancelSubscriptionError =
+  CancelSubscriptionErrors[keyof CancelSubscriptionErrors];
+
+export type RestoreSubscriptionData = {
+  body: {
+    /**
+     * Reference id of the subscription to restore. Eg: '123'
+     */
+    referenceId?: string;
+    /**
+     * The Stripe subscription ID to restore. Eg: 'sub_1ABC2DEF3GHI4JKL'
+     */
+    subscriptionId?: string;
+    customerType?: CustomerTypeEnum;
+  };
+  path?: never;
+  query?: never;
+  url: "/auth/subscription/restore";
+};
+
+export type RestoreSubscriptionErrors = {
+  /**
+   * Bad Request. Usually due to missing parameters, or invalid parameters.
+   */
+  400: {
+    message: string;
+  };
+  /**
+   * Unauthorized. Due to missing or invalid authentication.
+   */
+  401: {
+    message: string;
+  };
+  /**
+   * Forbidden. You do not have permission to access this resource or to perform this action.
+   */
+  403: {
+    message?: string;
+  };
+  /**
+   * Not Found. The requested resource was not found.
+   */
+  404: {
+    message?: string;
+  };
+  /**
+   * Too Many Requests. You have exceeded the rate limit. Try again later.
+   */
+  429: {
+    message?: string;
+  };
+  /**
+   * Internal Server Error. This is a problem with the server that you cannot fix.
+   */
+  500: {
+    message?: string;
+  };
+};
+
+export type RestoreSubscriptionError =
+  RestoreSubscriptionErrors[keyof RestoreSubscriptionErrors];
+
+export type ListActiveSubscriptionsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/auth/subscription/list";
+};
+
+export type ListActiveSubscriptionsErrors = {
+  /**
+   * Bad Request. Usually due to missing parameters, or invalid parameters.
+   */
+  400: {
+    message: string;
+  };
+  /**
+   * Unauthorized. Due to missing or invalid authentication.
+   */
+  401: {
+    message: string;
+  };
+  /**
+   * Forbidden. You do not have permission to access this resource or to perform this action.
+   */
+  403: {
+    message?: string;
+  };
+  /**
+   * Not Found. The requested resource was not found.
+   */
+  404: {
+    message?: string;
+  };
+  /**
+   * Too Many Requests. You have exceeded the rate limit. Try again later.
+   */
+  429: {
+    message?: string;
+  };
+  /**
+   * Internal Server Error. This is a problem with the server that you cannot fix.
+   */
+  500: {
+    message?: string;
+  };
+};
+
+export type ListActiveSubscriptionsError =
+  ListActiveSubscriptionsErrors[keyof ListActiveSubscriptionsErrors];
+
+export type HandleSubscriptionSuccessData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/auth/subscription/success";
+};
+
+export type HandleSubscriptionSuccessErrors = {
+  /**
+   * Bad Request. Usually due to missing parameters, or invalid parameters.
+   */
+  400: {
+    message: string;
+  };
+  /**
+   * Unauthorized. Due to missing or invalid authentication.
+   */
+  401: {
+    message: string;
+  };
+  /**
+   * Forbidden. You do not have permission to access this resource or to perform this action.
+   */
+  403: {
+    message?: string;
+  };
+  /**
+   * Not Found. The requested resource was not found.
+   */
+  404: {
+    message?: string;
+  };
+  /**
+   * Too Many Requests. You have exceeded the rate limit. Try again later.
+   */
+  429: {
+    message?: string;
+  };
+  /**
+   * Internal Server Error. This is a problem with the server that you cannot fix.
+   */
+  500: {
+    message?: string;
+  };
+};
+
+export type HandleSubscriptionSuccessError =
+  HandleSubscriptionSuccessErrors[keyof HandleSubscriptionSuccessErrors];
+
+export type CreateBillingPortalData = {
+  body: {
+    /**
+     * The IETF language tag of the locale Customer Portal is displayed in. Eg: 'en', 'ko'. If not provided or set to `auto`, the browser's locale is used.
+     */
+    locale?: string;
+    referenceId?: string;
+    customerType?: CustomerTypeEnum;
+    returnUrl?: string;
+    /**
+     * Disable redirect after creating billing portal session. Eg: true
+     */
+    disableRedirect?: boolean;
+  };
+  path?: never;
+  query?: never;
+  url: "/auth/subscription/billing-portal";
+};
+
+export type CreateBillingPortalErrors = {
+  /**
+   * Bad Request. Usually due to missing parameters, or invalid parameters.
+   */
+  400: {
+    message: string;
+  };
+  /**
+   * Unauthorized. Due to missing or invalid authentication.
+   */
+  401: {
+    message: string;
+  };
+  /**
+   * Forbidden. You do not have permission to access this resource or to perform this action.
+   */
+  403: {
+    message?: string;
+  };
+  /**
+   * Not Found. The requested resource was not found.
+   */
+  404: {
+    message?: string;
+  };
+  /**
+   * Too Many Requests. You have exceeded the rate limit. Try again later.
+   */
+  429: {
+    message?: string;
+  };
+  /**
+   * Internal Server Error. This is a problem with the server that you cannot fix.
+   */
+  500: {
+    message?: string;
+  };
+};
+
+export type CreateBillingPortalError =
+  CreateBillingPortalErrors[keyof CreateBillingPortalErrors];

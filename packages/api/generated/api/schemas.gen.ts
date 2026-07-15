@@ -5,6 +5,7 @@ export const UserSchema = {
   properties: {
     id: {
       type: "string",
+      readOnly: true,
     },
     name: {
       type: "string",
@@ -23,19 +24,16 @@ export const UserSchema = {
     createdAt: {
       type: "string",
       format: "date-time",
-      default: "Generated at runtime",
     },
     updatedAt: {
       type: "string",
       format: "date-time",
-      default: "Generated at runtime",
     },
-    stripeSubscriptionId: {
+    stripeCustomerId: {
       type: "string",
-      readOnly: true,
     },
   },
-  required: ["name", "email", "createdAt", "updatedAt"],
+  required: ["id", "name", "email", "emailVerified", "createdAt", "updatedAt"],
 } as const;
 
 export const SessionSchema = {
@@ -43,6 +41,7 @@ export const SessionSchema = {
   properties: {
     id: {
       type: "string",
+      readOnly: true,
     },
     expiresAt: {
       type: "string",
@@ -54,7 +53,6 @@ export const SessionSchema = {
     createdAt: {
       type: "string",
       format: "date-time",
-      default: "Generated at runtime",
     },
     updatedAt: {
       type: "string",
@@ -70,7 +68,7 @@ export const SessionSchema = {
       type: "string",
     },
   },
-  required: ["expiresAt", "token", "createdAt", "updatedAt", "userId"],
+  required: ["id", "expiresAt", "token", "createdAt", "updatedAt", "userId"],
 } as const;
 
 export const AccountSchema = {
@@ -78,6 +76,7 @@ export const AccountSchema = {
   properties: {
     id: {
       type: "string",
+      readOnly: true,
     },
     accountId: {
       type: "string",
@@ -114,53 +113,147 @@ export const AccountSchema = {
     createdAt: {
       type: "string",
       format: "date-time",
-      default: "Generated at runtime",
     },
     updatedAt: {
       type: "string",
       format: "date-time",
     },
   },
-  required: ["accountId", "providerId", "userId", "createdAt", "updatedAt"],
+  required: [
+    "id",
+    "accountId",
+    "providerId",
+    "userId",
+    "createdAt",
+    "updatedAt",
+  ],
+} as const;
+
+export const SubscriptionSchema = {
+  type: "object",
+  properties: {
+    id: {
+      type: "string",
+      readOnly: true,
+    },
+    plan: {
+      type: "string",
+    },
+    referenceId: {
+      type: "string",
+    },
+    stripeCustomerId: {
+      type: "string",
+    },
+    stripeSubscriptionId: {
+      type: "string",
+    },
+    status: {
+      type: "string",
+      default: "incomplete",
+    },
+    periodStart: {
+      type: "string",
+      format: "date-time",
+    },
+    periodEnd: {
+      type: "string",
+      format: "date-time",
+    },
+    trialStart: {
+      type: "string",
+      format: "date-time",
+    },
+    trialEnd: {
+      type: "string",
+      format: "date-time",
+    },
+    cancelAtPeriodEnd: {
+      type: "boolean",
+      default: false,
+    },
+    cancelAt: {
+      type: "string",
+      format: "date-time",
+    },
+    canceledAt: {
+      type: "string",
+      format: "date-time",
+    },
+    endedAt: {
+      type: "string",
+      format: "date-time",
+    },
+    seats: {
+      type: "number",
+    },
+    billingInterval: {
+      type: "string",
+    },
+    stripeScheduleId: {
+      type: "string",
+    },
+  },
+  required: ["id", "plan", "referenceId"],
 } as const;
 
 export const CodeEnumSchema = {
-  enum: ["AUTH_UNAUTHORIZED"],
-  type: "string",
-} as const;
-
-export const CodeEnum2Schema = {
-  enum: ["USER_NOT_FOUND"],
-  type: "string",
-} as const;
-
-export const CodeEnum3Schema = {
-  enum: ["USER_FETCH_FAILED"],
-  type: "string",
-} as const;
-
-export const CodeEnum4Schema = {
   enum: ["EMAIL_SEND_FAILED"],
   type: "string",
 } as const;
 
-export const CodeEnum5Schema = {
+export const CodeEnum2Schema = {
   enum: ["EMAIL_PROVIDER_ERROR"],
   type: "string",
 } as const;
 
-export const CodeEnum6Schema = {
+export const RecurringEnumSchema = {
+  type: "string",
+  enum: ["day", "week", "month", "year"],
+} as const;
+
+export const CodeEnum3Schema = {
+  enum: ["STRIPE_PRODUCTS_NOT_FOUND"],
+  type: "string",
+} as const;
+
+export const CodeEnum4Schema = {
   enum: ["STRIPE_INTERNAL_SERVER_ERROR"],
   type: "string",
 } as const;
 
-export const CodeEnum7Schema = {
+export const CodeEnum5Schema = {
   enum: ["STRIPE_PRICES_LIST_FAILED", "STRIPE_PRODUCTS_LIST_FAILED"],
   type: "string",
 } as const;
 
-export const CodeEnum8Schema = {
+export const TierEnumSchema = {
+  type: "string",
+  enum: ["free", "pro"],
+} as const;
+
+export const StatusEnumSchema = {
+  type: "string",
+  enum: ["free", "active", "canceling", "whitelisted"],
+} as const;
+
+export const CodeEnum6Schema = {
+  enum: ["AUTH_UNAUTHORIZED"],
+  type: "string",
+} as const;
+
+export const CodeEnum7Schema = {
   enum: ["STRIPE_SUBSCRIPTION_NOT_FOUND"],
+  type: "string",
+} as const;
+
+export const CodeEnum8Schema = {
+  enum: [
+    "STRIPE_SUBSCRIPTION_DETAILS_FAILED",
+    "STRIPE_SUBSCRIPTION_DATA_INVALID",
+    "STRIPE_PRICE_RETRIEVE_FAILED",
+    "STRIPE_PRODUCT_RETRIEVE_FAILED",
+  ],
   type: "string",
 } as const;
 
@@ -185,41 +278,12 @@ export const CodeEnum11Schema = {
   type: "string",
 } as const;
 
-export const StatusEnumSchema = {
-  enum: [
-    "incomplete",
-    "incomplete_expired",
-    "trialing",
-    "active",
-    "past_due",
-    "canceled",
-    "unpaid",
-    "paused",
-  ],
-  type: "string",
-} as const;
-
-export const IntervalEnumSchema = {
-  enum: ["day", "week", "month", "year"],
-  type: "string",
-} as const;
-
 export const CodeEnum12Schema = {
-  enum: [
-    "STRIPE_SUBSCRIPTION_DETAILS_FAILED",
-    "STRIPE_SUBSCRIPTION_DATA_INVALID",
-    "STRIPE_PRICE_RETRIEVE_FAILED",
-    "STRIPE_PRODUCT_RETRIEVE_FAILED",
-  ],
-  type: "string",
-} as const;
-
-export const CodeEnum13Schema = {
   enum: ["STRIPE_SUBSCRIPTION_REVOKE_FAILED"],
   type: "string",
 } as const;
 
-export const CodeEnum14Schema = {
+export const CodeEnum13Schema = {
   enum: [
     "STRIPE_SIGNATURE_MISSING",
     "STRIPE_WEBHOOK_INVALID_SIGNATURE",
@@ -228,9 +292,50 @@ export const CodeEnum14Schema = {
   type: "string",
 } as const;
 
-export const CodeEnum15Schema = {
+export const CodeEnum14Schema = {
   enum: ["STRIPE_INTERNAL_SERVER_ERROR", "STRIPE_WEBHOOK_USER_UPDATE_FAILED"],
   type: "string",
+} as const;
+
+export const _0EnumSchema = {
+  type: "string",
+  enum: [
+    "apple",
+    "atlassian",
+    "cognito",
+    "discord",
+    "facebook",
+    "figma",
+    "github",
+    "microsoft",
+    "google",
+    "huggingface",
+    "slack",
+    "spotify",
+    "twitch",
+    "twitter",
+    "dropbox",
+    "kick",
+    "linear",
+    "linkedin",
+    "gitlab",
+    "tiktok",
+    "reddit",
+    "roblox",
+    "salesforce",
+    "vk",
+    "zoom",
+    "notion",
+    "kakao",
+    "naver",
+    "line",
+    "paybin",
+    "paypal",
+    "polar",
+    "railway",
+    "vercel",
+    "wechat",
+  ],
 } as const;
 
 export const RedirectEnumSchema = {
@@ -257,12 +362,16 @@ export const MessageEnum3Schema = {
   description: "Confirmation message",
 } as const;
 
+export const CustomerTypeEnumSchema = {
+  type: "string",
+  enum: ["user", "organization"],
+  description:
+    'Customer type for the subscription. Eg: "user" or "organization"',
+} as const;
+
 export const UserWritableSchema = {
   type: "object",
   properties: {
-    id: {
-      type: "string",
-    },
     name: {
       type: "string",
     },
@@ -275,13 +384,156 @@ export const UserWritableSchema = {
     createdAt: {
       type: "string",
       format: "date-time",
-      default: "Generated at runtime",
     },
     updatedAt: {
       type: "string",
       format: "date-time",
-      default: "Generated at runtime",
+    },
+    stripeCustomerId: {
+      type: "string",
     },
   },
   required: ["name", "email", "createdAt", "updatedAt"],
+} as const;
+
+export const SessionWritableSchema = {
+  type: "object",
+  properties: {
+    expiresAt: {
+      type: "string",
+      format: "date-time",
+    },
+    token: {
+      type: "string",
+    },
+    createdAt: {
+      type: "string",
+      format: "date-time",
+    },
+    updatedAt: {
+      type: "string",
+      format: "date-time",
+    },
+    ipAddress: {
+      type: "string",
+    },
+    userAgent: {
+      type: "string",
+    },
+    userId: {
+      type: "string",
+    },
+  },
+  required: ["expiresAt", "token", "createdAt", "updatedAt", "userId"],
+} as const;
+
+export const AccountWritableSchema = {
+  type: "object",
+  properties: {
+    accountId: {
+      type: "string",
+    },
+    providerId: {
+      type: "string",
+    },
+    userId: {
+      type: "string",
+    },
+    accessToken: {
+      type: "string",
+    },
+    refreshToken: {
+      type: "string",
+    },
+    idToken: {
+      type: "string",
+    },
+    accessTokenExpiresAt: {
+      type: "string",
+      format: "date-time",
+    },
+    refreshTokenExpiresAt: {
+      type: "string",
+      format: "date-time",
+    },
+    scope: {
+      type: "string",
+    },
+    password: {
+      type: "string",
+    },
+    createdAt: {
+      type: "string",
+      format: "date-time",
+    },
+    updatedAt: {
+      type: "string",
+      format: "date-time",
+    },
+  },
+  required: ["accountId", "providerId", "userId", "createdAt", "updatedAt"],
+} as const;
+
+export const SubscriptionWritableSchema = {
+  type: "object",
+  properties: {
+    plan: {
+      type: "string",
+    },
+    referenceId: {
+      type: "string",
+    },
+    stripeCustomerId: {
+      type: "string",
+    },
+    stripeSubscriptionId: {
+      type: "string",
+    },
+    status: {
+      type: "string",
+      default: "incomplete",
+    },
+    periodStart: {
+      type: "string",
+      format: "date-time",
+    },
+    periodEnd: {
+      type: "string",
+      format: "date-time",
+    },
+    trialStart: {
+      type: "string",
+      format: "date-time",
+    },
+    trialEnd: {
+      type: "string",
+      format: "date-time",
+    },
+    cancelAtPeriodEnd: {
+      type: "boolean",
+      default: false,
+    },
+    cancelAt: {
+      type: "string",
+      format: "date-time",
+    },
+    canceledAt: {
+      type: "string",
+      format: "date-time",
+    },
+    endedAt: {
+      type: "string",
+      format: "date-time",
+    },
+    seats: {
+      type: "number",
+    },
+    billingInterval: {
+      type: "string",
+    },
+    stripeScheduleId: {
+      type: "string",
+    },
+  },
+  required: ["plan", "referenceId"],
 } as const;
