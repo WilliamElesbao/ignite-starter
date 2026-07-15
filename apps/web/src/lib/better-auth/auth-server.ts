@@ -1,37 +1,60 @@
 "use server";
 
-import type { GetSessionResponse } from "@repo/api/generated/api/types.gen";
+import type { Session, User } from "@repo/api/generated/api/types.gen";
 import { cookies } from "next/headers";
-import { safePromise } from "@/utils/safe-promise";
+import z from "zod";
+import { logger } from "@/utils/logger";
+import { safeFetch } from "@/utils/safe-fetch";
 
-export async function getSession(): Promise<GetSessionResponse> {
+type GetSessionResponse = { session: Session; user: User } | null;
+
+const sessionSchema: z.ZodType<GetSessionResponse> = z
+  .object({
+    session: z.object({
+      id: z.string(),
+      expiresAt: z.string(),
+      token: z.string(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      ipAddress: z.string().optional(),
+      userAgent: z.string().optional(),
+      userId: z.string(),
+    }),
+    user: z.object({
+      id: z.string(),
+      name: z.string(),
+      email: z.string(),
+      emailVerified: z.boolean(),
+      image: z.string().optional(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+      stripeCustomerId: z.string().optional(),
+    }),
+  })
+  .nullable();
+
+type SessionResponse = z.infer<typeof sessionSchema>;
+
+export async function getSession(): Promise<SessionResponse> {
   "use cache: private";
+
   const cookieStore = await cookies();
 
-  const [res, err] = await safePromise(
-    fetch(`${process.env.API_URL}/auth/get-session`, {
-      headers: { cookie: cookieStore.toString() },
-    }),
+  const result = await safeFetch(
+    `${process.env.API_URL}/auth/get-session`,
+    sessionSchema,
+    {
+      headers: {
+        cookie: cookieStore.toString(),
+      },
+    },
   );
 
-  if (err || !res.ok) {
-    console.error("Fetch error:", err);
+  if (!result.success) {
+    logger.error("Fetch error:", result.error);
     return null;
   }
 
-  const [json, jsonErr] = await safePromise(res.json());
-
-  if (jsonErr) {
-    console.error("JSON parse error:", jsonErr);
-    return null;
-  }
-
-  const data = json as GetSessionResponse; // Assuming the API response matches the SessionResponse type
-
-  if (!data) {
-    console.error("Invalid session data:", data);
-    return null;
-  }
-
-  return data;
+  logger.info("Session data:", result.data);
+  return result.data;
 }
