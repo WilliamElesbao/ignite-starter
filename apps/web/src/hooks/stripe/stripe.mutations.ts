@@ -16,11 +16,11 @@ export const useStripeSubscription = () =>
   });
 
 /**
- * Updates an existing Stripe subscription.
+ * Renews an existing Stripe subscription.
  *
- * @returns Mutation hook for updating a subscription
+ * @returns Mutation hook for renewing a subscription
  */
-export const useStripeUpdateSubscription = () =>
+export const useStripeRenewSubscription = () =>
   useMutation({
     ...patchStripeSubscriptionMutation(),
   });
