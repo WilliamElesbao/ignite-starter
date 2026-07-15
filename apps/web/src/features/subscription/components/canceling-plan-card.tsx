@@ -1,12 +1,14 @@
 "use client";
 
+import type { GetStripeSubscriptionResponse } from "@repo/api/generated/api/types.gen";
 import { Button } from "@repo/ui/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useRenewSubscription } from "../hooks/use-renew-subscription";
-import type { ResolvedPlan } from "../utils/plan-utils";
 
-export function CancelingPlanCard({ plan }: Readonly<{ plan: ResolvedPlan }>) {
+export function CancelingPlanCard({
+  plan,
+}: Readonly<{ plan: GetStripeSubscriptionResponse }>) {
   const t = useTranslations();
   const { mutateAsync, isPending } = useRenewSubscription();
 

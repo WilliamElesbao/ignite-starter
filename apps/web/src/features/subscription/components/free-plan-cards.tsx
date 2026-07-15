@@ -1,5 +1,6 @@
 "use client";
 
+import type { GetStripeSubscriptionResponse } from "@repo/api/generated/api/types.gen";
 import { Badge } from "@repo/ui/components/ui/badge";
 import { Button } from "@repo/ui/components/ui/button";
 import {
@@ -14,12 +15,11 @@ import { useTranslations } from "next-intl";
 import type Stripe from "stripe";
 import { upgradeSubscriptionAction } from "../actions/manage-subscription.action";
 import { FREE_FEATURES, PRO_FEATURES } from "../constants/constants";
-import type { ResolvedPlan } from "../utils/plan-utils";
 import { FeatureList } from "./feature-list";
 import { UpgradeToProButton } from "./upgrade-to-pro-button";
 
 export interface PlanSectionProps {
-  resolvedPlan?: ResolvedPlan;
+  resolvedPlan?: GetStripeSubscriptionResponse;
   proPlanPriceId: string;
   proPlanPrice: string;
   proPlanInterval: Stripe.Price.Recurring.Interval;
