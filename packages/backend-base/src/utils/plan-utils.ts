@@ -1,17 +1,4 @@
-const PLAN_LIMITS = {
-  free: {
-    maxQrCodes: 3,
-    maxFileSizeBytes: 2 * 1024 * 1024, // 2MB
-  },
-  pro: {
-    maxQrCodes: 10,
-    maxFileSizeBytes: 5 * 1024 * 1024, // 5MB
-  },
-} as const;
-
-type PlanTier = keyof typeof PLAN_LIMITS;
-
-type PlanStatus = "free" | "active" | "canceling" | "whitelisted";
+import type { SubscriptionDetailsResponse } from "../plugins/stripe/dtos/subscription/subscription-details-response.dto";
 
 interface SubscriptionSnapshot {
   status: string;
@@ -20,25 +7,17 @@ interface SubscriptionSnapshot {
   stripeSubscriptionId: string | null;
 }
 
-interface ResolvedPlan {
-  tier: PlanTier;
-  status: PlanStatus;
-  periodEnd: Date | null;
-  isProAccess: boolean;
-  stripeSubscriptionId: string | null;
-}
-
 export function resolvePlan(
   subscription: SubscriptionSnapshot | null,
   isWhitelisted: boolean,
-): ResolvedPlan {
+): SubscriptionDetailsResponse {
   if (isWhitelisted) {
     return {
       tier: "pro",
       status: "whitelisted",
-      periodEnd: null,
+      periodEnd: undefined,
       isProAccess: true,
-      stripeSubscriptionId: null,
+      stripeSubscriptionId: undefined,
     };
   }
 
@@ -46,9 +25,9 @@ export function resolvePlan(
     return {
       tier: "free",
       status: "free",
-      periodEnd: null,
+      periodEnd: undefined,
       isProAccess: false,
-      stripeSubscriptionId: null,
+      stripeSubscriptionId: undefined,
     };
   }
 
@@ -56,17 +35,17 @@ export function resolvePlan(
     return {
       tier: "pro",
       status: "canceling",
-      periodEnd: subscription.periodEnd,
+      periodEnd: subscription.periodEnd?.toISOString(),
       isProAccess: true,
-      stripeSubscriptionId: subscription.stripeSubscriptionId,
+      stripeSubscriptionId: subscription.stripeSubscriptionId ?? undefined,
     };
   }
 
   return {
     tier: "pro",
     status: "active",
-    periodEnd: subscription.periodEnd,
+    periodEnd: subscription.periodEnd?.toISOString(),
     isProAccess: true,
-    stripeSubscriptionId: subscription.stripeSubscriptionId,
+    stripeSubscriptionId: subscription.stripeSubscriptionId ?? undefined,
   };
 }

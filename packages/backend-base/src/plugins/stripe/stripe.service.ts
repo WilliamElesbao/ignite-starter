@@ -69,7 +69,7 @@ export class StripeService {
           currency: price.currency as "usd" | "brl",
           amount: price.unit_amount ?? 0,
         }),
-        recurring: price.recurring?.interval ?? null,
+        recurring: price.recurring?.interval,
       };
     });
 
@@ -114,7 +114,7 @@ export class StripeService {
       });
     }
 
-    return result;
+    return { url: result.url ?? undefined };
   }
 
   async renewSubscription({ user }: { user: SessionResponse["user"] }) {
