@@ -5,11 +5,12 @@ import { cookies } from "next/headers";
 import { safePromise } from "@/utils/safe-promise";
 
 export async function getSession(): Promise<GetSessionResponse> {
+  "use cache: private";
   const cookieStore = await cookies();
 
   const [res, err] = await safePromise(
     fetch(`${process.env.API_URL}/auth/get-session`, {
-      headers: { Cookie: cookieStore.toString() },
+      headers: { cookie: cookieStore.toString() },
     }),
   );
 
