@@ -10,10 +10,9 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
 import { Languages } from "lucide-react";
-import { usePathname as useNextPathname } from "next/navigation";
 import { hasLocale, useLocale, useTranslations } from "next-intl";
 import { useLocaleLabel } from "@/hooks/locale/use-locale";
-import { useRouter } from "@/lib/i18n/navigation";
+import { usePathname, useRouter } from "@/lib/i18n/navigation";
 import { routing } from "@/lib/i18n/routing";
 
 export function LanguageSwitcher() {
@@ -23,7 +22,7 @@ export function LanguageSwitcher() {
   const locale = hasLocale(routing.locales, localeFromContext)
     ? localeFromContext
     : routing.defaultLocale;
-  const pathname = useNextPathname();
+  const pathname = usePathname();
   const router = useRouter();
 
   const localePrefixPattern = new RegExp(
