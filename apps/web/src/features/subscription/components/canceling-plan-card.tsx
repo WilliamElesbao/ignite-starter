@@ -1,20 +1,19 @@
 "use client";
 
-import type { GetStripeSubscriptionResponse } from "@repo/api/generated/api/types.gen";
 import { Button } from "@repo/ui/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useStripeRenewSubscription } from "@/features/subscription/hooks/stripe.mutations";
+import { useGetStripeSubscriptionDetails } from "../hooks/stripe.queries";
 
-export function CancelingPlanCard({
-  plan,
-}: Readonly<{ plan: GetStripeSubscriptionResponse }>) {
+export function CancelingPlanCard() {
   const t = useTranslations();
+  const { data: subscription } = useGetStripeSubscriptionDetails();
   const { mutateAsync, isPending } = useStripeRenewSubscription();
 
   const format = useFormatter();
-  const formattedDate = plan.periodEnd
-    ? format.dateTime(new Date(plan.periodEnd), {
+  const formattedDate = subscription?.periodEnd
+    ? format.dateTime(new Date(subscription.periodEnd), {
         year: "numeric",
         month: "long",
         day: "numeric",

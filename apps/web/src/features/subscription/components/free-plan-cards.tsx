@@ -11,20 +11,18 @@ import {
 } from "@repo/ui/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import type Stripe from "stripe";
+
 import { useStripeSubscription } from "@/features/subscription/hooks/stripe.mutations";
 import { FREE_FEATURES, PRO_FEATURES } from "../constants/constants";
+import { useGetStripeProducts } from "../hooks/stripe.queries";
 import { FeatureList } from "./feature-list";
 
-interface Props {
-  priceId: string;
-  price: string;
-  recurring: Stripe.Price.Recurring.Interval;
-}
-
-export function FreePlanCards({ priceId, price, recurring }: Readonly<Props>) {
+export function FreePlanCards() {
   const t = useTranslations();
+  const { data: products } = useGetStripeProducts();
   const { mutateAsync, isPending } = useStripeSubscription();
+
+  const proPlan = products?.find((p) => p.planName === "pro");
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -58,10 +56,10 @@ export function FreePlanCards({ priceId, price, recurring }: Readonly<Props>) {
             </Badge>
           </div>
           <p>
-            <span className="text-2xl font-bold">{price}</span>
+            <span className="text-2xl font-bold">{proPlan?.price}</span>
             <span className="text-sm text-muted-foreground">
               {" "}
-              / {t(`subscription.${recurring}`)}
+              / {t(`subscription.${proPlan?.recurring ?? "month"}`)}
             </span>
           </p>
         </CardHeader>
@@ -72,7 +70,11 @@ export function FreePlanCards({ priceId, price, recurring }: Readonly<Props>) {
           <Button
             className="w-full"
             disabled={isPending}
-            onClick={() => mutateAsync({ body: { priceId, planName: "pro" } })}
+            onClick={() =>
+              mutateAsync({
+                body: { priceId: proPlan?.id ?? "", planName: "pro" },
+              })
+            }
           >
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {t("subscription.upgrade-to-pro")}
