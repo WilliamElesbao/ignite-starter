@@ -1,6 +1,6 @@
 import { toast } from "sonner";
-import { WELCOME_TOAST } from "@/constants/session-storage";
 import { authClient } from "@/lib/better-auth/auth-client";
+import { logger } from "@/utils/logger";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
 
@@ -10,24 +10,22 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
  * @returns Promise that resolves when sign-in is initiated
  */
 export const signInWithGoogle = async () => {
-  try {
-    sessionStorage.setItem(WELCOME_TOAST.key, WELCOME_TOAST.value);
+  const { error } = await authClient.signIn.social(
+    {
+      provider: "google",
+      callbackURL: `${baseUrl}/subscription`,
+    },
+    {
+      onError: (context) => {
+        toast.error("Google sign-in failed", {
+          description: context.error.message,
+        });
+      },
+    },
+  );
 
-    await authClient.signIn.social(
-      {
-        provider: "google",
-        callbackURL: `${baseUrl}/subscription`,
-      },
-      {
-        onError: (context) => {
-          toast.error("Google sign-in failed", {
-            description: context.error.message,
-          });
-        },
-      },
-    );
-  } catch (error) {
-    console.error("[signIn] error:", error);
+  if (error) {
+    logger.error("[signIn] error:", error);
     throw error;
   }
 };
