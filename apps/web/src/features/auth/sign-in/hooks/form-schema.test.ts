@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { signInFormSchema } from "./form-schema";
+import { useSignInFormSchema } from "./form-schema";
 
 // Mock next-intl
 vi.mock("next-intl", () => ({
@@ -13,10 +13,10 @@ vi.mock("next-intl", () => ({
 }));
 
 describe("signInFormSchema", () => {
-  let schema: ReturnType<typeof signInFormSchema>;
+  let schema: ReturnType<typeof useSignInFormSchema>;
 
   beforeEach(() => {
-    schema = signInFormSchema();
+    schema = useSignInFormSchema();
   });
 
   describe("valid inputs", () => {
@@ -247,8 +247,8 @@ describe("signInFormSchema", () => {
       };
 
       // Create multiple schema instances
-      const schema1 = signInFormSchema();
-      const schema2 = signInFormSchema();
+      const schema1 = useSignInFormSchema();
+      const schema2 = useSignInFormSchema();
 
       const result1 = schema1.safeParse(input);
       const result2 = schema2.safeParse(input);
