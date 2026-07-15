@@ -3,7 +3,7 @@
 import { Badge } from "@repo/ui/components/ui/badge";
 import { Skeleton } from "@repo/ui/components/ui/skeleton";
 import { useTranslations } from "next-intl";
-import { useGetStripeSubscriptionDetails } from "@/hooks/stripe/stripe.queries";
+import { useGetStripeSubscriptionDetails } from "@/features/subscription/hooks/stripe.queries";
 import { planStatusToLabelMap } from "@/utils/plan-status-to-label";
 
 export function UserPlanBadge() {

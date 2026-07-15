@@ -6,13 +6,13 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
-import { useCancelSubscription } from "../hooks/use-cancel-subscription";
+import { useStripeCancelSubscription } from "@/features/subscription/hooks/stripe.mutations";
 
 export function ActivePlanCard({
   plan,
 }: Readonly<{ plan: GetStripeSubscriptionResponse }>) {
   const t = useTranslations();
-  const { mutateAsync, isPending } = useCancelSubscription();
+  const { mutateAsync, isPending } = useStripeCancelSubscription();
 
   const format = useFormatter();
   const formattedDate = plan.periodEnd
@@ -45,7 +45,7 @@ export function ActivePlanCard({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => mutateAsync()}
+            onClick={() => mutateAsync({})}
             disabled={isPending}
             className="shrink-0"
           >

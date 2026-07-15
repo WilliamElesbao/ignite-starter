@@ -9,13 +9,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/ui/card";
-import { useMutation } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type Stripe from "stripe";
-import { upgradeSubscriptionAction } from "../actions/manage-subscription.action";
+import { useStripeSubscription } from "@/features/subscription/hooks/stripe.mutations";
 import { FREE_FEATURES, PRO_FEATURES } from "../constants/constants";
 import { FeatureList } from "./feature-list";
-import { UpgradeToProButton } from "./upgrade-to-pro-button";
 
 interface Props {
   priceId: string;
@@ -25,21 +24,7 @@ interface Props {
 
 export function FreePlanCards({ priceId, price, recurring }: Readonly<Props>) {
   const t = useTranslations();
-
-  const { mutateAsync } = useMutation({
-    mutationFn: async () => {
-      await upgradeSubscriptionAction({
-        priceId,
-        planName: "pro",
-      });
-    },
-    onError: (error) => {
-      console.error("Error upgrading subscription:", error);
-    },
-    onSuccess: () => {
-      console.log("Subscription upgraded successfully!");
-    },
-  });
+  const { mutateAsync, isPending } = useStripeSubscription();
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -84,15 +69,14 @@ export function FreePlanCards({ priceId, price, recurring }: Readonly<Props>) {
           <FeatureList features={PRO_FEATURES} />
         </CardContent>
         <CardFooter>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              mutateAsync();
-            }}
+          <Button
             className="w-full"
+            disabled={isPending}
+            onClick={() => mutateAsync({ body: { priceId, planName: "pro" } })}
           >
-            <UpgradeToProButton />
-          </form>
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {t("subscription.upgrade-to-pro")}
+          </Button>
         </CardFooter>
       </Card>
     </div>

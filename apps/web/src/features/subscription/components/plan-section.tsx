@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import {
   useGetStripeProducts,
   useGetStripeSubscriptionDetails,
-} from "@/hooks/stripe/stripe.queries";
+} from "@/features/subscription/hooks/stripe.queries";
 import { ActivePlanCard } from "./active-plan-card";
 import { CancelingPlanCard } from "./canceling-plan-card";
 import { DeveloperPlanCard } from "./developer-plan-card";

@@ -4,13 +4,13 @@ import type { GetStripeSubscriptionResponse } from "@repo/api/generated/api/type
 import { Button } from "@repo/ui/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
-import { useRenewSubscription } from "../hooks/use-renew-subscription";
+import { useStripeRenewSubscription } from "@/features/subscription/hooks/stripe.mutations";
 
 export function CancelingPlanCard({
   plan,
 }: Readonly<{ plan: GetStripeSubscriptionResponse }>) {
   const t = useTranslations();
-  const { mutateAsync, isPending } = useRenewSubscription();
+  const { mutateAsync, isPending } = useStripeRenewSubscription();
 
   const format = useFormatter();
   const formattedDate = plan.periodEnd
@@ -39,7 +39,7 @@ export function CancelingPlanCard({
       <Button
         variant="outline"
         size="sm"
-        onClick={() => mutateAsync()}
+        onClick={() => mutateAsync({})}
         disabled={isPending}
       >
         {isPending && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
