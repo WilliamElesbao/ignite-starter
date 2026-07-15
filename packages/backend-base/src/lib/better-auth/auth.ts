@@ -5,9 +5,9 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
 import type Stripe from "stripe";
 import { env } from "../../env";
-import { stripe as stripeClient } from "../../lib/stripe";
 import redisClient from "../../shared/redis.client";
 import { logger } from "../logger";
+import { stripe as stripeClient } from "../stripe";
 
 export const auth = betterAuth({
   basePath: "/auth",
