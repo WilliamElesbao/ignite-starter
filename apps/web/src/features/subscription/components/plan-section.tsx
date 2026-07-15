@@ -10,10 +10,11 @@ import { ActivePlanCard } from "./active-plan-card";
 import { CancelingPlanCard } from "./canceling-plan-card";
 import { DeveloperPlanCard } from "./developer-plan-card";
 import { FreePlanCards } from "./free-plan-cards";
+import { PlanSectionSkeleton } from "./plan-section-skeleton";
 
 export function PlanSection() {
   const t = useTranslations();
-  const { data: plans } = useGetStripeProducts();
+  const { data: plans, isPending } = useGetStripeProducts();
   const { data: subscription } = useGetStripeSubscriptionDetails();
 
   const proPlan = plans?.find((plan) => plan.planName === "pro");
@@ -42,7 +43,7 @@ export function PlanSection() {
   return (
     <section className="space-y-4 px-4 lg:px-6">
       <Text variant="heading-md">{t("subscription.plan")}</Text>
-      {renderPlanView()}
+      {isPending ? <PlanSectionSkeleton /> : renderPlanView()}
     </section>
   );
 }
