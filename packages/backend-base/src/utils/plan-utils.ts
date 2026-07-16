@@ -3,6 +3,7 @@ import type { SubscriptionDetailsResponse } from "../plugins/stripe/dtos/subscri
 interface SubscriptionSnapshot {
   status: string;
   periodEnd: Date | null;
+  cancelAt: Date | null;
   cancelAtPeriodEnd: boolean;
   stripeSubscriptionId: string | null;
 }
@@ -31,7 +32,7 @@ export function resolvePlan(
     };
   }
 
-  if (subscription.cancelAtPeriodEnd) {
+  if (subscription.cancelAt || subscription.cancelAtPeriodEnd) {
     return {
       tier: "pro",
       status: "canceling",

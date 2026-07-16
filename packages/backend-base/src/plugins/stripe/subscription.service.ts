@@ -11,22 +11,23 @@ export class SubscriptionService {
   constructor(private readonly db: db) {}
 
   async getSubscriptionByUserId(userId: string, userEmail: string) {
-    const [subscription] = await this.db
-      .select({
-        status: schema.subscriptions.status,
-        periodEnd: schema.subscriptions.periodEnd,
-        cancelAtPeriodEnd: schema.subscriptions.cancelAtPeriodEnd,
-        stripeSubscriptionId: schema.subscriptions.stripeSubscriptionId,
-      })
-      .from(schema.subscriptions)
-      .where(eq(schema.subscriptions.referenceId, userId))
-      .limit(1);
+    const subscription = await this.db.query.subscriptions.findFirst({
+      where: eq(schema.subscriptions.referenceId, userId),
+      columns: {
+        status: true,
+        periodEnd: true,
+        cancelAt: true,
+        cancelAtPeriodEnd: true,
+        stripeSubscriptionId: true,
+      },
+    });
 
     return resolvePlan(
       subscription
         ? {
             status: subscription.status ?? "inactive",
             periodEnd: subscription.periodEnd,
+            cancelAt: subscription.cancelAt,
             cancelAtPeriodEnd: subscription.cancelAtPeriodEnd ?? false,
             stripeSubscriptionId: subscription.stripeSubscriptionId,
           }
