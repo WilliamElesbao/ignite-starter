@@ -44,6 +44,35 @@ jobs:
           bun run locale-check
           bun run locale-unused
 
+      - name: Generate API client from backend OpenAPI schema
+        env:
+          DATABASE_URL: postgresql://postgres_user:postgres_password@localhost:5432/ignite-starter
+          REDIS_URL: redis://:abcd1234@localhost:6379
+          WEB_URL: http://localhost:3000
+          GOOGLE_CLIENT_ID: ci.apps.googleusercontent.com
+          GOOGLE_CLIENT_SECRET: ci-secret
+          STRIPE_API_KEY: sk_test_ci_fakekey
+          STRIPE_WEBHOOK_SECRET: whsec_ci_fakesecret
+          API_URL: http://localhost:3333
+          PORT: 3333
+        run: |
+          bun run apps/backend/src/index.ts &
+          BACKEND_PID=$!
+
+          for i in $(seq 1 30); do
+            if curl -s http://localhost:3333/openapi/json > /dev/null 2>&1; then
+              echo "Backend is ready"
+              break
+            fi
+            echo "Waiting for backend... (attempt $i)"
+            sleep 2
+          done
+
+          bun run --cwd packages/api generate
+
+          kill $BACKEND_PID 2>/dev/null || true
+          wait $BACKEND_PID 2>/dev/null || true
+
       - name: Typecheck
         run: bun run tsc
 
