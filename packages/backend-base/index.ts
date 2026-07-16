@@ -15,16 +15,16 @@ import stripePlugin, {
 } from "./src/plugins/stripe/stripe.plugin";
 
 export {
-  OpenAPI,
-  subscriptionExpirationCron,
-  authPlugin,
   type AuthPlugin,
-  emailPlugin,
-  type EmailPlugin,
-  type SessionResponse,
-  stripePlugin,
-  type StripePlugin,
-  bullBoardPlugin,
-  EmailQueueWorker,
+  authPlugin,
   type BullBoardPlugin,
+  bullBoardPlugin,
+  type EmailPlugin,
+  EmailQueueWorker,
+  emailPlugin,
+  OpenAPI,
+  type SessionResponse,
+  type StripePlugin,
+  stripePlugin,
+  subscriptionExpirationCron,
 };

@@ -1,7 +1,6 @@
 import { auth } from "../lib/better-auth/auth";
 
 let _schema: ReturnType<typeof auth.api.generateOpenAPISchema>;
-// biome-ignore lint/suspicious/noAssignInExpressions: <https://elysiajs.com/integrations/better-auth.html#openapi>
 const getSchema = async () => (_schema ??= auth.api.generateOpenAPISchema());
 
 export const OpenAPI = {
