@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { eq, isNotNull } from "drizzle-orm";
 import type Stripe from "stripe";
 import { logger } from "../lib/logger";
-import { stripe } from "../lib/stripe";
+import { stripeClient } from "../lib/stripe/stripe-client";
 
 export const CRON_NAME = "subscription-expiration";
 
@@ -51,7 +51,7 @@ export const processUser = async (user: {
   if (!user.stripeSubscriptionId) return false;
 
   try {
-    const subscription = await stripe.subscriptions.retrieve(
+    const subscription = await stripeClient.subscriptions.retrieve(
       user.stripeSubscriptionId,
     );
 

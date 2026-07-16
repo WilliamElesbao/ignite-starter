@@ -2,7 +2,7 @@ import { cors } from "@elysiajs/cors";
 import { db as Database } from "@repo/db";
 import { Elysia } from "elysia";
 import { logger } from "../lib/logger";
-import { stripe } from "../lib/stripe";
+import { stripeClient } from "../lib/stripe/stripe-client";
 import { EventService } from "../services/event.service";
 import { SHARED_ERROR_MAP, SharedErrorCode } from "./errors/shared.errors";
 import { toErrorResponse } from "./errors/to-error-response";
@@ -30,7 +30,7 @@ const setup = new Elysia({ name: "shared" })
   )
   .state("db", Database)
   .state("cache", redisClient)
-  .state("stripe", stripe)
+  .state("stripe", stripeClient)
   .state("logger", logger)
   .state("eventService", eventService)
   .onError(({ code, error, set, path, request }) => {

@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
 import type Stripe from "stripe";
 import { env } from "../../env";
 import { auth, type SessionResponse } from "../../lib/better-auth/auth";
-import { stripe } from "../../lib/stripe";
+import { stripeClient } from "../../lib/stripe/stripe-client";
 import {
   EVENT_TYPE,
   type EventService,
@@ -149,7 +149,7 @@ export class StripeService {
     }
 
     const [, stripeError] = await safePromise(
-      stripe.subscriptions.update(subscriptionId, {
+      stripeClient.subscriptions.update(subscriptionId, {
         cancel_at_period_end: true,
       }),
     );
@@ -239,7 +239,7 @@ export class StripeService {
     }
 
     const [, stripeError] = await safePromise(
-      stripe.subscriptions.update(stripeSubscriptionId, {
+      stripeClient.subscriptions.update(stripeSubscriptionId, {
         cancel_at_period_end: false,
       }),
     );

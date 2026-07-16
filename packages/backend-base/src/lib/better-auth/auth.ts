@@ -9,7 +9,7 @@ import { WELCOME_COOKIE } from "../../constants/welcome-cookie";
 import { env } from "../../env";
 import redisClient from "../../shared/redis.client";
 import { logger } from "../logger";
-import { stripe as stripeClient } from "../stripe";
+import { stripeClient } from "../stripe/stripe-client";
 
 export const auth = betterAuth({
   basePath: "/auth",
