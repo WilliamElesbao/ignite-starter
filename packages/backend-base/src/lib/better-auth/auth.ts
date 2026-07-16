@@ -6,7 +6,6 @@ import { openAPI } from "better-auth/plugins";
 import type Stripe from "stripe";
 import { WELCOME_COOKIE } from "../../constants/welcome-cookie";
 import { env } from "../../env";
-import { EmailService } from "../../plugins/email/email.service";
 import redisClient from "../../shared/redis.client";
 import { logger } from "../logger";
 import { stripe as stripeClient } from "../stripe";
@@ -42,7 +41,9 @@ export const auth = betterAuth({
           maxAge: 60,
           path: "/",
         });
-        new EmailService(logger).sendWelcomeEmail({ emailTo: data.user.email });
+        // Resend sandbox mode only allows sending emails to the account owner's email address.
+        // Verify a domain and use a matching `from` address to send emails to other recipients.
+        // new EmailService(logger).sendWelcomeEmail({ emailTo: data.user.email });
       },
       stripeClient,
       stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
