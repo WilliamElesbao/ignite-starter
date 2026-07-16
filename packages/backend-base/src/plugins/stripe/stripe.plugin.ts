@@ -114,9 +114,7 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
       .patch(
         "/subscription",
         async ({ store: { stripeService }, set, user }) => {
-          await stripeService.renewSubscription({
-            user,
-          });
+          await stripeService.renewSubscription({ user });
 
           set.status = 204;
           return;
