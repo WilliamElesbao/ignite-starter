@@ -44,6 +44,37 @@ jobs:
           bun run locale-check
           bun run locale-unused
 
+      - name: Generate API client from backend OpenAPI schema
+        env:
+          PORT: ${{ secrets.PORT }}
+          API_URL: ${{ secrets.API_URL }}
+          WEB_URL: ${{ secrets.WEB_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+        run: |
+          bun run apps/backend/src/index.ts &
+          BACKEND_PID=$!
+
+          for i in $(seq 1 30); do
+            if curl -s http://localhost:3333/openapi/json > /dev/null 2>&1; then
+              echo "Backend is ready"
+              break
+            fi
+            echo "Waiting for backend... (attempt $i)"
+            sleep 2
+          done
+
+          bun run --cwd packages/api generate
+
+          kill $BACKEND_PID 2>/dev/null || true
+          wait $BACKEND_PID 2>/dev/null || true
+
       - name: Typecheck
         run: bun run tsc
 
