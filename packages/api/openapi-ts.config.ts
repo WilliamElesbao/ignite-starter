@@ -4,7 +4,7 @@ export default defineConfig({
   input: `${process.env.API_URL}/openapi/json`,
   output: {
     path: "./generated/api",
-    postProcess: ["biome:format"],
+    // postProcess: ["biome:format"],
   },
   plugins: [
     "@hey-api/schemas",
