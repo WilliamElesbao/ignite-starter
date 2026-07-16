@@ -9,7 +9,7 @@ export const formatPrice = ({
   amount,
 }: {
   currency: "usd" | "brl";
-  amount: number | null | undefined;
+  amount?: number | null;
 }): string => {
   return new Intl.NumberFormat(currency === "usd" ? "en-US" : "pt-BR", {
     style: "currency",
