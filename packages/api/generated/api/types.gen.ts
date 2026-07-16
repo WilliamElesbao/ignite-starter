@@ -137,18 +137,6 @@ export const CodeEnum12 = { STRIPE_SUBSCRIPTION_REVOKE_FAILED: 'STRIPE_SUBSCRIPT
 
 export type CodeEnum12 = typeof CodeEnum12[keyof typeof CodeEnum12];
 
-export const CodeEnum13 = {
-    STRIPE_SIGNATURE_MISSING: 'STRIPE_SIGNATURE_MISSING',
-    STRIPE_WEBHOOK_INVALID_SIGNATURE: 'STRIPE_WEBHOOK_INVALID_SIGNATURE',
-    STRIPE_WEBHOOK_METADATA_MISSING: 'STRIPE_WEBHOOK_METADATA_MISSING'
-} as const;
-
-export type CodeEnum13 = typeof CodeEnum13[keyof typeof CodeEnum13];
-
-export const CodeEnum14 = { STRIPE_INTERNAL_SERVER_ERROR: 'STRIPE_INTERNAL_SERVER_ERROR', STRIPE_WEBHOOK_USER_UPDATE_FAILED: 'STRIPE_WEBHOOK_USER_UPDATE_FAILED' } as const;
-
-export type CodeEnum14 = typeof CodeEnum14[keyof typeof CodeEnum14];
-
 export const _0Enum = {
     APPLE: 'apple',
     ATLASSIAN: 'atlassian',
@@ -574,43 +562,6 @@ export type PatchStripeSubscriptionCancelResponses = {
      */
     204: unknown;
 };
-
-export type PostStripeWebhookData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/stripe/webhook';
-};
-
-export type PostStripeWebhookErrors = {
-    /**
-     * Response for status 400
-     */
-    400: {
-        code: CodeEnum13;
-        message: string;
-    };
-    /**
-     * Response for status 500
-     */
-    500: {
-        code: CodeEnum14;
-        message: string;
-    };
-};
-
-export type PostStripeWebhookError = PostStripeWebhookErrors[keyof PostStripeWebhookErrors];
-
-export type PostStripeWebhookResponses = {
-    /**
-     * Response for status 200
-     */
-    200: {
-        message: string;
-    };
-};
-
-export type PostStripeWebhookResponse = PostStripeWebhookResponses[keyof PostStripeWebhookResponses];
 
 export type SocialSignInData = {
     body: {

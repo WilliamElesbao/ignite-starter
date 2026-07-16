@@ -334,23 +334,6 @@ export const CodeEnum12Schema = {
     type: 'string'
 } as const;
 
-export const CodeEnum13Schema = {
-    enum: [
-        'STRIPE_SIGNATURE_MISSING',
-        'STRIPE_WEBHOOK_INVALID_SIGNATURE',
-        'STRIPE_WEBHOOK_METADATA_MISSING'
-    ],
-    type: 'string'
-} as const;
-
-export const CodeEnum14Schema = {
-    enum: [
-        'STRIPE_INTERNAL_SERVER_ERROR',
-        'STRIPE_WEBHOOK_USER_UPDATE_FAILED'
-    ],
-    type: 'string'
-} as const;
-
 export const _0EnumSchema = {
     type: 'string',
     enum: [
