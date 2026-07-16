@@ -1,6 +1,6 @@
 import { schema } from "@repo/db";
 import dayjs from "dayjs";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type Stripe from "stripe";
 import { env } from "../../env";
 import { auth, type SessionResponse } from "../../lib/better-auth/auth";
@@ -117,7 +117,7 @@ export class StripeService {
     return { url: result.url ?? undefined };
   }
 
-  async renewSubscription({ user }: { user: SessionResponse["user"] }) {
+  async cancelSubscription({ user }: { user: SessionResponse["user"] }) {
     if (!user.stripeCustomerId) {
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_CUSTOMER_NOT_FOUND,
@@ -126,17 +126,17 @@ export class StripeService {
     }
 
     const [userSubscription, userSubscriptionError] = await safePromise(
-      this.db
-        .select({
-          stripeSubscriptionId: schema.subscriptions.stripeSubscriptionId,
-        })
-        .from(schema.subscriptions)
-        .where(
-          eq(schema.subscriptions.stripeCustomerId, user.stripeCustomerId),
+      this.db.query.subscriptions.findFirst({
+        where: and(
+          eq(schema.subscriptions.referenceId, user.id),
+          eq(schema.subscriptions.status, "active"),
         ),
+        columns: { stripeSubscriptionId: true },
+      }),
     );
+    const subscriptionId = userSubscription?.stripeSubscriptionId;
 
-    if (userSubscriptionError) {
+    if (!subscriptionId || userSubscriptionError) {
       this.logger.error({
         msg: "Failed to retrieve user subscription",
         userId: user.id,
@@ -149,25 +149,107 @@ export class StripeService {
       });
     }
 
-    const [subscription] = userSubscription;
-    if (!subscription?.stripeSubscriptionId) {
+    const [, stripeError] = await safePromise(
+      stripe.subscriptions.update(subscriptionId, {
+        cancel_at_period_end: true,
+      }),
+    );
+
+    if (stripeError) {
+      this.logger.error({
+        msg: "Failed to revoke Stripe subscription",
+        userId: user.id,
+        subscriptionId,
+        error: stripeError,
+      });
+
+      throw AppError.fromCatalog({
+        code: StripeErrorCode.STRIPE_SUBSCRIPTION_REVOKE_FAILED,
+        catalog: STRIPE_ERROR_MAP,
+        details: stripeError,
+      });
+    }
+
+    const [cancelSubscription, cancelSubscriptionError] = await safePromise(
+      this.db
+        .update(schema.subscriptions)
+        .set({ cancelAtPeriodEnd: true })
+        .where(
+          and(
+            eq(schema.subscriptions.referenceId, user.id),
+            eq(schema.subscriptions.status, "active"),
+          ),
+        )
+        .returning(),
+    );
+
+    if (cancelSubscriptionError) {
+      this.logger.error({
+        msg: "Failed to cancel subscription in DB",
+        userId: user.id,
+        error: cancelSubscriptionError,
+      });
+
+      throw AppError.fromCatalog({
+        code: StripeErrorCode.STRIPE_SUBSCRIPTION_REVOKE_FAILED,
+        catalog: STRIPE_ERROR_MAP,
+        details: cancelSubscriptionError,
+      });
+    }
+
+    const [canceled] = cancelSubscription;
+    await this.trackBusinessEvent({
+      type: EVENT_TYPE.SUBSCRIPTION_CANCELED,
+      userId: user.id,
+      payload: {
+        canceled,
+      },
+    });
+  }
+
+  async renewSubscription({ user }: { user: SessionResponse["user"] }) {
+    if (!user.stripeCustomerId) {
+      throw AppError.fromCatalog({
+        code: StripeErrorCode.STRIPE_CUSTOMER_NOT_FOUND,
+        catalog: STRIPE_ERROR_MAP,
+      });
+    }
+
+    const [userSubscription, userSubscriptionError] = await safePromise(
+      this.db.query.subscriptions.findFirst({
+        where: and(
+          eq(schema.subscriptions.referenceId, user.id),
+          eq(schema.subscriptions.status, "active"),
+        ),
+        columns: { stripeSubscriptionId: true },
+      }),
+    );
+    const stripeSubscriptionId = userSubscription?.stripeSubscriptionId;
+
+    if (!stripeSubscriptionId || userSubscriptionError) {
+      this.logger.error({
+        msg: "Failed to retrieve user subscription",
+        userId: user.id,
+        error: userSubscriptionError,
+      });
+
       throw AppError.fromCatalog({
         code: StripeErrorCode.STRIPE_SUBSCRIPTION_NOT_FOUND,
         catalog: STRIPE_ERROR_MAP,
       });
     }
 
-    const subscriptionId = subscription.stripeSubscriptionId;
     const [, stripeError] = await safePromise(
-      stripe.subscriptions.update(subscriptionId, {
+      stripe.subscriptions.update(stripeSubscriptionId, {
         cancel_at_period_end: false,
       }),
     );
+
     if (stripeError) {
       this.logger.error({
         msg: "Failed to renew Stripe subscription",
         userId: user.id,
-        subscriptionId,
+        stripeSubscriptionId,
         error: stripeError,
       });
 
@@ -206,83 +288,6 @@ export class StripeService {
       userId: user.id,
       payload: {
         renewed,
-      },
-    });
-  }
-
-  async cancelSubscription({ user }: { user: SessionResponse["user"] }) {
-    if (!user.stripeCustomerId) {
-      throw AppError.fromCatalog({
-        code: StripeErrorCode.STRIPE_CUSTOMER_NOT_FOUND,
-        catalog: STRIPE_ERROR_MAP,
-      });
-    }
-
-    const [currentSubscription] = await this.db
-      .select({
-        stripeSubscriptionId: schema.subscriptions.stripeSubscriptionId,
-      })
-      .from(schema.subscriptions)
-      .where(eq(schema.subscriptions.stripeCustomerId, user.stripeCustomerId));
-
-    if (!currentSubscription?.stripeSubscriptionId) {
-      throw AppError.fromCatalog({
-        code: StripeErrorCode.STRIPE_SUBSCRIPTION_NOT_FOUND,
-        catalog: STRIPE_ERROR_MAP,
-      });
-    }
-
-    const subscriptionId = currentSubscription.stripeSubscriptionId;
-    const [, stripeError] = await safePromise(
-      stripe.subscriptions.update(subscriptionId, {
-        cancel_at_period_end: true,
-      }),
-    );
-
-    if (stripeError) {
-      this.logger.error({
-        msg: "Failed to revoke Stripe subscription",
-        userId: user.id,
-        subscriptionId,
-        error: stripeError,
-      });
-
-      throw AppError.fromCatalog({
-        code: StripeErrorCode.STRIPE_SUBSCRIPTION_REVOKE_FAILED,
-        catalog: STRIPE_ERROR_MAP,
-        details: stripeError,
-      });
-    }
-
-    const [subscription, subscriptionError] = await safePromise(
-      this.db
-        .update(schema.subscriptions)
-        .set({ cancelAtPeriodEnd: true })
-        .where(eq(schema.subscriptions.referenceId, user.id))
-        .returning(),
-    );
-
-    if (subscriptionError) {
-      this.logger.error({
-        msg: "Failed to revoke subscription in DB",
-        userId: user.id,
-        error: subscriptionError,
-      });
-
-      throw AppError.fromCatalog({
-        code: StripeErrorCode.STRIPE_SUBSCRIPTION_REVOKE_FAILED,
-        catalog: STRIPE_ERROR_MAP,
-        details: subscriptionError,
-      });
-    }
-
-    const [revoked] = subscription;
-
-    await this.trackBusinessEvent({
-      type: EVENT_TYPE.SUBSCRIPTION_CANCELED,
-      userId: user.id,
-      payload: {
-        revoked,
       },
     });
   }
