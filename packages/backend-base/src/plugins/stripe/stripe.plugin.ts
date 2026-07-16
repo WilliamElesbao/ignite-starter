@@ -1,5 +1,4 @@
 import { Elysia, t } from "elysia";
-import { AppError } from "../../shared/errors/app-error";
 import { toErrorResponse } from "../../shared/errors/to-error-response";
 import shared from "../../shared/shared.plugin";
 import authPlugin from "../auth/auth.plugin";
@@ -16,14 +15,11 @@ import {
   stripeUnauthorizedErrorDto,
   stripeUpdateSubscription500ErrorDto,
   stripeUpdateSubscription502ErrorDto,
-  stripeWebhook400ErrorDto,
-  stripeWebhook500ErrorDto,
 } from "./dtos/errors/stripe-error.dto";
 import { ProductsResponseDto } from "./dtos/products-response.dto";
 import { SubscriptionBodyDto } from "./dtos/subscription/subscription-body.dto";
 import { SubscriptionDetailsResponseDto } from "./dtos/subscription/subscription-details-response.dto";
 import { SubscriptionResponseDto } from "./dtos/subscription/subscription-response.dto";
-import { WebhookResponseDto } from "./dtos/webhook-response.dto";
 import { STRIPE_ERROR_MAP, StripeErrorCode } from "./stripe.errors";
 import { StripeService } from "./stripe.service";
 import { SubscriptionService } from "./subscription.service";
@@ -154,35 +150,6 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
             404: stripeSubscriptionNotFoundErrorDto,
             500: stripeRevoke500ErrorDto,
             502: stripeRevoke502ErrorDto,
-          },
-        },
-      )
-      .post(
-        "/webhook",
-        async ({ request, store: { stripeService } }) => {
-          const signature = request.headers.get("stripe-signature");
-
-          if (!signature) {
-            throw AppError.fromCatalog({
-              code: StripeErrorCode.STRIPE_SIGNATURE_MISSING,
-              catalog: STRIPE_ERROR_MAP,
-            });
-          }
-
-          const payload = await request.text();
-          const response = await stripeService.webhookHandler({
-            payload,
-            signature,
-          });
-
-          return { message: response.message };
-        },
-        {
-          detail: { description: "Stripe webhook" },
-          response: {
-            200: WebhookResponseDto,
-            400: stripeWebhook400ErrorDto,
-            500: stripeWebhook500ErrorDto,
           },
         },
       ),
