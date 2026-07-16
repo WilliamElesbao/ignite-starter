@@ -1,5 +1,5 @@
 import { schema } from "@repo/db";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { env } from "../../env";
 import type { db } from "../../shared/shared.plugin";
 import { getWhitelistedEmails } from "../../utils/get-whitelisted-emails";
@@ -12,7 +12,10 @@ export class SubscriptionService {
 
   async getSubscriptionByUserId(userId: string, userEmail: string) {
     const subscription = await this.db.query.subscriptions.findFirst({
-      where: eq(schema.subscriptions.referenceId, userId),
+      where: and(
+        eq(schema.subscriptions.referenceId, userId),
+        eq(schema.subscriptions.status, "active"),
+      ),
       columns: {
         status: true,
         periodEnd: true,
