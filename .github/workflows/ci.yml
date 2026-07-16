@@ -51,8 +51,11 @@ jobs:
           WEB_URL: http://localhost:3000
           GOOGLE_CLIENT_ID: ci.apps.googleusercontent.com
           GOOGLE_CLIENT_SECRET: ci-secret
+          RESEND_API_KEY: re_ci_fakekey
+          EMAIL_FROM: no-reply@ignite-starter.com
           STRIPE_API_KEY: sk_test_ci_fakekey
           STRIPE_WEBHOOK_SECRET: whsec_ci_fakesecret
+          BETTER_AUTH_URL: http://localhost:3333
           API_URL: http://localhost:3333
           PORT: 3333
         run: |
