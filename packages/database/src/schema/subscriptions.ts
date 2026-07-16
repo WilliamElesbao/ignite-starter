@@ -2,10 +2,22 @@ import { randomUUIDv7 } from "bun";
 import {
   boolean,
   integer,
+  pgEnum,
   pgTable,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
+
+export const statusEnum = pgEnum("status", [
+  "active",
+  "canceled",
+  "incomplete",
+  "incomplete_expired",
+  "past_due",
+  "paused",
+  "trialing",
+  "unpaid",
+]);
 
 export const subscriptions = pgTable("subscriptions", {
   id: text("id")
@@ -15,7 +27,7 @@ export const subscriptions = pgTable("subscriptions", {
   referenceId: text("reference_id").notNull(),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
-  status: text("status").default("incomplete"),
+  status: statusEnum().default("incomplete"),
   periodStart: timestamp("period_start"),
   periodEnd: timestamp("period_end"),
   trialStart: timestamp("trial_start"),
