@@ -36,7 +36,7 @@ export const auth = betterAuth({
   plugins: [
     openAPI(),
     stripe({
-      onCustomerCreate: async (data, ctx) => {
+      onCustomerCreate: async (_data, ctx) => {
         ctx.setCookie(WELCOME_COOKIE.key, WELCOME_COOKIE.value, {
           maxAge: 60,
           path: "/",
