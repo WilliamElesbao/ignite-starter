@@ -1,8 +1,9 @@
 import { stripe } from "@better-auth/stripe";
-import { db } from "@repo/db";
+import { db, schema } from "@repo/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
+import { eq } from "drizzle-orm";
 import type Stripe from "stripe";
 import { WELCOME_COOKIE } from "../../constants/welcome-cookie";
 import { env } from "../../env";
@@ -67,6 +68,11 @@ export const auth = betterAuth({
             "[Subscription Complete] Revalidating user plan cache for userId: " +
               subscription.referenceId,
           );
+
+          await db
+            .update(schema.users)
+            .set({ stripeCustomerId: subscription.stripeCustomerId })
+            .where(eq(schema.users.id, subscription.referenceId));
         },
         onSubscriptionUpdate: async ({ subscription }) => {
           logger.info(`[Subscription Update]:${subscription.referenceId}`);
