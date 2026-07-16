@@ -23,6 +23,7 @@ export const useStripeSubscription = () => {
     ...postStripeSubscriptionMutation(),
     onError: (error) => {
       logger.error("Error upgrading subscription:", error);
+      toast.error(error.code, { description: error.message });
     },
     onSuccess: ({ url }) => {
       if (!url) {
