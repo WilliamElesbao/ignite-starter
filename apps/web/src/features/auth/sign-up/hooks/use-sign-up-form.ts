@@ -1,0 +1,47 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { authClient } from "@/lib/better-auth/auth-client";
+import { logger } from "@/utils/logger";
+import { type SignUpFormValues, useSignUpFormSchema } from "./form-schema";
+
+/**
+ * Manages sign-up form state and submission logic with email authentication.
+ *
+ * @returns Form instance and submit handler for user registration
+ */
+export const useSignUpForm = () => {
+  const t = useTranslations("sign-up");
+  const schema = useSignUpFormSchema();
+
+  const form = useForm<SignUpFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+    mode: "onSubmit",
+  });
+
+  const onSubmit = async (values: SignUpFormValues) => {
+    await authClient.signUp.email(
+      {
+        ...values,
+        callbackURL: `${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}`,
+      },
+      {
+        onSuccess: (context) => {
+          logger.log("[useSignupForm] - Sign-up successful:", context.data);
+          globalThis.location.replace("/");
+        },
+        onError: (context) => {
+          toast.error(`${t("toast.sign-up-failed")}: ${context.error.message}`);
+        },
+      },
+    );
+  };
+
+  return { form, onSubmit };
+};

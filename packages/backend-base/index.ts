@@ -13,21 +13,18 @@ import {
 import stripePlugin, {
   type StripePlugin,
 } from "./src/plugins/stripe/stripe.plugin";
-import userPlugin, { type UserPlugin } from "./src/plugins/user/user.plugin";
 
 export {
-  OpenAPI,
-  subscriptionExpirationCron,
-  authPlugin,
   type AuthPlugin,
-  emailPlugin,
-  type EmailPlugin,
-  userPlugin,
-  type UserPlugin,
-  type SessionResponse,
-  stripePlugin,
-  type StripePlugin,
-  bullBoardPlugin,
-  EmailQueueWorker,
+  authPlugin,
   type BullBoardPlugin,
+  bullBoardPlugin,
+  type EmailPlugin,
+  EmailQueueWorker,
+  emailPlugin,
+  OpenAPI,
+  type SessionResponse,
+  type StripePlugin,
+  stripePlugin,
+  subscriptionExpirationCron,
 };

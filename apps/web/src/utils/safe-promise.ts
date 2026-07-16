@@ -11,6 +11,6 @@ export const safePromise = async <T>(
     const value = await promise;
     return [value, null];
   } catch (error) {
-    return [null, error as Error];
+    return [null, error instanceof Error ? error : new Error(String(error))];
   }
 };

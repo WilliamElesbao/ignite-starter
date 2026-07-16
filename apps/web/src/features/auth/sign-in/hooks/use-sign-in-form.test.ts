@@ -5,10 +5,8 @@
 import { renderHook } from "@testing-library/react";
 import { toast } from "sonner";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { WELCOME_TOAST } from "@/constants";
 import { authClient } from "@/lib/better-auth/auth-client";
 import { createMockSignInValues } from "@/test/factories/auth-factory";
-import { mockSessionStorage } from "@/test/setup";
 import { useSignInForm } from "./use-sign-in-form";
 
 // Mock authClient
@@ -93,23 +91,6 @@ describe("useSignInForm", () => {
         expect.objectContaining({
           onError: expect.any(Function),
         }),
-      );
-    });
-
-    it("should store welcome toast flag in sessionStorage before authentication", async () => {
-      const mockSignInEmail = authClient.signIn.email as ReturnType<
-        typeof vi.fn
-      >;
-      mockSignInEmail.mockResolvedValue(undefined);
-
-      const { result } = renderHook(() => useSignInForm());
-      const values = createMockSignInValues();
-
-      await result.current.onSubmit(values);
-
-      expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
-        WELCOME_TOAST.key,
-        WELCOME_TOAST.value,
       );
     });
 
@@ -356,29 +337,6 @@ describe("useSignInForm", () => {
         "Request timeout",
       );
     });
-
-    it("should still set welcome toast flag even if authentication throws", async () => {
-      const mockSignInEmail = authClient.signIn.email as ReturnType<
-        typeof vi.fn
-      >;
-
-      mockSignInEmail.mockRejectedValue(new Error("Network error"));
-
-      const { result } = renderHook(() => useSignInForm());
-      const values = createMockSignInValues();
-
-      try {
-        await result.current.onSubmit(values);
-      } catch {
-        // Expected to throw
-      }
-
-      // Welcome toast should still be set before the error
-      expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
-        WELCOME_TOAST.key,
-        WELCOME_TOAST.value,
-      );
-    });
   });
 
   describe("edge cases", () => {
@@ -423,7 +381,6 @@ describe("useSignInForm", () => {
 
       // All submissions should go through
       expect(mockSignInEmail).toHaveBeenCalledTimes(3);
-      expect(mockSessionStorage.setItem).toHaveBeenCalledTimes(3);
     });
 
     it("should handle special characters in password", async () => {

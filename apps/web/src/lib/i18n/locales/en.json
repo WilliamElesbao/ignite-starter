@@ -30,34 +30,67 @@
       "sign-up-failed": "Sign up failed"
     }
   },
-  "dashboard": {
-    "toast": {
-      "welcome": {
-        "title": "Hey D3v!",
-        "description": "Welcome to Ignite Starter, Wow, the authentication worked perfectly!"
-      },
-      "send-email": {
-        "failed-to-send-email": "Failed to send email. Please try again later.",
-        "email-sent-successfully": "Email sent successfully!"
-      },
-      "subscription": {
-        "redirecting-to-stripe-for-subscription": "Redirecting to Stripe for subscription...",
-        "please-wait-while-we-set-up-your-subscription": "Please wait while we set up your subscription.",
-        "failed-to-create-subscription": "Failed to create subscription.",
-        "an-error-occurred-while-creating-your-subscription": "An error occurred while creating your subscription. Please try again."
-      },
-      "update-subscription": {
-        "subscription-updated-successfully": "Subscription updated successfully!",
-        "your-subscription-has-been-updated": "Your subscription has been updated.",
-        "failed-to-update-subscription": "Failed to update subscription.",
-        "an-error-occurred-while-updating-your-subscription": "An error occurred while updating your subscription. Please try again."
-      },
-      "cancel-subscription": {
-        "your-subscription-has-been-canceled": "Your subscription has been canceled.",
-        "you-will-not-be-charged-for-the-next-billing-cycle": "You will not be charged for the next billing cycle\nBut you can still access your account until the end of the current period.",
-        "failed-to-cancel-subscription": "Failed to cancel subscription.",
-        "an-error-occurred-while-canceling-your-subscription": "An error occurred while canceling your subscription. Please try again."
-      }
+  "welcome-toast": {
+    "title": "Hey D3v!",
+    "description": "Welcome to Ignite Starter, Wow, the authentication worked perfectly!"
+  },
+  "send-email": {
+    "failed-to-send-email": "Failed to send email. Please try again later.",
+    "email-sent-successfully": "Email sent successfully!"
+  },
+  "subscription": {
+    "plan": "Plan",
+    "developer-access": "Developer Access",
+    "you-have-full-pro-access-as-a-developer": "You have full pro access as a developer",
+    "pro": "Pro",
+    "free-plan": "Free Plan",
+    "pro-plan": "Pro Plan",
+    "active": "Active",
+    "renews-on": "Renews on {date}",
+    "cancel-subscription": "Cancel subscription",
+    "subscription-canceling": "Subscription canceling",
+    "your-pro-access-is-active-until": "Your Pro access is active until <span>{date}</span>. You won't be charged after this date.",
+    "end-of-billing-period": "end of billing period",
+    "renew-subscription": "Renew subscription",
+    "free": "Free",
+    "day": "Day",
+    "month": "Month",
+    "week": "Week",
+    "year": "Year",
+    "current-plan": "Current plan",
+    "recommended": "Recommended",
+    "upgrade-to-pro": "Upgrade to Pro"
+  },
+  "plans": {
+    "cancel": {
+      "subscription-canceled": "Subscription canceled",
+      "your-pro-access-continues-until-the-end-of-the-billing-period": "Your Pro access continues until the end of the billing period.",
+      "failed-to-cancel": "Failed to cancel subscription.",
+      "please-try-again": "Please try again."
+    },
+    "renew": {
+      "subscription-renewed": "Subscription renewed",
+      "your-pro-access-subscription-will-continue-normally": "Your Pro access subscription will continue normally.",
+      "failed-to-renew": "Failed to renew",
+      "please-try-again": "Please try again."
+    }
+  },
+  "features": {
+    "free": {
+      "manual-setup": "Manual setup",
+      "manual-auth-configuration": "Manual auth configuration",
+      "manual-stripe-configuration": "Manual Stripe configuration",
+      "manual-database-setup": "Manual database setup",
+      "manual-email-configuration": "Manual email configuration"
+    },
+    "pro": {
+      "rocket-propulsion": "Rocket propulsion",
+      "preconfigured-auth": "Preconfigured auth",
+      "preconfigured-stripe": "Preconfigured Stripe",
+      "preconfigured-database": "Preconfigured database",
+      "preconfigured-email": "Preconfigured email",
+      "docker-ready": "Docker ready",
+      "production-ready": "Production ready"
     }
   },
   "validation": {

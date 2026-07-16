@@ -4,20 +4,7 @@ export default defineConfig({
   input: `${process.env.API_URL}/openapi/json`,
   output: {
     path: "./generated/api",
-    postProcess: [
-      {
-        args: ["run", "./src/scripts/fix-heyapi-headers.ts"],
-        command: "bun",
-        name: "Fix Hey API headers callback types",
-      },
-      {
-        args: ["run", "./src/scripts/fix-unknown.ts"],
-        command: "bun",
-        name: "Replace unknown with null",
-      },
-      "biome:format",
-      "biome:lint",
-    ],
+    // postProcess: ["biome:format"],
   },
   plugins: [
     "@hey-api/schemas",
@@ -33,7 +20,7 @@ export default defineConfig({
     {
       exportFromIndex: false,
       name: "@hey-api/client-fetch",
-      runtimeConfigPath: "../../src/lib/client/heyapi",
+      runtimeConfigPath: "./src/lib/client/heyapi",
     },
     {
       exportFromIndex: false,

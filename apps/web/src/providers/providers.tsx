@@ -1,12 +1,24 @@
 "use client";
 
+import { Toaster } from "@repo/ui/components/ui/sonner";
+import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
+import { useIsMobile } from "@repo/ui/lib/shadcn";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { PropsWithChildren } from "react";
-import { Toaster } from "@/features/dashboard/components/sonner";
-import { queryClient } from "@/lib/react-query";
+import { getQueryClient } from "@/lib/react-query/query-client";
 
-export function Providers({ children }: PropsWithChildren) {
+function ToasterWithPosition() {
+  const isMobile = useIsMobile();
+
+  return (
+    <Toaster richColors position={isMobile ? "top-center" : "bottom-right"} />
+  );
+}
+
+export function Providers({ children }: Readonly<PropsWithChildren>) {
+  const client = getQueryClient();
+
   return (
     <NextThemesProvider
       attribute="class"
@@ -14,9 +26,11 @@ export function Providers({ children }: PropsWithChildren) {
       enableSystem
       disableTransitionOnChange
     >
-      <QueryClientProvider client={queryClient}>
-        {children}
-        <Toaster richColors />
+      <QueryClientProvider client={client}>
+        <TooltipProvider>
+          {children}
+          <ToasterWithPosition />
+        </TooltipProvider>
       </QueryClientProvider>
     </NextThemesProvider>
   );

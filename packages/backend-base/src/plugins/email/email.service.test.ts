@@ -1,27 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// Set environment variables BEFORE any imports
-process.env.RESEND_API_KEY = "re_test_mock_api_key";
-process.env.EMAIL_FROM = "test@example.com";
-process.env.EMAIL_TO = "recipient@example.com";
-process.env.WEB_URL = "http://localhost:3000";
-
-// Mock the Resend class before any imports using a factory function
-vi.mock("resend", () => {
-  class MockResend {
-    emails = {
-      send: vi.fn(),
-    };
-    constructor(apiKey: string) {
-      // Store for testing if needed
-      this.apiKey = apiKey;
-    }
-    apiKey: string;
-  }
-  return {
-    Resend: MockResend,
-  };
-});
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock the WelcomeEmail component
 vi.mock("@repo/emails/templates", () => ({
@@ -37,6 +14,10 @@ import { EmailService } from "./email.service";
 describe("EmailService", () => {
   let emailService: EmailService;
   let mockLogger: ReturnType<typeof createMockLogger>;
+  // The recipient is now resolved by the caller (e.g. the logged-in user's
+  // email) and passed explicitly to `sendWelcomeEmail`. It no longer comes
+  // from an `EMAIL_TO` environment variable.
+  const emailTo = "recipient@example.com";
 
   beforeEach(() => {
     // Reset all mocks before each test
@@ -50,6 +31,11 @@ describe("EmailService", () => {
   });
 
   describe("environment variables", () => {
+    afterEach(() => {
+      // Always restore stubbed env vars, even if an assertion above throws.
+      vi.unstubAllEnvs();
+    });
+
     it("should use EMAIL_FROM from environment when set", async () => {
       // This test verifies the module loads with env vars set
       expect(process.env.EMAIL_FROM).toBe("test@example.com");
@@ -62,7 +48,7 @@ describe("EmailService", () => {
         headers: null,
       });
 
-      await service.sendWelcomeEmail();
+      await service.sendWelcomeEmail({ emailTo });
 
       // Verify EMAIL_FROM was used in the call
       expect(resend.emails.send).toHaveBeenCalledWith(
@@ -73,32 +59,8 @@ describe("EmailService", () => {
       sendSpy.mockRestore();
     });
 
-    it("should use EMAIL_TO from environment when set", async () => {
-      // This test verifies the module loads with env vars set
-      expect(process.env.EMAIL_TO).toBe("recipient@example.com");
-
-      const service = new EmailService(mockLogger);
-      const mockEmailData = { id: "email-123" };
-      const sendSpy = vi.spyOn(resend.emails, "send").mockResolvedValue({
-        data: mockEmailData,
-        error: null,
-        headers: null,
-      });
-
-      await service.sendWelcomeEmail();
-
-      // Verify EMAIL_TO was used in the call
-      expect(resend.emails.send).toHaveBeenCalledWith(
-        expect.objectContaining({
-          to: "recipient@example.com",
-        }),
-      );
-      sendSpy.mockRestore();
-    });
-
     it("should use empty string when EMAIL_FROM is undefined", async () => {
-      const originalValue = process.env.EMAIL_FROM;
-      delete process.env.EMAIL_FROM;
+      vi.stubEnv("EMAIL_FROM", "");
 
       const service = new EmailService(mockLogger);
       const mockEmailData = { id: "email-123" };
@@ -108,7 +70,7 @@ describe("EmailService", () => {
         headers: null,
       });
 
-      await service.sendWelcomeEmail();
+      await service.sendWelcomeEmail({ emailTo });
 
       // Verify empty string was used when env var is undefined
       expect(resend.emails.send).toHaveBeenCalledWith(
@@ -118,13 +80,11 @@ describe("EmailService", () => {
       );
 
       sendSpy.mockRestore();
-      process.env.EMAIL_FROM = originalValue;
     });
+  });
 
-    it("should use empty string when EMAIL_TO is undefined", async () => {
-      const originalValue = process.env.EMAIL_TO;
-      delete process.env.EMAIL_TO;
-
+  describe("recipient resolution", () => {
+    it("should send to the email address passed as argument", async () => {
       const service = new EmailService(mockLogger);
       const mockEmailData = { id: "email-123" };
       const sendSpy = vi.spyOn(resend.emails, "send").mockResolvedValue({
@@ -133,17 +93,33 @@ describe("EmailService", () => {
         headers: null,
       });
 
-      await service.sendWelcomeEmail();
+      await service.sendWelcomeEmail({ emailTo: "logged-user@example.com" });
 
-      // Verify empty string was used when env var is undefined
       expect(resend.emails.send).toHaveBeenCalledWith(
         expect.objectContaining({
-          to: "",
+          to: "logged-user@example.com",
         }),
       );
-
       sendSpy.mockRestore();
-      process.env.EMAIL_TO = originalValue;
+    });
+
+    it("should use the exact recipient passed in, not any environment fallback", async () => {
+      const service = new EmailService(mockLogger);
+      const mockEmailData = { id: "email-123" };
+      const sendSpy = vi.spyOn(resend.emails, "send").mockResolvedValue({
+        data: mockEmailData,
+        error: null,
+        headers: null,
+      });
+
+      await service.sendWelcomeEmail({ emailTo: "someone-else@example.com" });
+
+      expect(resend.emails.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: "someone-else@example.com",
+        }),
+      );
+      sendSpy.mockRestore();
     });
   });
 
@@ -158,7 +134,7 @@ describe("EmailService", () => {
       });
 
       // Act
-      await emailService.sendWelcomeEmail();
+      await emailService.sendWelcomeEmail({ emailTo });
 
       // Assert
       expect(resend.emails.send).toHaveBeenCalledWith({
@@ -180,7 +156,7 @@ describe("EmailService", () => {
       });
 
       // Act
-      await emailService.sendWelcomeEmail();
+      await emailService.sendWelcomeEmail({ emailTo });
 
       // Assert
       expect(mockLogger.info).toHaveBeenCalledWith({
@@ -201,7 +177,7 @@ describe("EmailService", () => {
       });
 
       // Act
-      const result = await emailService.sendWelcomeEmail();
+      const result = await emailService.sendWelcomeEmail({ emailTo });
 
       // Assert
       expect(result).toEqual(mockEmailData);
@@ -222,10 +198,12 @@ describe("EmailService", () => {
       });
 
       // Act & Assert
-      await expect(emailService.sendWelcomeEmail()).rejects.toThrow(AppError);
+      await expect(emailService.sendWelcomeEmail({ emailTo })).rejects.toThrow(
+        AppError,
+      );
 
       try {
-        await emailService.sendWelcomeEmail();
+        await emailService.sendWelcomeEmail({ emailTo });
       } catch (error) {
         expect(error).toBeInstanceOf(AppError);
         expect((error as AppError).code).toBe(
@@ -253,7 +231,7 @@ describe("EmailService", () => {
 
       // Act
       try {
-        await emailService.sendWelcomeEmail();
+        await emailService.sendWelcomeEmail({ emailTo });
       } catch {
         // Expected to throw
       }
@@ -276,10 +254,12 @@ describe("EmailService", () => {
         .mockRejectedValue(mockException);
 
       // Act & Assert
-      await expect(emailService.sendWelcomeEmail()).rejects.toThrow(AppError);
+      await expect(emailService.sendWelcomeEmail({ emailTo })).rejects.toThrow(
+        AppError,
+      );
 
       try {
-        await emailService.sendWelcomeEmail();
+        await emailService.sendWelcomeEmail({ emailTo });
       } catch (error) {
         expect(error).toBeInstanceOf(AppError);
         expect((error as AppError).code).toBe(EmailErrorCode.EMAIL_SEND_FAILED);
@@ -298,7 +278,7 @@ describe("EmailService", () => {
 
       // Act
       try {
-        await emailService.sendWelcomeEmail();
+        await emailService.sendWelcomeEmail({ emailTo });
       } catch {
         // Expected to throw
       }
@@ -323,33 +303,12 @@ describe("EmailService", () => {
       });
 
       // Act
-      await emailService.sendWelcomeEmail();
+      await emailService.sendWelcomeEmail({ emailTo });
 
       // Assert
       expect(resend.emails.send).toHaveBeenCalledWith(
         expect.objectContaining({
           from: "test@example.com",
-        }),
-      );
-      sendSpy.mockRestore();
-    });
-
-    it("should use correct EMAIL_TO environment variable", async () => {
-      // Arrange
-      const mockEmailData = { id: "email-123" };
-      const sendSpy = vi.spyOn(resend.emails, "send").mockResolvedValue({
-        data: mockEmailData,
-        error: null,
-        headers: null,
-      });
-
-      // Act
-      await emailService.sendWelcomeEmail();
-
-      // Assert
-      expect(resend.emails.send).toHaveBeenCalledWith(
-        expect.objectContaining({
-          to: "recipient@example.com",
         }),
       );
       sendSpy.mockRestore();
@@ -365,7 +324,7 @@ describe("EmailService", () => {
       });
 
       // Act
-      await emailService.sendWelcomeEmail();
+      await emailService.sendWelcomeEmail({ emailTo });
 
       // Assert
       expect(resend.emails.send).toHaveBeenCalledWith(
@@ -393,10 +352,12 @@ describe("EmailService", () => {
         .mockRejectedValue(originalAppError);
 
       // Act & Assert
-      await expect(emailService.sendWelcomeEmail()).rejects.toThrow(AppError);
+      await expect(emailService.sendWelcomeEmail({ emailTo })).rejects.toThrow(
+        AppError,
+      );
 
       try {
-        await emailService.sendWelcomeEmail();
+        await emailService.sendWelcomeEmail({ emailTo });
       } catch (error) {
         // Should preserve the original AppError
         expect(error).toBeInstanceOf(AppError);
@@ -415,10 +376,12 @@ describe("EmailService", () => {
         .mockRejectedValue(genericError);
 
       // Act & Assert
-      await expect(emailService.sendWelcomeEmail()).rejects.toThrow(AppError);
+      await expect(emailService.sendWelcomeEmail({ emailTo })).rejects.toThrow(
+        AppError,
+      );
 
       try {
-        await emailService.sendWelcomeEmail();
+        await emailService.sendWelcomeEmail({ emailTo });
       } catch (error) {
         // Should wrap in AppError
         expect(error).toBeInstanceOf(AppError);
@@ -442,7 +405,7 @@ describe("EmailService", () => {
 
       // Act
       try {
-        await emailService.sendWelcomeEmail();
+        await emailService.sendWelcomeEmail({ emailTo });
       } catch {
         // Expected to throw
       }
@@ -467,7 +430,7 @@ describe("EmailService", () => {
 
       // Act
       try {
-        await emailService.sendWelcomeEmail();
+        await emailService.sendWelcomeEmail({ emailTo });
       } catch {
         // Expected to throw
       }

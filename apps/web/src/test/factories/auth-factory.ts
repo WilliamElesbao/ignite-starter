@@ -1,5 +1,5 @@
+import type { User } from "@repo/api/generated/api/types.gen";
 import type { SignInFormValues } from "@/features/auth/sign-in/hooks/form-schema";
-import type { User } from "@/lib/better-auth/auth.types";
 
 /**
  * Create a mock user object for testing
@@ -15,7 +15,7 @@ export const createMockUser = (overrides: Partial<User> = {}): User => ({
   image: undefined,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  stripeSubscriptionId: undefined,
+  stripeCustomerId: undefined,
   ...overrides,
 });
 

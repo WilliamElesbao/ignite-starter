@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import z from "zod";
 
-export const signInFormSchema = () => {
+export const useSignInFormSchema = () => {
   const t = useTranslations("validation");
 
   return z.object({
@@ -10,4 +10,4 @@ export const signInFormSchema = () => {
   });
 };
 
-export type SignInFormValues = z.infer<ReturnType<typeof signInFormSchema>>;
+export type SignInFormValues = z.infer<ReturnType<typeof useSignInFormSchema>>;

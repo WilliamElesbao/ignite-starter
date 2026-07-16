@@ -58,7 +58,10 @@ const bullBoardPlugin = new Elysia({ tags: ["Admin"] })
     const emailQueueService = new EmailQueueService(state.logger);
 
     // Configure Bull Board with email queue
-    const serverAdapter = new ElysiaAdapter("/admin/queues");
+    const serverAdapter = new ElysiaAdapter({
+      prefix: "/admin/queues",
+      basePath: "/admin/queues",
+    });
 
     // Polyfill require.resolve for @bull-board/api compatibility
     polyfillRequireResolve();

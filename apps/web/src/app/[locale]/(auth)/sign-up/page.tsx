@@ -1,3 +1,1 @@
-import { SignUpPage } from "@/features/auth";
-
-export default SignUpPage;
+export { SignUpPage as default } from "@/features/auth/sign-up/sign-up-page";

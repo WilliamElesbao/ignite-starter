@@ -2,8 +2,18 @@ import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   output: "standalone",
+  cacheComponents: true,
+  reactCompiler: true,
+
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${process.env.API_URL}/:path*`,
+      },
+    ];
+  },
 };
 
 const withNextIntl = createNextIntlPlugin({

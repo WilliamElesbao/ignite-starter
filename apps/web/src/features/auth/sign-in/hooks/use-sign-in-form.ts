@@ -2,9 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { WELCOME_TOAST } from "@/constants";
 import { authClient } from "@/lib/better-auth/auth-client";
-import { type SignInFormValues, signInFormSchema } from "./form-schema";
+import { type SignInFormValues, useSignInFormSchema } from "./form-schema";
 
 /**
  * Manages sign-in form state and submission with email/password authentication.
@@ -13,9 +12,10 @@ import { type SignInFormValues, signInFormSchema } from "./form-schema";
  */
 export const useSignInForm = () => {
   const t = useTranslations("sign-in");
+  const schema = useSignInFormSchema();
 
   const form = useForm<SignInFormValues>({
-    resolver: zodResolver(signInFormSchema()),
+    resolver: zodResolver(schema),
     defaultValues: {
       email: "",
       password: "",
@@ -24,8 +24,6 @@ export const useSignInForm = () => {
   });
 
   const onSubmit = async (values: SignInFormValues) => {
-    sessionStorage.setItem(WELCOME_TOAST.key, WELCOME_TOAST.value);
-
     await authClient.signIn.email(
       {
         ...values,

@@ -1,8 +1,7 @@
 import { FieldDescription } from "@repo/ui/components/ui/field";
+import { IconRocket } from "@tabler/icons-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { GiFox } from "rocketicons/gi";
-import { RcRocketIcon } from "rocketicons/rc";
 
 interface AuthFormHeaderProps {
   mode: "sign-in" | "sign-up";
@@ -14,7 +13,7 @@ export const AuthFormHeader = ({ mode = "sign-in" }: AuthFormHeaderProps) => {
   const content =
     mode === "sign-in"
       ? {
-          icon: <GiFox className="size-8 text-primary" />,
+          icon: <IconRocket className="size-8 text-primary" />,
           description: t("sign-in.dont-have-an-account"),
           link: {
             href: "/sign-up",
@@ -22,7 +21,7 @@ export const AuthFormHeader = ({ mode = "sign-in" }: AuthFormHeaderProps) => {
           },
         }
       : {
-          icon: <RcRocketIcon className="size-6 text-primary" />,
+          icon: <IconRocket className="size-8 text-primary" />,
           description: t("sign-up.already-have-an-account"),
           link: {
             href: "/sign-in",

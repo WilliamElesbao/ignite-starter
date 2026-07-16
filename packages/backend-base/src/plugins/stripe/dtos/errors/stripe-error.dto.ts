@@ -8,6 +8,10 @@ export const stripeInternalErrorDto = createErrorDto([
   StripeErrorCode.STRIPE_INTERNAL_SERVER_ERROR,
 ] as const);
 
+export const stripeProductsNotFoundErrorDto = createErrorDto([
+  StripeErrorCode.STRIPE_PRODUCTS_NOT_FOUND,
+] as const);
+
 export const stripeProductsErrorDto = createErrorDto([
   StripeErrorCode.STRIPE_PRICES_LIST_FAILED,
   StripeErrorCode.STRIPE_PRODUCTS_LIST_FAILED,

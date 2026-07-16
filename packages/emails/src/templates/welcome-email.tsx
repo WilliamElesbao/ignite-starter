@@ -18,7 +18,7 @@ import {
   Preview,
   Tailwind,
   Text,
-} from "@react-email/components";
+} from "react-email";
 
 /**
  * Props for the Welcome Email

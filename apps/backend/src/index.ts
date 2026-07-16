@@ -5,7 +5,6 @@ import {
   OpenAPI,
   stripePlugin,
   subscriptionExpirationCron,
-  userPlugin,
 } from "@repo/backend-base";
 import { logger } from "@repo/backend-base/src/lib/logger";
 import { Elysia } from "elysia";
@@ -19,7 +18,6 @@ const app = new Elysia()
       documentation: {
         tags: [
           { name: "Better Auth", description: "Authentication endpoints" },
-          { name: "User", description: "Endpoints related to user management" },
           {
             name: "Email",
             description: "Endpoints related to email functionality",
@@ -39,7 +37,6 @@ const app = new Elysia()
     }),
   )
   .use(subscriptionExpirationCron)
-  .use(userPlugin)
   .use(emailPlugin) // Email plugin includes bullBoardPlugin
   .use(stripePlugin);
 

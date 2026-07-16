@@ -3,10 +3,9 @@
  */
 
 import { toast } from "sonner";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { WELCOME_TOAST } from "@/constants";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authClient } from "@/lib/better-auth/auth-client";
-import { mockSessionStorage } from "@/test/setup";
+import { logger } from "@/utils/logger";
 import { signInWithGoogle } from "./sign-in";
 
 // Mock authClient
@@ -26,31 +25,30 @@ vi.mock("sonner", () => ({
   },
 }));
 
-describe("signInWithGoogle", () => {
-  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+// Mock logger
+vi.mock("@/utils/logger", () => ({
+  logger: {
+    error: vi.fn(),
+  },
+}));
 
+describe("signInWithGoogle", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockSessionStorage.clear();
-    consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    consoleErrorSpy.mockRestore();
   });
 
   it('should call authClient.signIn.social with provider "google"', async () => {
     const mockSignInSocial = authClient.signIn.social as ReturnType<
       typeof vi.fn
     >;
-    mockSignInSocial.mockResolvedValue(undefined);
+    mockSignInSocial.mockResolvedValue({ error: null });
 
     await signInWithGoogle();
 
     expect(mockSignInSocial).toHaveBeenCalledWith(
       {
         provider: "google",
-        callbackURL: "http://localhost:3000",
+        callbackURL: "http://localhost:3000/subscription",
       },
       expect.objectContaining({
         onError: expect.any(Function),
@@ -58,85 +56,34 @@ describe("signInWithGoogle", () => {
     );
   });
 
-  it("should store welcome toast flag before authentication", async () => {
-    const mockSignInSocial = authClient.signIn.social as ReturnType<
-      typeof vi.fn
-    >;
-    mockSignInSocial.mockResolvedValue(undefined);
-
-    await signInWithGoogle();
-
-    expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
-      WELCOME_TOAST.key,
-      WELCOME_TOAST.value,
-    );
-  });
-
   it("should include correct callbackURL", async () => {
     const mockSignInSocial = authClient.signIn.social as ReturnType<
       typeof vi.fn
     >;
-    mockSignInSocial.mockResolvedValue(undefined);
+    mockSignInSocial.mockResolvedValue({ error: null });
 
     await signInWithGoogle();
 
     expect(mockSignInSocial).toHaveBeenCalledWith(
       expect.objectContaining({
-        callbackURL: "http://localhost:3000",
+        callbackURL: "http://localhost:3000/subscription",
       }),
       expect.any(Object),
     );
-  });
-
-  it("should display error toast on failure", async () => {
-    const mockSignInSocial = authClient.signIn.social as ReturnType<
-      typeof vi.fn
-    >;
-    const mockToastError = toast.error as ReturnType<typeof vi.fn>;
-
-    // Simulate onError callback being invoked
-    mockSignInSocial.mockImplementation(async (_, options) => {
-      if (options?.onError) {
-        options.onError({
-          error: {
-            message: "Google authentication failed",
-          },
-        });
-      }
-    });
-
-    await signInWithGoogle();
-
-    expect(mockToastError).toHaveBeenCalledWith("Google sign-in failed", {
-      description: "Google authentication failed",
-    });
-  });
-
-  it("should log and re-throw exceptions", async () => {
-    const mockSignInSocial = authClient.signIn.social as ReturnType<
-      typeof vi.fn
-    >;
-    const testError = new Error("Network error");
-
-    mockSignInSocial.mockRejectedValue(testError);
-
-    await expect(signInWithGoogle()).rejects.toThrow("Network error");
-
-    expect(consoleErrorSpy).toHaveBeenCalledWith("[signIn] error:", testError);
   });
 
   it("should use NEXT_PUBLIC_BASE_URL from environment", async () => {
     const mockSignInSocial = authClient.signIn.social as ReturnType<
       typeof vi.fn
     >;
-    mockSignInSocial.mockResolvedValue(undefined);
+    mockSignInSocial.mockResolvedValue({ error: null });
 
     // Environment variable is already set in setup.ts
     await signInWithGoogle();
 
     expect(mockSignInSocial).toHaveBeenCalledWith(
       expect.objectContaining({
-        callbackURL: process.env.NEXT_PUBLIC_BASE_URL,
+        callbackURL: `${process.env.NEXT_PUBLIC_BASE_URL}/subscription`,
       }),
       expect.any(Object),
     );
@@ -146,7 +93,7 @@ describe("signInWithGoogle", () => {
     const mockSignInSocial = authClient.signIn.social as ReturnType<
       typeof vi.fn
     >;
-    mockSignInSocial.mockResolvedValue(undefined);
+    mockSignInSocial.mockResolvedValue({ error: null });
 
     // Temporarily remove the environment variable
     const originalBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -156,7 +103,7 @@ describe("signInWithGoogle", () => {
 
     expect(mockSignInSocial).toHaveBeenCalledWith(
       expect.objectContaining({
-        callbackURL: "http://localhost:3000",
+        callbackURL: "http://localhost:3000/subscription",
       }),
       expect.any(Object),
     );
@@ -165,148 +112,114 @@ describe("signInWithGoogle", () => {
     process.env.NEXT_PUBLIC_BASE_URL = originalBaseUrl;
   });
 
-  it("should set welcome toast flag before calling authClient", async () => {
-    const mockSignInSocial = authClient.signIn.social as ReturnType<
-      typeof vi.fn
-    >;
-    const callOrder: string[] = [];
+  describe("when the API returns an error in the response", () => {
+    it("should display error toast via the onError callback", async () => {
+      const mockSignInSocial = authClient.signIn.social as ReturnType<
+        typeof vi.fn
+      >;
+      const mockToastError = toast.error as ReturnType<typeof vi.fn>;
+      const apiError = { message: "Google authentication failed" };
 
-    // Track the order of calls
-    const mockSetItem = mockSessionStorage.setItem as ReturnType<typeof vi.fn>;
-    mockSetItem.mockImplementation(() => {
-      callOrder.push("sessionStorage.setItem");
-    });
-
-    mockSignInSocial.mockImplementation(async () => {
-      callOrder.push("authClient.signIn.social");
-    });
-
-    await signInWithGoogle();
-
-    expect(callOrder).toEqual([
-      "sessionStorage.setItem",
-      "authClient.signIn.social",
-    ]);
-  });
-
-  it("should pass error context to toast notification", async () => {
-    const mockSignInSocial = authClient.signIn.social as ReturnType<
-      typeof vi.fn
-    >;
-    const mockToastError = toast.error as ReturnType<typeof vi.fn>;
-
-    const errorMessage = "OAuth provider returned an error";
-
-    mockSignInSocial.mockImplementation(async (_, options) => {
-      if (options?.onError) {
-        options.onError({
-          error: {
-            message: errorMessage,
-          },
-        });
-      }
-    });
-
-    await signInWithGoogle();
-
-    expect(mockToastError).toHaveBeenCalledWith(
-      "Google sign-in failed",
-      expect.objectContaining({
-        description: errorMessage,
-      }),
-    );
-  });
-
-  it("should handle different error messages from OAuth provider", async () => {
-    const mockSignInSocial = authClient.signIn.social as ReturnType<
-      typeof vi.fn
-    >;
-    const mockToastError = toast.error as ReturnType<typeof vi.fn>;
-
-    const errorMessages = [
-      "Access denied",
-      "Invalid OAuth state",
-      "User cancelled authentication",
-    ];
-
-    for (const errorMessage of errorMessages) {
-      vi.clearAllMocks();
-
+      // better-auth invokes onError AND resolves the promise with { error }
       mockSignInSocial.mockImplementation(async (_, options) => {
-        if (options?.onError) {
-          options.onError({
-            error: {
-              message: errorMessage,
-            },
-          });
-        }
+        options?.onError?.({ error: apiError });
+        return { error: apiError };
       });
 
-      await signInWithGoogle();
+      try {
+        await signInWithGoogle();
+      } catch {
+        // Expected: signInWithGoogle throws when the response contains an error
+      }
 
       expect(mockToastError).toHaveBeenCalledWith("Google sign-in failed", {
-        description: errorMessage,
+        description: apiError.message,
       });
-    }
-  });
+    });
 
-  it("should handle empty error message", async () => {
-    const mockSignInSocial = authClient.signIn.social as ReturnType<
-      typeof vi.fn
-    >;
-    const mockToastError = toast.error as ReturnType<typeof vi.fn>;
+    it("should log the error via logger and throw it", async () => {
+      const mockSignInSocial = authClient.signIn.social as ReturnType<
+        typeof vi.fn
+      >;
+      const apiError = { message: "Invalid credentials" };
+      mockSignInSocial.mockResolvedValue({ error: apiError });
 
-    mockSignInSocial.mockImplementation(async (_, options) => {
-      if (options?.onError) {
-        options.onError({
-          error: {
-            message: "",
-          },
+      await expect(signInWithGoogle()).rejects.toEqual(apiError);
+
+      expect(logger.error).toHaveBeenCalledWith("[signIn] error:", apiError);
+    });
+
+    it("should handle different error messages from OAuth provider", async () => {
+      const mockSignInSocial = authClient.signIn.social as ReturnType<
+        typeof vi.fn
+      >;
+      const mockToastError = toast.error as ReturnType<typeof vi.fn>;
+
+      const errorMessages = [
+        "Access denied",
+        "Invalid OAuth state",
+        "User cancelled authentication",
+      ];
+
+      for (const errorMessage of errorMessages) {
+        vi.clearAllMocks();
+        const apiError = { message: errorMessage };
+
+        mockSignInSocial.mockImplementation(async (_, options) => {
+          options?.onError?.({ error: apiError });
+          return { error: apiError };
+        });
+
+        try {
+          await signInWithGoogle();
+        } catch {
+          // Expected: throws after logging
+        }
+
+        expect(mockToastError).toHaveBeenCalledWith("Google sign-in failed", {
+          description: errorMessage,
         });
       }
     });
 
-    await signInWithGoogle();
+    it("should handle empty error message", async () => {
+      const mockSignInSocial = authClient.signIn.social as ReturnType<
+        typeof vi.fn
+      >;
+      const mockToastError = toast.error as ReturnType<typeof vi.fn>;
+      const apiError = { message: "" };
 
-    expect(mockToastError).toHaveBeenCalledWith("Google sign-in failed", {
-      description: "",
+      mockSignInSocial.mockImplementation(async (_, options) => {
+        options?.onError?.({ error: apiError });
+        return { error: apiError };
+      });
+
+      try {
+        await signInWithGoogle();
+      } catch {
+        // Expected: throws after logging
+      }
+
+      expect(mockToastError).toHaveBeenCalledWith("Google sign-in failed", {
+        description: "",
+      });
     });
   });
 
-  it("should still set welcome toast flag even if authentication throws", async () => {
-    const mockSignInSocial = authClient.signIn.social as ReturnType<
-      typeof vi.fn
-    >;
+  describe("when authClient.signIn.social rejects outright", () => {
+    it("should propagate the exception without logging it", async () => {
+      const mockSignInSocial = authClient.signIn.social as ReturnType<
+        typeof vi.fn
+      >;
+      const testError = new Error("Connection timeout");
+      mockSignInSocial.mockRejectedValue(testError);
 
-    mockSignInSocial.mockRejectedValue(new Error("Network error"));
+      await expect(signInWithGoogle()).rejects.toThrow("Connection timeout");
 
-    try {
-      await signInWithGoogle();
-    } catch {
-      // Expected to throw
-    }
-
-    // Welcome toast should still be set before the error
-    expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
-      WELCOME_TOAST.key,
-      WELCOME_TOAST.value,
-    );
-  });
-
-  it("should log exception details before re-throwing", async () => {
-    const mockSignInSocial = authClient.signIn.social as ReturnType<
-      typeof vi.fn
-    >;
-    const testError = new Error("Connection timeout");
-
-    mockSignInSocial.mockRejectedValue(testError);
-
-    try {
-      await signInWithGoogle();
-    } catch (error: unknown) {
-      expect(error).toBe(testError);
-    }
-
-    expect(consoleErrorSpy).toHaveBeenCalledWith("[signIn] error:", testError);
+      // No try/catch wraps the call in signInWithGoogle, so a rejected
+      // promise propagates directly — logger.error is only reached when
+      // the API responds successfully but with an `error` field.
+      expect(logger.error).not.toHaveBeenCalled();
+    });
   });
 });

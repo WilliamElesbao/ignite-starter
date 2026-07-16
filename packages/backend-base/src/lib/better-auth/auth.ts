@@ -1,10 +1,15 @@
-import { db } from "@repo/db";
+import { stripe } from "@better-auth/stripe";
+import { db, schema } from "@repo/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
+import { eq } from "drizzle-orm";
+import type Stripe from "stripe";
+import { WELCOME_COOKIE } from "../../constants/welcome-cookie";
 import { env } from "../../env";
 import redisClient from "../../shared/redis.client";
 import { logger } from "../logger";
+import { stripeClient } from "../stripe/stripe-client";
 
 export const auth = betterAuth({
   basePath: "/auth",
@@ -29,7 +34,55 @@ export const auth = betterAuth({
       logger.info(metadata);
     },
   },
-  plugins: [openAPI()],
+  plugins: [
+    openAPI(),
+    stripe({
+      onCustomerCreate: async (_data, ctx) => {
+        ctx.setCookie(WELCOME_COOKIE.key, WELCOME_COOKIE.value, {
+          maxAge: 60,
+          path: "/",
+        });
+        // Resend sandbox mode only allows sending emails to the account owner's email address.
+        // Verify a domain and use a matching `from` address to send emails to other recipients.
+        // new EmailService(logger).sendWelcomeEmail({ emailTo: data.user.email });
+      },
+      stripeClient,
+      stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
+      createCustomerOnSignUp: true,
+      subscription: {
+        enabled: true,
+        plans: async () => {
+          // Fetch directly from Stripe
+          const { data } = await stripeClient.products.list({
+            active: true,
+            expand: ["data.default_price"],
+          });
+
+          return data.map((product) => ({
+            name: product.name.toLowerCase(), // match your needs
+            priceId: (product.default_price as Stripe.Price).id,
+          }));
+        },
+        onSubscriptionComplete: async ({ subscription }) => {
+          logger.info(
+            "[Subscription Complete] Revalidating user plan cache for userId: " +
+              subscription.referenceId,
+          );
+
+          await db
+            .update(schema.users)
+            .set({ stripeCustomerId: subscription.stripeCustomerId })
+            .where(eq(schema.users.id, subscription.referenceId));
+        },
+        onSubscriptionUpdate: async ({ subscription }) => {
+          logger.info(`[Subscription Update]:${subscription.referenceId}`);
+        },
+        onSubscriptionCancel: async ({ subscription }) => {
+          logger.info(`[Subscription Cancel]:${subscription.referenceId}`);
+        },
+      },
+    }),
+  ],
   secondaryStorage: {
     get: async (key) => await redisClient.get(key),
     set: async (key, value, ttl) => {
@@ -49,15 +102,6 @@ export const auth = betterAuth({
       generateId: false,
     },
   },
-  user: {
-    additionalFields: {
-      stripeSubscriptionId: {
-        type: "string",
-        required: false,
-        input: false,
-      },
-    },
-  },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     cookieCache: {
@@ -68,10 +112,6 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
-    password: {
-      hash: (password) => Bun.password.hash(password),
-      verify: ({ password, hash }) => Bun.password.verify(password, hash),
-    },
   },
   socialProviders: {
     google: {

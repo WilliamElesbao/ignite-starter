@@ -1,5 +1,5 @@
 import { t } from "elysia";
 
 export const SubscriptionResponseDto = t.Object({
-  url: t.String(),
+  url: t.Optional(t.String({ format: "uri" })),
 });

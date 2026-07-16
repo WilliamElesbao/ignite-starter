@@ -1,27 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// Mock the env module
-vi.mock("../../../env", () => ({
-  env: {
-    DATABASE_URL: "postgresql://test:test@localhost:5432/test",
-    REDIS_URL: "redis://localhost:6379",
-    WEB_URL: "http://localhost:3000",
-    GOOGLE_CLIENT_ID: "test-google-client-id",
-    GOOGLE_CLIENT_SECRET: "test-google-client-secret",
-    STRIPE_SECRET_KEY: "sk_test_mock",
-    STRIPE_WEBHOOK_SECRET: "whsec_test_mock",
-  },
-}));
-
-// Mock resend module
-vi.mock("../../../lib/resend", () => ({
-  resend: {
-    emails: {
-      send: vi.fn(),
-    },
-  },
-}));
-
 // Mock BullMQ Worker
 vi.mock("bullmq", () => {
   class MockWorker {
