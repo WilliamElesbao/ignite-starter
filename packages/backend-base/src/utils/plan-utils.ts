@@ -1,52 +1,55 @@
+import type { schema } from "@repo/db";
 import type { SubscriptionDetailsResponse } from "../plugins/stripe/dtos/subscription/subscription-details-response.dto";
 
-interface SubscriptionSnapshot {
-  status: string;
-  periodEnd: Date | null;
-  cancelAt: Date | null;
-  cancelAtPeriodEnd: boolean;
-  stripeSubscriptionId: string | null;
-}
+type SubscriptionSnapshot = Pick<
+  typeof schema.subscriptions.$inferSelect,
+  | "status"
+  | "periodEnd"
+  | "cancelAt"
+  | "cancelAtPeriodEnd"
+  | "stripeSubscriptionId"
+>;
+
+const FREE_PLAN: SubscriptionDetailsResponse = {
+  tier: "free",
+  status: "free",
+  periodEnd: undefined,
+  isProAccess: false,
+  stripeSubscriptionId: undefined,
+};
+
+const WHITELISTED_PLAN: SubscriptionDetailsResponse = {
+  tier: "pro",
+  status: "whitelisted",
+  periodEnd: undefined,
+  isProAccess: true,
+  stripeSubscriptionId: undefined,
+};
 
 export function resolvePlan(
-  subscription: SubscriptionSnapshot | null,
-  isWhitelisted: boolean,
+  subscription?: SubscriptionSnapshot | null,
+  isWhitelisted?: boolean,
 ): SubscriptionDetailsResponse {
   if (isWhitelisted) {
-    return {
-      tier: "pro",
-      status: "whitelisted",
-      periodEnd: undefined,
-      isProAccess: true,
-      stripeSubscriptionId: undefined,
-    };
+    return WHITELISTED_PLAN;
   }
 
   if (subscription?.status !== "active") {
-    return {
-      tier: "free",
-      status: "free",
-      periodEnd: undefined,
-      isProAccess: false,
-      stripeSubscriptionId: undefined,
-    };
+    return FREE_PLAN;
   }
 
-  if (subscription.cancelAt || subscription.cancelAtPeriodEnd) {
-    return {
-      tier: "pro",
-      status: "canceling",
-      periodEnd: subscription.periodEnd?.toISOString(),
-      isProAccess: true,
-      stripeSubscriptionId: subscription.stripeSubscriptionId ?? undefined,
-    };
-  }
+  const proPlan = {
+    tier: "pro" as const,
+    isProAccess: true,
+    periodEnd: subscription.periodEnd?.toISOString(),
+    stripeSubscriptionId: subscription.stripeSubscriptionId ?? undefined,
+  };
 
   return {
-    tier: "pro",
-    status: "active",
-    periodEnd: subscription.periodEnd?.toISOString(),
-    isProAccess: true,
-    stripeSubscriptionId: subscription.stripeSubscriptionId ?? undefined,
+    ...proPlan,
+    status:
+      subscription.cancelAt !== null || subscription.cancelAtPeriodEnd
+        ? "canceling"
+        : "active",
   };
 }

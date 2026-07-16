@@ -22,17 +22,6 @@ export class SubscriptionService {
       },
     });
 
-    return resolvePlan(
-      subscription
-        ? {
-            status: subscription.status ?? "inactive",
-            periodEnd: subscription.periodEnd,
-            cancelAt: subscription.cancelAt,
-            cancelAtPeriodEnd: subscription.cancelAtPeriodEnd ?? false,
-            stripeSubscriptionId: subscription.stripeSubscriptionId,
-          }
-        : null,
-      whitelistedEmails.includes(userEmail),
-    );
+    return resolvePlan(subscription, whitelistedEmails.includes(userEmail));
   }
 }
