@@ -2,7 +2,6 @@ import { Elysia, t } from "elysia";
 import { AppError } from "../../shared/errors/app-error";
 import { toErrorResponse } from "../../shared/errors/to-error-response";
 import shared from "../../shared/shared.plugin";
-import { AUTH_ERROR_MAP, AuthErrorCode } from "../auth/auth.errors";
 import authPlugin from "../auth/auth.plugin";
 import {
   stripeCreateSubscription404ErrorDto,
@@ -95,13 +94,6 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
       .post(
         "/subscription",
         async ({ request, store: { stripeService }, body, user }) => {
-          if (!user) {
-            throw AppError.fromCatalog({
-              code: AuthErrorCode.AUTH_UNAUTHORIZED,
-              catalog: AUTH_ERROR_MAP,
-            });
-          }
-
           const { url } = await stripeService.upgradeSubscription({
             ...body,
             user,
@@ -126,13 +118,6 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
       .patch(
         "/subscription",
         async ({ store: { stripeService }, set, user }) => {
-          if (!user) {
-            throw AppError.fromCatalog({
-              code: AuthErrorCode.AUTH_UNAUTHORIZED,
-              catalog: AUTH_ERROR_MAP,
-            });
-          }
-
           await stripeService.renewSubscription({
             user,
           });
@@ -155,13 +140,6 @@ const stripePlugin = new Elysia({ tags: ["Stripe"] })
       .patch(
         "/subscription/cancel",
         async ({ store: { stripeService }, set, user }) => {
-          if (!user) {
-            throw AppError.fromCatalog({
-              code: AuthErrorCode.AUTH_UNAUTHORIZED,
-              catalog: AUTH_ERROR_MAP,
-            });
-          }
-
           await stripeService.cancelSubscription({ user });
 
           set.status = 204;
