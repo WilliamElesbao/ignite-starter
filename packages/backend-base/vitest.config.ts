@@ -16,21 +16,6 @@ export default defineConfig({
       // Mock Bun's randomUUIDv7 for Vitest
       bun: new URL("./src/test/mocks/bun.mock.ts", import.meta.url).pathname,
     },
-    env: {
-      // Set required environment variables for tests
-      VITEST: "true",
-      NODE_ENV: "test",
-      RESEND_API_KEY: "re_test_mock_api_key",
-      EMAIL_FROM: "test@example.com",
-      EMAIL_TO: "recipient@example.com",
-      DATABASE_URL: "postgresql://test:test@localhost:5432/test",
-      REDIS_URL: "redis://localhost:6379",
-      WEB_URL: "http://localhost:3000",
-      GOOGLE_CLIENT_ID: "test-google-client-id",
-      GOOGLE_CLIENT_SECRET: "test-google-client-secret",
-      STRIPE_API_KEY: "sk_test_mock",
-      STRIPE_WEBHOOK_SECRET: "whsec_test_mock",
-    },
     coverage: {
       thresholds: {
         lines: 80,
@@ -49,19 +34,3 @@ export default defineConfig({
     },
   },
 });
-
-// Ensure environment variables are set in Bun.env for tests
-if (typeof Bun !== "undefined" && Bun.env) {
-  Object.assign(Bun.env, {
-    RESEND_API_KEY: "re_test_mock_api_key",
-    EMAIL_FROM: "test@example.com",
-    EMAIL_TO: "recipient@example.com",
-    DATABASE_URL: "postgresql://test:test@localhost:5432/test",
-    REDIS_URL: "redis://localhost:6379",
-    WEB_URL: "http://localhost:3000",
-    GOOGLE_CLIENT_ID: "test-google-client-id",
-    GOOGLE_CLIENT_SECRET: "test-google-client-secret",
-    STRIPE_API_KEY: "sk_test_mock",
-    STRIPE_WEBHOOK_SECRET: "whsec_test_mock",
-  });
-}

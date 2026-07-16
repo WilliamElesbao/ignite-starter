@@ -1,27 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// Set environment variables BEFORE any imports
-process.env.RESEND_API_KEY = "re_test_mock_api_key";
-process.env.EMAIL_FROM = "test@example.com";
-process.env.WEB_URL = "http://localhost:3000";
-
-// Mock the Resend class before any imports using a factory function
-vi.mock("resend", () => {
-  class MockResend {
-    emails = {
-      send: vi.fn(),
-    };
-    constructor(apiKey: string) {
-      // Store for testing if needed
-      this.apiKey = apiKey;
-    }
-    apiKey: string;
-  }
-  return {
-    Resend: MockResend,
-  };
-});
-
 // Mock the WelcomeEmail component
 vi.mock("@repo/emails/templates", () => ({
   WelcomeEmail: vi.fn(() => "MockedWelcomeEmail"),

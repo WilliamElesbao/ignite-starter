@@ -8,7 +8,7 @@ const envVars = {
   DATABASE_URL: "postgresql://test:test@localhost:5432/test",
   REDIS_URL: "redis://localhost:6379",
   WEB_URL: "http://localhost:3000",
-  GOOGLE_CLIENT_ID: "test-google-client-id",
+  GOOGLE_CLIENT_ID: "test-google-client-id.apps.googleusercontent.com",
   GOOGLE_CLIENT_SECRET: "test-google-client-secret",
   STRIPE_API_KEY: "sk_test_mock",
   STRIPE_WEBHOOK_SECRET: "whsec_test_mock",
