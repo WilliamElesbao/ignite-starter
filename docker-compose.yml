@@ -37,7 +37,7 @@ services:
   stripe:
     image: stripe/stripe-cli:latest
     container_name: stripe-webhook
-    command: listen --forward-to http://host.docker.internal:3333/stripe/webhook
+    command: listen --forward-to http://host.docker.internal:3333/auth/stripe/webhook
     env_file:
       - ./apps/backend/.env
     depends_on:
