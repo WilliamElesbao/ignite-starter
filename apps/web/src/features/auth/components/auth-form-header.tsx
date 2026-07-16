@@ -21,7 +21,7 @@ export const AuthFormHeader = ({ mode = "sign-in" }: AuthFormHeaderProps) => {
           },
         }
       : {
-          icon: <IconRocket className="size-6 text-primary" />,
+          icon: <IconRocket className="size-8 text-primary" />,
           description: t("sign-up.already-have-an-account"),
           link: {
             href: "/sign-in",
