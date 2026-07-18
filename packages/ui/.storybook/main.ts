@@ -15,7 +15,7 @@ const config: StorybookConfig = {
     getAbsolutePath("@storybook/addon-docs"),
     getAbsolutePath("@storybook/addon-mcp"),
   ],
-  framework: "@storybook/react-vite",
+  framework: getAbsolutePath("@storybook/react-vite"),
 };
 export default config;
 
