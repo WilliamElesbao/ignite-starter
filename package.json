@@ -15,7 +15,8 @@
     "check:all": "for d in web backend; do (cd apps/$d && bun biome format . --write && bun biome lint . && bun tsc --noEmit); done && for d in database backend-base api ui emails; do (cd packages/$d && bun biome format . --write && bun biome lint . && bun tsc --noEmit); done",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
-    "syncpack": "syncpack lint"
+    "syncpack": "syncpack lint",
+    "postinstall": "bun scripts/postinstall.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.4",
