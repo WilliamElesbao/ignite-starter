@@ -33,7 +33,7 @@ jobs:
         run: bun install
 
       - name: Install Playwright browsers
-        run: bunx playwright install --with-deps chromium
+        run: bunx playwright install
 
       - name: Lint
         run: bun run ci
