@@ -1,6 +1,6 @@
 services:
   redis:
-    container_name: redis
+    container_name: ignite-starter-redis
     image: redis:8.6-alpine
     restart: always
     ports:
@@ -11,20 +11,18 @@ services:
     # volumes:
     #   - ./.docker/redis:/data
 
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    container_name: redis-commander
-    restart: always
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: ignite-starter-redis-insight
+    restart: unless-stopped
     ports:
-      - "8081:8081"
-    environment:
-      - REDIS_HOSTS=local:redis:6379:0:abcd1234
+      - "8888:5540"
     depends_on:
       - redis
 
   database:
     image: postgres:latest
-    container_name: database
+    container_name: ignite-starter-database
     environment:
       POSTGRES_DB: ignite-starter
       POSTGRES_USER: postgres_user
@@ -36,7 +34,7 @@ services:
 
   stripe:
     image: stripe/stripe-cli:latest
-    container_name: stripe-webhook
+    container_name: ignite-starter-stripe-webhook
     command: listen --forward-to http://host.docker.internal:3333/auth/stripe/webhook
     env_file:
       - ./apps/backend/.env
@@ -45,7 +43,7 @@ services:
 
   jaeger:
     image: jaegertracing/all-in-one:latest
-    container_name: jaeger
+    container_name: ignite-starter-jaeger
     ports:
       - "16686:16686" # Jaeger UI
       - "4318:4318" # OTLP HTTP receiver (traces)
